@@ -37,7 +37,7 @@ ID 	[a-zA-Z][a-zA-Z0-9]*
 
  /* Keywords */
 PROGRAM|BEGIN|END|FUNCTION|READ|WRITE|IF|ELSE|ENDIF|WHILE|ENDWHILE|RETURN|INT|VOID|STRING|FLOAT|TRUE|FALSE {
-	printf("KEYWORD (Value = \"%\"s)\n", yytext);
+	printf("KEYWORD (Value = \"%s\")\n", yytext);
 }
  /* other Keywords */
 FOR|ENDFOR|CONTINUE|BREAK {
