@@ -1,8 +1,13 @@
 %{
 #include <math.h>
+#include <cstdio>
+#include <iostream>
+#include <fstream>
+using namespace std;
 %}
+%option noyywrap
 DIGIT [0-9]
-ID 	[a-z][a-z0-9]*	
+ID 	[a-zA-Z][a-zA-Z0-9]*	
 
 %%
  /* INTLITERAL */
@@ -14,17 +19,17 @@ ID 	[a-z][a-z0-9]*
 
  /* INTLITERAL */
 {DIGIT}+ {
-		printf("An integer: %s (%d)\n",yytext, atoi(yytext))
+		printf("An integer: %s (%d)\n",yytext, atoi(yytext));
 		}
 
  /* FLOATLITERAL */
 {DIGIT}+"."{DIGIT}* {
-		printf("An float: %s (%g)\n", yytext, atof(yytext))
+		printf("An float: %s (%g)\n", yytext, atof(yytext));
 		}
 
  /* STRINGLITERAL */		
 \"[^\"]\" {
-		printf("A string: %s\n", yytext)
+		printf("A string: %s\n", yytext);
 }
 
  /* COMMENT */ 
@@ -36,7 +41,7 @@ PROGRAM|BEGIN|END|FUNCTION|READ|WRITE|IF|ELSE|ENDIF|WHILE|ENDWHILE|RETURN|INT|VO
 }
  /* other Keywords */
 FOR|ENDFOR|CONTINUE|BREAK {
-	printf("A Keyword: %s\n" yytext);
+	printf("A Keyword: %s\n", yytext);
 }
 
  /* Operators */
@@ -51,13 +56,13 @@ FOR|ENDFOR|CONTINUE|BREAK {
 
 %%
 
-int mian(int argc, char **argv){
-	++argv; --argc;
-	if (argc){
-		yyin = fopen(argv[0],"r");
+int main(int argc, char **argv){
+	ifstream* fs = new ifstream();
+	if (argc > 0){
+		fs -> open(argv[1], ios::in);
 	}
-	else{
-		yyin = stdin;
-	}
-	yylex();
+	FlexLexer* lexer = new yyFlexLexer(fs);
+	lexer->yylex();
+
+	return 0;
 }
