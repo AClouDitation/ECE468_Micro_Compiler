@@ -4,3 +4,11 @@ team:
 	@echo "qiao22"
 	@echo "Shutao Wang"
 	@echo "wang2590"
+
+compiler:
+	flex -+ scanner.l
+	g++	lex.yy.cc -o compiler -ll
+
+clean:
+	rm lex.yy.cc -rf
+
