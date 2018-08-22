@@ -31,11 +31,13 @@ ID 	[a-z][a-z0-9]*
 --[\s]*\n
 
  /* Keywords */
-PROGRAM|BEGIN|END|FUNCTION|READ|WRITE|
-IF|ELSE|ENDIF|WHILE|ENDWHILE|RETURN|INT|
-VOID|STRING|FLOAT|TRUE|FALSE|
+PROGRAM|BEGIN|END|FUNCTION|READ|WRITE|IF|ELSE|ENDIF|WHILE|ENDWHILE|RETURN|INT|VOID|STRING|FLOAT|TRUE|FALSE {
+	printf("A Keyword: %s\n", yytext);
+}
  /* other Keywords */
-FOR|ENDFOR|CONTINUE|BREAK
+FOR|ENDFOR|CONTINUE|BREAK {
+	printf("A Keyword: %s\n" yytext);
+}
 
  /* Operators */
 ":="|"+"|"-"|"*"|"/"|"="|"!="|"<"|">"|"("|")"|";"|","|"<="|">=" {
