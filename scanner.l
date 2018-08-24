@@ -13,10 +13,11 @@ ID 	[_a-zA-Z][_a-zA-Z0-9]*
 %%
 
  /* rm whitespace */
-([ \r\n\t]+) {
+[ \r\n\t]+ {
 }
 
  /* Keywords */
+ /* TODO: categorize this */
 PROGRAM|BEGIN|END|FUNCTION|READ|WRITE|IF|ELSE|ENDIF|WHILE|ENDWHILE|RETURN|INT|VOID|STRING|FLOAT|TRUE|FALSE {
 	printf("Token Type: ");
 	printf("KEYWORD\n");
@@ -24,6 +25,7 @@ PROGRAM|BEGIN|END|FUNCTION|READ|WRITE|IF|ELSE|ENDIF|WHILE|ENDWHILE|RETURN|INT|VO
 }
 
  /* other Keywords */
+ /* TODO: categorize this */
 FOR|ENDFOR|CONTINUE|BREAK {
 	printf("Token Type: ");
 	printf("KEYWORD\n");
@@ -31,7 +33,8 @@ FOR|ENDFOR|CONTINUE|BREAK {
 }
 
  /* Operators */
-":="|"+"|"-"|"*"|"/"|"="|"!="|"<"|">"|"("|")"|";"|","|"<="|">=" {
+ /* TODO: categorize this */
+":="|"+"|"-"|"*"|"/"|"="|"!="|"<="|">="|"<"|">"|"("|")"|";"|"," {
 	printf("Token Type: ");
 	printf("OPERATOR\n");
 	printf("Value: %s\n", yytext);
@@ -52,6 +55,7 @@ FOR|ENDFOR|CONTINUE|BREAK {
 }
 
  /* INTLITERAL */
+ /* this is conflicting with "-" */
 -?{DIGIT}+ {
 	printf("Token Type: ");
 	printf("INTLITERAL\n");
@@ -59,18 +63,15 @@ FOR|ENDFOR|CONTINUE|BREAK {
 }
 
  /* STRINGLITERAL */		
-\"[^\"]\" {
+\"[^\"]*\" {
 	printf("Token Type: ");
 	printf("STRINGLITERAL\n");
 	printf("Value: %s\n", yytext);
 }
 
  /* COMMENT */ 
---[\s]*\n {
+--[^\n]*\n {
 }
-
-
-
 
  /* others */
 .	{
