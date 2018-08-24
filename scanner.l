@@ -48,15 +48,14 @@ FOR|ENDFOR|CONTINUE|BREAK {
 }
 
  /* FLOATLITERAL */
--?{DIGIT}+"."{DIGIT}* {
+{DIGIT}+"."{DIGIT}* {
 	printf("Token Type: ");
 	printf("FLOATLITERAL\n");
 	printf("Value: %s\n", yytext);
 }
 
  /* INTLITERAL */
- /* this is conflicting with "-" */
--?{DIGIT}+ {
+{DIGIT}+ {
 	printf("Token Type: ");
 	printf("INTLITERAL\n");
 	printf("Value: %s\n", yytext);
