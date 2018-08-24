@@ -3,57 +3,82 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <cstring>
 using namespace std;
 %}
 %option noyywrap
 DIGIT [0-9]
-ID 	[a-zA-Z][a-zA-Z0-9]*	
+ID 	[_a-zA-Z][_a-zA-Z0-9]*	
 
 %%
- /* INTLITERAL */
 
- /* IDENTIFIERS */
-{ID} {
-		printf("IDENTIFIER (Value = \"%s\")\n", yytext);
+ /* rm whitespace */
+([ \r\n\t]+) {
 }
-
- /* INTLITERAL */
-{DIGIT}+ {
-		printf("INTLITERAL (Value = \"%s\")\n",yytext);
-}
-
- /* FLOATLITERAL */
-{DIGIT}+"."{DIGIT}* {
-		printf("FLOATLITERAL (Value = \"%s\")\n", yytext);
-}
-
- /* STRINGLITERAL */		
-\"[^\"]\" {
-		printf("STRINGLITERAL (Value = \"%s\")\n", yytext);
-}
-
- /* COMMENT */ 
---[\s]*\n
 
  /* Keywords */
 PROGRAM|BEGIN|END|FUNCTION|READ|WRITE|IF|ELSE|ENDIF|WHILE|ENDWHILE|RETURN|INT|VOID|STRING|FLOAT|TRUE|FALSE {
-	printf("KEYWORD (Value = \"%s\")\n", yytext);
+	printf("Token Type: ");
+	printf("KEYWORD\n");
+	printf("Value: %s\n", yytext);
 }
+
  /* other Keywords */
 FOR|ENDFOR|CONTINUE|BREAK {
-	printf("KEYWORD (Value = \"%s\")\n", yytext);
+	printf("Token Type: ");
+	printf("KEYWORD\n");
+	printf("Value: %s\n", yytext);
 }
 
  /* Operators */
 ":="|"+"|"-"|"*"|"/"|"="|"!="|"<"|">"|"("|")"|";"|","|"<="|">=" {
-	printf("OPERATOR (Value = \"%s\")\n", yytext);
+	printf("Token Type: ");
+	printf("OPERATOR\n");
+	printf("Value: %s\n", yytext);
 }
- /* rm whitespace */
-[ \t\n]+	
+
+ /* IDENTIFIERS */
+{ID} {
+	printf("Token Type: ");
+	printf("IDENTIFIER\n");
+	printf("Value: %s\n", yytext);
+}
+
+ /* FLOATLITERAL */
+-?{DIGIT}+"."{DIGIT}* {
+	printf("Token Type: ");
+	printf("FLOATLITERAL\n");
+	printf("Value: %s\n", yytext);
+}
+
+ /* INTLITERAL */
+-?{DIGIT}+ {
+	printf("Token Type: ");
+	printf("INTLITERAL\n");
+	printf("Value: %s\n", yytext);
+}
+
+ /* STRINGLITERAL */		
+\"[^\"]\" {
+	printf("Token Type: ");
+	printf("STRINGLITERAL\n");
+	printf("Value: %s\n", yytext);
+}
+
+ /* COMMENT */ 
+--[\s]*\n {
+}
+
+
+
 
  /* others */
-.	printf("Unrecognized character: %s\n", yytext);
-
+.	{
+	printf("Unrecognized character: %s\n", yytext);
+	for(int i = 0;i < strlen(yytext);i++){
+		printf("%d\n",(int)yytext[i]);
+	}
+}
 %%
 
 int main(int argc, char **argv){
