@@ -41,12 +41,12 @@ PROGRAM|BEGIN|END|FUNCTION|READ|WRITE|IF|ELSE|ENDIF|WHILE|ENDWHILE|RETURN|INT|VO
 }
  /* other Keywords */
 FOR|ENDFOR|CONTINUE|BREAK {
-	printf("A Keyword: %s\n", yytext);
+	printf("KEYWORD (Value = \"%s\")\n", yytext);
 }
 
  /* Operators */
 ":="|"+"|"-"|"*"|"/"|"="|"!="|"<"|">"|"("|")"|";"|","|"<="|">=" {
-	printf("An operator: %s\n", yytext);
+	printf("OPERATOR (Value = \"%s\")\n", yytext);
 }
  /* rm whitespace */
 [ \t\n]+	
