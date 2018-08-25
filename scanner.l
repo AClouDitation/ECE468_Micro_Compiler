@@ -48,7 +48,7 @@ FOR|ENDFOR|CONTINUE|BREAK {
 }
 
  /* FLOATLITERAL */
-{DIGIT}+"."{DIGIT}* {
+{DIGIT}*"."{DIGIT}* {
 	printf("Token Type: ");
 	printf("FLOATLITERAL\n");
 	printf("Value: %s\n", yytext);
