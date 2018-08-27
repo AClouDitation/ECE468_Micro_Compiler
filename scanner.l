@@ -17,28 +17,82 @@ ID 	[_a-zA-Z][_a-zA-Z0-9]*
 }
 
  /* Keywords */
- /* TODO: categorize this */
-PROGRAM|BEGIN|END|FUNCTION|READ|WRITE|IF|ELSE|ENDIF|WHILE|ENDWHILE|RETURN|INT|VOID|STRING|FLOAT|TRUE|FALSE {
+ /* Segment Keywords */
+PROGRAM|BEGIN|END|FUNCTION {
 	printf("Token Type: ");
 	printf("KEYWORD\n");
 	printf("Value: %s\n", yytext);
 }
 
- /* other Keywords */
- /* TODO: categorize this */
-FOR|ENDFOR|CONTINUE|BREAK {
+ /* R/W Keywords */
+READ|WRITE {
+	printf("Token Type: ");
+	printf("KEYWORD\n");
+	printf("Value: %s\n", yytext);
+}
+
+ /* Branching Keywords */
+IF|ELSE|ENDIF {
+	printf("Token Type: ");
+	printf("KEYWORD\n");
+	printf("Value: %s\n", yytext);
+}
+ /* Bool Value Keywords */
+TRUE|FALSE {
+	printf("Token Type: ");
+	printf("KEYWORD\n");
+	printf("Value: %s\n", yytext);
+}
+
+ /* Datatype Keywords */
+INT|VOID|STRING|FLOAT {
+	printf("Token Type: ");
+	printf("KEYWORD\n");
+	printf("Value: %s\n", yytext);
+}
+
+ /* Control Keywords */
+CONTINUE|BREAK|RETURN {
+	printf("Token Type: ");
+	printf("KEYWORD\n");
+	printf("Value: %s\n", yytext);
+}
+
+ /* Loop Keywords */
+FOR|ENDFOR|WHILE|ENDWHILE {
 	printf("Token Type: ");
 	printf("KEYWORD\n");
 	printf("Value: %s\n", yytext);
 }
 
  /* Operators */
- /* TODO: categorize this */
-":="|"+"|"-"|"*"|"/"|"="|"!="|"<="|">="|"<"|">"|"("|")"|";"|"," {
+ /* Value Assign Operators */
+":=" {
 	printf("Token Type: ");
 	printf("OPERATOR\n");
 	printf("Value: %s\n", yytext);
 }
+
+ /* Arithmetic Operators */
+"+"|"-"|"*"|"/" {
+	printf("Token Type: ");
+	printf("OPERATOR\n");
+	printf("Value: %s\n", yytext);
+}
+
+ /* Comparision Operators */
+"="|"!="|"<="|">="|"<"|">" {
+	printf("Token Type: ");
+	printf("OPERATOR\n");
+	printf("Value: %s\n", yytext);
+}
+
+ /* MISC Operators */ 
+ "("|")"|";"|"," {
+	printf("Token Type: ");
+	printf("OPERATOR\n");
+	printf("Value: %s\n", yytext);
+ }
 
  /* IDENTIFIERS */
 {ID} {
@@ -72,12 +126,9 @@ FOR|ENDFOR|CONTINUE|BREAK {
 --[^\n]*\n {
 }
 
- /* others */
+ /* Others, Raise error message*/
 .	{
 	printf("Unrecognized character: %s\n", yytext);
-	for(int i = 0;i < strlen(yytext);i++){
-		printf("%d\n",(int)yytext[i]);
-	}
 }
 %%
 
