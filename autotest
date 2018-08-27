@@ -1,0 +1,19 @@
+#! /bin/bash
+
+for fn in ./input_files/*
+do
+	./compiler $fn > test.out
+	output=$(diff -d test.out ./output_files/${fn:14:${#fn}-19}out)
+	if [[ $output ]]
+	then 
+		echo TEST FAILED
+		break
+	else 
+		echo "ACCEPTED $fn"
+	fi
+
+done
+
+rm test.out -rf
+
+
