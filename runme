@@ -7,7 +7,7 @@ then
 fi
 
 #open an output file for writing
-exec 4> $2.txt
+exec 4> $2
 
 #redirect output into outputfile, after compile
 echo "$(./compiler $1)" >&4
