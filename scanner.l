@@ -5,7 +5,6 @@
 #include <fstream>
 #include <cstring>
 #include "compiler_driver.hpp"
-using namespace std;
 %}
 %option noyywrap
 DIGIT [0-9]
