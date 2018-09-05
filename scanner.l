@@ -1,9 +1,10 @@
 %{
-#include <math.h>
+#include <cstdlib>
 #include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include "compiler_driver.hpp"
 using namespace std;
 %}
 %option noyywrap
@@ -132,13 +133,11 @@ FOR|ENDFOR|WHILE|ENDWHILE {
 }
 %%
 
-int main(int argc, char **argv){
-	ifstream* fs = new ifstream();
-	if (argc > 0){
-		fs -> open(argv[1], ios::in);
-	}
-	FlexLexer* lexer = new yyFlexLexer(fs);
+void compiler_driver::scan_begin(){
+	lexer = new yyFlexLexer(fs);
 	lexer->yylex();
+}
 
-	return 0;
+void compiler_driver::scan_end(){
+	delete lexer;
 }

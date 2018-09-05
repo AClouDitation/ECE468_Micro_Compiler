@@ -1,3 +1,10 @@
+cc = g++
+deps = compiler_driver.hpp
+src = comp.cpp
+src += compiler_driver.cpp
+obj = $(src:%.cpp=%.o)
+
+
 team:
 	@echo "Team: Compliation_Error\n"
 	@echo "Yi Qiao"
@@ -6,10 +13,18 @@ team:
 	@echo "Shutao Wang"
 	@echo "wang2590"
 
-compiler:
+compiler: $(obj) scanner.l
+
 	flex -+ scanner.l
-	g++	lex.yy.cc -o compiler -ll
+	$(cc) -c lex.yy.cc -o lex.o -ll
+	$(cc) -o compiler $(obj) lex.o
+
+
+
+%.o: %.cpp $(deps)
+	$(cc) -c $< -o $@
 
 clean:
-	rm lex.yy.cc -rf
+	rm -rf lex.yy.cc
+	rm -rf $(obj) lex.o
 
