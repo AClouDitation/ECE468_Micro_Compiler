@@ -24,4 +24,5 @@ public:
 	void error(const std::string &msg);
 	FlexLexer* lexer;
 };
+
 #endif
