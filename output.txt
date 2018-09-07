@@ -1,0 +1,14 @@
+Commit ID tagged for submission: 02cd89ddde40e9c800467bdb412111d105f282ce
+Submission graded at: 2018-09-07 14:00:31
+
+rm lex.yy.cc -rf
+flex -+ scanner.l
+g++	lex.yy.cc -o compiler -ll
+Testing.....fibonacci.micro
+Test Passed
+Testing.....loop.micro
+Test Passed
+Testing.....nested.micro
+Test Passed
+Testing.....sqrt.micro
+Test Passed
