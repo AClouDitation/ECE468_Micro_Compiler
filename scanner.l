@@ -1,17 +1,16 @@
 %{
-#include <cstdlib>
-#include <cstdio>
-#include <iostream>
-#include <fstream>
-#include <cstring>
-#include "compiler_driver.hpp"
+#include <stdio.h>
+#include <stdlib.h>
+#define YY_DECL int yylex()
+#include "parser.tab.h"
+#undef yywrap
+#define yywrap() 1
 %}
-%option noyywrap
+%option noyywrap nounput batch debug noinput
 DIGIT [0-9]
 ID 	[_a-zA-Z][_a-zA-Z0-9]*	
 
 %%
-
  /* rm whitespace */
 [ \r\n\t]+ {
 }
@@ -132,11 +131,3 @@ FOR|ENDFOR|WHILE|ENDWHILE {
 }
 %%
 
-void compiler_driver::scan_begin(){
-	lexer = new yyFlexLexer(fs);
-	lexer->yylex();
-}
-
-void compiler_driver::scan_end(){
-	delete lexer;
-}

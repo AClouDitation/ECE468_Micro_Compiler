@@ -1,7 +1,6 @@
-cc = g++
-deps = compiler_driver.hpp
+CXX = g++
+CC = gcc
 src = comp.cpp
-src += compiler_driver.cpp
 obj = $(src:%.cpp=%.o)
 
 
@@ -13,18 +12,20 @@ team:
 	@echo "Shutao Wang"
 	@echo "wang2590"
 
-compiler: $(obj) scanner.l
+compiler: scanner.l parser.y $(src) 
 
-	flex -+ scanner.l
-	$(cc) -c lex.yy.cc -o lex.o -ll
-	$(cc) -o compiler $(obj) lex.o
+	flex scanner.l
+	bison -d parser.y
+	$(CC) -c lex.yy.c -o lex.o -ll
+	$(CC) -c parser.tab.c -o parser.o 
+	$(CXX) -c comp.cpp -o comp.o
+	$(CXX) -o compiler comp.o parser.o lex.o
 
-
-
-%.o: %.cpp $(deps)
-	$(cc) -c $< -o $@
 
 clean:
-	rm -rf lex.yy.cc
-	rm -rf $(obj) lex.o
+	rm -rf lex.yy.c
+	rm -rf parser.tab.c
+	rm -rf parser.tab.h
+	rm -rf *.o
+
 

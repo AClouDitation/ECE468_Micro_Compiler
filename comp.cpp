@@ -1,9 +1,17 @@
-#include "compiler_driver.hpp"
+#include <string>
+#include <cstdlib>
+extern "C" {
+    #include "parser.tab.h"
+}
+extern int yylex();
+extern int yyparse();
+extern FILE* yyin;
 
 int main(int argc, char** argv){
-	compiler_driver driver;
-	for (++argv; *argv; ++argv){
-		driver.parse(*argv);	
-		break;
-	}		
+
+    FILE* fp = fopen(argv[1],"r");
+    yyin = fp;
+    yyparse();
+
+    return 0;
 }
