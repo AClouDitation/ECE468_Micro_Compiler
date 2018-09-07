@@ -12,20 +12,21 @@ team:
 	@echo "Shutao Wang"
 	@echo "wang2590"
 
-compiler: scanner.l parser.y $(src) 
+compiler: ./src/* 
 
-	flex scanner.l
-	bison -d parser.y
-	$(CC) -c lex.yy.c -o lex.o -ll
-	$(CC) -c parser.tab.c -o parser.o 
-	$(CXX) -c comp.cpp -o comp.o
-	$(CXX) -o compiler comp.o parser.o lex.o
+	mkdir -p generated
+	mkdir -p build
+	flex -o generated/scanner.cpp src/scanner.ll
+	bison -d -o generated/parser.cpp src/parser.yy
+	$(CXX) -c generated/scanner.cpp 	-o build/scanner.o -ll	-g
+	$(CXX) -c generated/parser.cpp 	-o build/parser.o 		-g
+	$(CXX) -c src/comp.cpp 		-o build/comp.o			-g
+	$(CXX) -o compiler build/comp.o build/parser.o build/scanner.o -g
 
 
 clean:
-	rm -rf lex.yy.c
-	rm -rf parser.tab.c
-	rm -rf parser.tab.h
-	rm -rf *.o
+	rm -rf generated
+	rm -rf build
+	rm -rf compiler
 
 
