@@ -2,14 +2,15 @@
 
 for fn in ./input_files/*
 do
+    echo testing...$fn
 	./compiler $fn > test.out
 	output=$(diff -d test.out ./output_files/${fn:14:${#fn}-19}out)
 	if [[ $output ]]
 	then 
-		echo TEST FAILED
-		break
+	    echo TEST FAILED
+	    break
 	else 
-		echo "ACCEPTED $fn"
+	    echo "ACCEPTED $fn"
 	fi
 
 done
