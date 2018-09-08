@@ -6,7 +6,7 @@
     #define YY_DECL int yylex()
 %}
 
-%option noyywrap nounput batch debug noinput
+%option noyywrap nounput batch noinput
 DIGIT [0-9]
 IDENTIFIER 	    [_a-zA-Z][_a-zA-Z0-9]*	
 INTLITERAL      {DIGIT}+

@@ -19,10 +19,9 @@ compiler: ./src/*
 	flex -o generated/scanner.cpp src/scanner.ll
 	bison -d -o generated/parser.cpp src/parser.yy
 	$(CXX) -c generated/scanner.cpp 	-o build/scanner.o -ll	-g
-	$(CXX) -c generated/parser.cpp 	-o build/parser.o 		-g
-	$(CXX) -c src/comp.cpp 		-o build/comp.o			-g
+	$(CXX) -c generated/parser.cpp 		-o build/parser.o 		-g
+	$(CXX) -c src/comp.cpp 				-o build/comp.o			-g
 	$(CXX) -o compiler build/comp.o build/parser.o build/scanner.o -g
-
 
 clean:
 	rm -rf generated

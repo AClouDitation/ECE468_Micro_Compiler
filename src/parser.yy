@@ -1,20 +1,19 @@
 %{
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <string.h>
+    #include <cstdio>
+    #include <cstdlib>
+    #include <string>
 
     extern int yylex();
     extern int yylineno;
-    extern char* yytext();
-    extern FILE* yyin;
+    extern char* yytext;
     void yyerror(const char* s);
 %}
 
 %define api.token.prefix{TOK_}
 %union {
-    char* sval;
-	int ival;
-	float fval;
+    char*   sval;
+	int     ival;
+	float   fval;
 }
 
 /* Keywords */
@@ -63,80 +62,73 @@
 %%
 /* Grammar rules */
 /* Program */
-program : PROGRAM id BEGIN pgm_body END;
-id      : IDENTIFIER;
-pgm_body: decl func_declarations;
-decl    : string_decl decl 
-        | var_decl decl 
-        | /* empty */;
+program             :PROGRAM id BEGIN pgm_body END;
+id                  :IDENTIFIER;
+pgm_body            :decl func_declarations;
+decl                :string_decl decl|var_decl decl|/* empty */;
 
 /* Global String Declaration */
-string_decl:    STRING id ASSIGN str;
-str:            STRINGLITERAL;
+string_decl         :STRING id ASSIGN str SEMICOLON;
+str                 :STRINGLITERAL;
 
 /* Variable Declaration */
-var_decl: var_type id_list;
-var_type: FLOAT 
-        | INT;
-
-any_type: var_type 
-        | VOID; 
-
-id_list :id id_tail;
-
-id_tail :id id_tail 
-        | /* empty */ ;
+var_decl            :var_type id_list SEMICOLON;
+var_type            :FLOAT|INT;
+any_type            :var_type|VOID; 
+id_list             :id id_tail;
+id_tail             :COMMA id id_tail|/* empty */ ;
 
 /* Function Paramater List */
-param_decl_list: param_decl param_decl_tail | /* empty */;
-param_decl: var_type id
-param_decl_tail:  param_decl param_decl_tail | /* empty */;
+param_decl_list     :param_decl param_decl_tail|/* empty */;
+param_decl          : var_type id;
+param_decl_tail     :COMMA param_decl param_decl_tail|/* empty */;
 
 /* Function Declarations */
-func_declarations: func_decl func_declarations | /* empty */;
-func_decl:  FUNCTION any_type id OPAREN param_decl_list CPAREN BEGIN func_body END;
-func_body:  decl stmt_list;
+func_declarations   :func_decl func_declarations|/* empty */;
+func_decl           :FUNCTION any_type id OPAREN param_decl_list CPAREN BEGIN func_body END;
+func_body           :decl stmt_list;
 
 /* Statement List */
-stmt_list:  stmt stmt_list | /* empty */;
-stmt:       base_stmt | if_stmt | loop_stmt; 
-base_stmt:  assign_stmt | read_stmt | write_stmt | control_stmt;
+stmt_list           :stmt stmt_list|/* empty */;
+stmt                :base_stmt|if_stmt|loop_stmt; 
+base_stmt           :assign_stmt|read_stmt|write_stmt|control_stmt;
 
 /* Basic Statements */
-assign_stmt: assign_expr;
-assign_expr: id ASSIGN expr
-read_stmt:   READ OPAREN id_list CPAREN;
-write_stmt:  WRITE "(" id_list ")";
-return_stmt: RETURN expr ;
+assign_stmt         :assign_expr SEMICOLON;
+assign_expr         :id ASSIGN expr;
+read_stmt           :READ OPAREN id_list CPAREN SEMICOLON;
+write_stmt          :WRITE OPAREN id_list CPAREN SEMICOLON;
+return_stmt         :RETURN expr SEMICOLON;
 
 /* Expressions */
-expr:           expr_prefix factor;
-expr_prefix:    expr_prefix factor addop | /* empty */;
-factor:         factor_prefix postfix_expr;
-factor_prefix:  factor_prefix postfix_expr mulop | /* empty */;
-postfix_expr:   primary | call_expr;
-call_expr:      id OPAREN expr_list CPAREN;
-expr_list:      expr expr_list_tail | /* empty */;
-expr_list_tail: COMMA expr expr_list_tail | /* empty */;
-primary:        OPAREN expr CPAREN | id | INTLITERAL | FLOATLITERAL;
-addop:          PLUS | MINUS;
-mulop:          MUL | DIV;
+expr                :expr_prefix factor;
+expr_prefix         :expr_prefix factor addop | /* empty */;
+factor              :factor_prefix postfix_expr;
+factor_prefix       :factor_prefix postfix_expr mulop | /* empty */;
+postfix_expr        :primary | call_expr;
+call_expr           :id OPAREN expr_list CPAREN;
+expr_list           :expr expr_list_tail | /* empty */;
+expr_list_tail      :COMMA expr expr_list_tail | /* empty */;
+primary             :OPAREN expr CPAREN | id | INTLITERAL | FLOATLITERAL;
+addop               :PLUS | MINUS;
+mulop               :MUL | DIV;
 
 /* Complex Statements and Condition */ 
-if_stmt:        IF OPAREN cond CPAREN decl stmt_list else_part ENDIF;
-else_part:      ELSE decl stmt_list | /* empty */;
-cond:           expr compop expr | TRUE | FALSE;
-compop:         LT | GT | EQ | NEQ | LEQ | GEQ;
-while_stmt:     WHILE OPAREN cond CPAREN decl stmt_list ENDWHILE;
+if_stmt             :IF OPAREN cond CPAREN decl stmt_list else_part ENDIF;
+else_part           :ELSE decl stmt_list | /* empty */;
+cond                :expr compop expr | TRUE | FALSE;
+compop              :LT | GT | EQ | NEQ | LEQ | GEQ;
+while_stmt          :WHILE OPAREN cond CPAREN decl stmt_list ENDWHILE;
 
 
 /*ECE468 ONLY*/
-control_stmt:   return_stmt;
-loop_stmt:      while_stmt;
+control_stmt        :return_stmt;
+loop_stmt           :while_stmt;
 
 %%
 //Epilouge
 void yyerror (const char* s){
-    fprintf(stderr,"Error Line %d token %s\n",yylineno,s);
+    //fprintf(stderr,"Error Line %d token %s\n",yylineno,s);
+    fprintf(stdout,"Not Accepted");
     exit(1);
 }
