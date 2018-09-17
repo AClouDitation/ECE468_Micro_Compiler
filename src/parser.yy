@@ -1,7 +1,8 @@
 %{
-    #include <cstdio>
     #include <cstdlib>
     #include <string>
+    #include <stack>
+    #include "../src/symtable.hpp"
 
     extern int yylex();
     extern int yylineno;
@@ -9,9 +10,14 @@
     void yyerror(const char* s);
 %}
 
+%code{
+    int block_index = 0;
+    std::stack<Symtable*> symtable_list;
+}
+
 %define api.token.prefix{TOK_}
 %union {
-    char*   sval;
+    char*   cstr;
 	int     ival;
 	float   fval;
 }
@@ -31,16 +37,16 @@
 %token          RETURN
 %token          INT
 %token          VOID
-%token          STRING
+%token <cstr>   STRING
 %token          FLOAT
 %token          TRUE
 %token          FALSE
 
 /* Data type */
-%token <sval>    IDENTIFIER
+%token <cstr>    IDENTIFIER
 %token <ival>    INTLITERAL
 %token <fval>    FLOATLITERAL
-%token <sval>    STRINGLITERAL
+%token <cstr>    STRINGLITERAL
 
 %token          ASSIGN 
 %token          NEQ 
@@ -58,18 +64,29 @@
 %token          SEMICOLON
 %token          COMMA
 
+/*%type <entry> string_decl*/
+%type <cstr> id str
 %start program
 %%
 /* Grammar rules */
 /* Program */
-program             :PROGRAM id BEGIN pgm_body END;
-id                  :IDENTIFIER;
+program             :PROGRAM id BEGIN pgm_body END{
+                        Symtable* current = new Symtable("Global");
+                        symtable_list.push(current);
+                    };
+id                  :IDENTIFIER{};
 pgm_body            :decl func_declarations;
 decl                :string_decl decl|var_decl decl|/* empty */;
 
 /* Global String Declaration */
-string_decl         :STRING id ASSIGN str SEMICOLON;
-str                 :STRINGLITERAL;
+string_decl         :STRING id ASSIGN str SEMICOLON {
+                        std::string id($2);
+                        std::string type($1);
+                        SymEntry new_entry(id, type,(void*)$4);
+                        Symtable* current = symtable_list.top();
+                        current->add(new_entry);
+                    };
+str                 :STRINGLITERAL{};
 
 /* Variable Declaration */
 var_decl            :var_type id_list SEMICOLON;
