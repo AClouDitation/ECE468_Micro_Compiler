@@ -2,17 +2,21 @@
     #include <cstdlib>
     #include <string>
     #include <stack>
+    #include <vector>
+    #include <iostream>
     #include "../src/symtable.hpp"
 
     extern int yylex();
     extern int yylineno;
     extern char* yytext;
+    std::string typenow;
     void yyerror(const char* s);
 %}
 
 %code{
     int block_index = 0;
-    std::stack<Symtable*> symtable_list;
+    std::stack<Symtable*> symtable_stack;
+    std::vector<Symtable*> symtable_list;
 }
 
 %define api.token.prefix{TOK_}
@@ -35,10 +39,10 @@
 %token          WHILE
 %token          ENDWHILE
 %token          RETURN
-%token          INT
-%token          VOID
+%token <cstr>   INT
+%token <cstr>   VOID
 %token <cstr>   STRING
-%token          FLOAT
+%token <cstr>   FLOAT
 %token          TRUE
 %token          FALSE
 
@@ -65,45 +69,81 @@
 %token          COMMA
 
 /*%type <entry> string_decl*/
-%type <cstr> id str
+%type <cstr> id str var_type
 %start program
 %%
 /* Grammar rules */
 /* Program */
-program             :PROGRAM id BEGIN pgm_body END{
-                        Symtable* current = new Symtable("Global");
-                        symtable_list.push(current);
+program             :PROGRAM {
+                        Symtable* current = new Symtable("GLOBAL");
+                        symtable_stack.push(current);
+                        symtable_list.push_back(current);
+                    }
+                    id BEGIN pgm_body END;
+
+id                  :IDENTIFIER{
+                        std::cout << "id :" << $1 << std::endl;
+                        $$ = $1;
                     };
-id                  :IDENTIFIER{};
 pgm_body            :decl func_declarations;
-decl                :string_decl decl|var_decl decl|/* empty */;
+decl                :string_decl decl|var_decl decl|/* empty */{
+                        std::cout << "BAKA!" << std::endl;
+                    };
 
 /* Global String Declaration */
 string_decl         :STRING id ASSIGN str SEMICOLON {
                         std::string id($2);
-                        std::string type($1);
-                        SymEntry new_entry(id, type,(void*)$4);
-                        Symtable* current = symtable_list.top();
+                        SymEntry new_entry(id, "STRING",(void*)$4);
+                        Symtable* current = symtable_stack.top();
                         current->add(new_entry);
                     };
-str                 :STRINGLITERAL{};
+str                 :STRINGLITERAL{
+                        $$ = $1;
+                    };
 
 /* Variable Declaration */
-var_decl            :var_type id_list SEMICOLON;
-var_type            :FLOAT|INT;
+var_decl            :var_type{
+                        typenow = $1;
+                    }
+                    id_list SEMICOLON{
+                        
+                        //Symtable* current = symtable_list.top();
+                        //SymEntry new_entry(id, type);
+                        //current->add(new_entry);
+                    };
+var_type            :FLOAT|INT{$$=$1;};
 any_type            :var_type|VOID; 
-id_list             :id id_tail;
-id_tail             :COMMA id id_tail|/* empty */ ;
+id_list             :id {
+                        std::cout << "add ids" << std::endl;
+                        Symtable* current = symtable_stack.top();
+                        SymEntry new_entry($1, typenow);
+                        current->add(new_entry);
+                    }
+                    id_tail;
+id_tail             :COMMA id{
+                        Symtable* current = symtable_stack.top();
+                        SymEntry new_entry($2, typenow);
+                        current->add(new_entry);
+                    }id_tail|/* empty */ ;
 
 /* Function Paramater List */
+
 param_decl_list     :param_decl param_decl_tail|/* empty */;
 param_decl          : var_type id;
 param_decl_tail     :COMMA param_decl param_decl_tail|/* empty */;
 
 /* Function Declarations */
 func_declarations   :func_decl func_declarations|/* empty */;
-func_decl           :FUNCTION any_type id OPAREN param_decl_list CPAREN BEGIN func_body END;
-func_body           :decl stmt_list;
+func_decl           :FUNCTION any_type id {
+                        std::cout << "fdecl:id:" << $3 << std::endl;
+                        Symtable* current = new Symtable(std::string($3));
+                        symtable_stack.push(current);
+                        symtable_list.push_back(current);
+                    }
+                    OPAREN param_decl_list CPAREN BEGIN func_body END{
+                        symtable_stack.pop();
+                    };
+func_body           :decl {std::cout << "end of decl" << std::endl;} stmt_list{std::cout << "end of stmt_list" << std::endl;};
 
 /* Statement List */
 stmt_list           :stmt stmt_list|/* empty */;

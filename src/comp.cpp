@@ -8,7 +8,8 @@
 
 
 extern FILE* yyin;
-extern std::stack<Symtable*> symtable_list;
+extern std::stack<Symtable*> symtable_stack;
+extern std::vector<Symtable*> symtable_list;
 int main(int argc, char** argv){
     
     FILE* fp = fopen(argv[1],"r");
@@ -16,11 +17,9 @@ int main(int argc, char** argv){
     yyparse();
 
     //std::cout<< "Accepted" << std::endl << std::endl;
-    while(symtable_list.size()){
-        std::cout<<"BAKA!"<<std::endl;
-        Symtable* curr = symtable_list.top();
-        curr->print();
-        symtable_list.pop();
+    for(auto it :symtable_list){
+        it->print();
+        std::cout << std::endl;
     }        
 
     return 0;

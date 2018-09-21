@@ -8,8 +8,8 @@ class SymEntry{
     std::string type;
     void* value;
 public:
-    SymEntry(std::string& name, std::string& type);
-    SymEntry(std::string& name, std::string& type, void* value);
+    SymEntry(std::string name, std::string type);
+    SymEntry(std::string name, std::string type, void* value);
     virtual ~SymEntry();
     virtual void print();
 };

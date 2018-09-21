@@ -1,13 +1,13 @@
 #include "symtable.hpp"
 #include <iostream>
 
-SymEntry::SymEntry(std::string& name, std::string& type){
+SymEntry::SymEntry(std::string name, std::string type){
     this->name = name;
     this->type = type;
     this->value = NULL;
 }
 
-SymEntry::SymEntry(std::string& name, std::string& type, void* value){
+SymEntry::SymEntry(std::string name, std::string type, void* value){
     this->name = name;
     this->type = type;
     this->value = value;
@@ -16,9 +16,9 @@ SymEntry::SymEntry(std::string& name, std::string& type, void* value){
 SymEntry::~SymEntry(){}
 
 void SymEntry::print(){
-    std::cout<<name<<" "<<type;
+    std::cout<<"name " <<name<<" type "<<type;
     if(value){
-        std::cout<<(char*)value<<std::endl;
+        std::cout<< " value " << (char*)value<<std::endl;
     }
     else{
         std::cout<<std::endl;
@@ -32,6 +32,7 @@ void Symtable::add(SymEntry& entry){
 }
 
 void Symtable::print(){
+    std::cout << "Symbol table " << name << std::endl;
     for(int i = 0;i < entrylist.size();i++)
         entrylist[i].print();
 }

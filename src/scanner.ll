@@ -33,20 +33,33 @@ EATUPWHITESPACE     [ \t\r\n]+
 "WHILE"				{ return TOK_WHILE; }
 "ENDWHILE"			{ return TOK_ENDWHILE; }
 "RETURN"            { return TOK_RETURN; }
-"INT"               { return TOK_INT; }
-"VOID"              { return TOK_VOID; }
-"STRING"            { return TOK_STRING; }
-"FLOAT"             { return TOK_FLOAT; }
+"INT"               { yylval.cstr = yytext;return TOK_INT; }
+"VOID"              { yylval.cstr = yytext;return TOK_VOID; }
+"STRING"            { yylval.cstr = yytext;return TOK_STRING; }
+"FLOAT"             { yylval.cstr = yytext;return TOK_FLOAT; }
 "TRUE"				{ return TOK_TRUE; }
 "FALSE"				{ return TOK_FALSE; }
 
-{IDENTIFIER}        { return TOK_IDENTIFIER; }
+{IDENTIFIER}        { 
+                        //printf("from scanner! %s \n",yytext);
+                        yylval.cstr = yytext;
+                        return TOK_IDENTIFIER; 
+                    }
 
-{STRINGLITERAL}     { return TOK_STRINGLITERAL; }
+{STRINGLITERAL}     { 
+                        yylval.cstr = yytext;    
+                        return TOK_STRINGLITERAL; 
+                    }
 
-{FLOATLITERAL}      { return TOK_FLOATLITERAL; }
+{FLOATLITERAL}      {   
+                        yylval.fval = atof(yytext);
+                        return TOK_FLOATLITERAL;
+                    }
 
-{INTLITERAL}        { return TOK_INTLITERAL; }
+{INTLITERAL}        {   
+                        yylval.ival = atoi(yytext);
+                        return TOK_INTLITERAL; 
+                    }
 
 ":="                { return TOK_ASSIGN; }
 "!="                { return TOK_NEQ; }
