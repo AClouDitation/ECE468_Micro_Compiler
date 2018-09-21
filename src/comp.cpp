@@ -15,11 +15,12 @@ int main(int argc, char** argv){
     yyin = fp;
     yyparse();
 
-    std::cout<< "Accepted";
+    //std::cout<< "Accepted" << std::endl << std::endl;
     while(symtable_list.size()){
         std::cout<<"BAKA!"<<std::endl;
         Symtable* curr = symtable_list.top();
         curr->print();
+        symtable_list.pop();
     }        
 
     return 0;
