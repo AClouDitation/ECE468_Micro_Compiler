@@ -91,9 +91,8 @@ decl                :string_decl decl|var_decl decl|/* empty */;
 
 /* Global String Declaration */
 string_decl         :STRING id ASSIGN str SEMICOLON {
-                        std::string* id = $2;
-                        SymEntry new_entry(*id, "STRING",(void*)$4);
                         Symtable* current = symtable_stack.top();
+                        StrEntry* new_entry = new StrEntry(*$2,*$4);
                         current->add(new_entry);
                     };
 str                 :STRINGLITERAL{
@@ -108,8 +107,14 @@ var_decl            :{
                     var_type id_list SEMICOLON {
                         Symtable* current = symtable_stack.top();
                         while(!id_stack.empty()){
-                            SymEntry new_entry(id_stack.top(), *$2);
-                            current->add(new_entry);
+                            if(*$2 == "INT"){
+                                IntEntry* new_entry = new IntEntry(id_stack.top());
+                                current->add(new_entry);
+                            }
+                            else{
+                                FltEntry* new_entry = new FltEntry(id_stack.top());
+                                current->add(new_entry);
+                            }
                             id_stack.pop();
                         }
                     };
@@ -139,9 +144,15 @@ id_tail             :COMMA id id_tail{
 
 param_decl_list     :param_decl param_decl_tail|/* empty */;
 param_decl          :var_type id{
-                        SymEntry new_entry(*$2, *$1);
                         Symtable* current = symtable_stack.top(); 
-                        current->add(new_entry);
+                        if(*$1 == "INT"){
+                            IntEntry* new_entry = new IntEntry(*$2);
+                            current->add(new_entry);
+                        }
+                        else{
+                            FltEntry* new_entry = new FltEntry(*$2);
+                            current->add(new_entry);
+                        }
                     };
 param_decl_tail     :COMMA param_decl param_decl_tail|/* empty */;
 
