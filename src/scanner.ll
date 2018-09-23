@@ -4,6 +4,7 @@
     extern char* yytext;
     #include <stdio.h>
     #include <stdlib.h>
+    #include <string>
     #define YY_DECL int yylex()
 %}
 
@@ -33,15 +34,14 @@ EATUPWHITESPACE     [ \t\r\n]+
 "WHILE"				{ return TOK_WHILE; }
 "ENDWHILE"			{ return TOK_ENDWHILE; }
 "RETURN"            { return TOK_RETURN; }
-"INT"               { yylval.cstr = yytext;return TOK_INT; }
-"VOID"              { yylval.cstr = yytext;return TOK_VOID; }
-"STRING"            { yylval.cstr = yytext;return TOK_STRING; }
-"FLOAT"             { yylval.cstr = yytext;return TOK_FLOAT; }
+"INT"               { return TOK_INT; }
+"VOID"              { return TOK_VOID; }
+"STRING"            { return TOK_STRING; }
+"FLOAT"             { return TOK_FLOAT; }
 "TRUE"				{ return TOK_TRUE; }
 "FALSE"				{ return TOK_FALSE; }
 
 {IDENTIFIER}        { 
-                        //printf("from scanner! %s \n",yytext);
                         yylval.cstr = yytext;
                         return TOK_IDENTIFIER; 
                     }

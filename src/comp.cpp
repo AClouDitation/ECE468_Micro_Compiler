@@ -17,9 +17,9 @@ int main(int argc, char** argv){
     yyparse();
 
     //std::cout<< "Accepted" << std::endl << std::endl;
-    for(auto it :symtable_list){
-        it->print();
-        std::cout << std::endl;
+    for(int i = 0;i < symtable_list.size();i++){
+        symtable_list[i]->print();
+        if(i != symtable_list.size()-1)std::cout << std::endl;
     }        
 
     return 0;

@@ -18,7 +18,7 @@ SymEntry::~SymEntry(){}
 void SymEntry::print(){
     std::cout<<"name " <<name<<" type "<<type;
     if(value){
-        std::cout<< " value " << (char*)value<<std::endl;
+        std::cout<< " value " << *(std::string*)value <<std::endl;
     }
     else{
         std::cout<<std::endl;
