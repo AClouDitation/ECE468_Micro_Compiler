@@ -138,7 +138,11 @@ id_tail             :COMMA id id_tail{
 /* Function Paramater List */
 
 param_decl_list     :param_decl param_decl_tail|/* empty */;
-param_decl          : var_type id;
+param_decl          :var_type id{
+                        SymEntry new_entry(*$2, *$1);
+                        Symtable* current = symtable_stack.top(); 
+                        current->add(new_entry);
+                    };
 param_decl_tail     :COMMA param_decl param_decl_tail|/* empty */;
 
 /* Function Declarations */
@@ -180,11 +184,40 @@ addop               :PLUS | MINUS;
 mulop               :MUL | DIV;
 
 /* Complex Statements and Condition */ 
-if_stmt             :IF OPAREN cond CPAREN decl stmt_list else_part ENDIF;
-else_part           :ELSE decl stmt_list | /* empty */;
+if_stmt             :IF{
+                        block_index++;
+                        Symtable* current = new Symtable(
+                            "BLOCK "+std::to_string(block_index));
+                        symtable_stack.push(current);
+                        symtable_list.push_back(current);
+                    } 
+                    OPAREN cond CPAREN decl stmt_list {
+                        symtable_stack.pop();
+                    }
+                    else_part ENDIF;
+else_part           :ELSE{
+                        block_index++;
+                        Symtable* current = new Symtable(
+                            "BLOCK "+std::to_string(block_index));
+                        symtable_stack.push(current);
+                        symtable_list.push_back(current);
+                    }
+                    decl stmt_list{
+                        symtable_stack.pop(); 
+                    } 
+                    | /* empty */;
 cond                :expr compop expr | TRUE | FALSE;
 compop              :LT | GT | EQ | NEQ | LEQ | GEQ;
-while_stmt          :WHILE OPAREN cond CPAREN decl stmt_list ENDWHILE;
+while_stmt          :WHILE{
+                        block_index++;
+                        Symtable* current = new Symtable(
+                            "BLOCK "+std::to_string(block_index));
+                        symtable_stack.push(current);
+                        symtable_list.push_back(current);
+                    } 
+                    OPAREN cond CPAREN decl stmt_list ENDWHILE{
+                        symtable_stack.pop(); 
+                    };
 
 
 /*ECE468 ONLY*/
