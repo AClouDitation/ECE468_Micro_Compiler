@@ -1,13 +1,13 @@
 #ifndef SYMTABLE_HPP
 #define SYMTABLE_HPP
 #include <vector>
+#include <unordered_set>
 #include <string>
 #include <iostream>
 
 class SymEntry{
-protected:
-    std::string name;
 public:
+    std::string name;
     SymEntry(std::string name);
     virtual ~SymEntry();
     virtual void print()=0;
@@ -40,6 +40,7 @@ public:
 class Symtable{
 
     std::vector<SymEntry*> entrylist;
+    std::unordered_set<std::string> id_set;
     std::string name;
 public:
     Symtable(std::string name);

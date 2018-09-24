@@ -31,6 +31,13 @@ Symtable::Symtable(std::string name){this->name = name;}
 Symtable::~Symtable(){}
 void Symtable::add(SymEntry* entry){
     entrylist.push_back(entry);
+    if(id_set.find(entry->name)==id_set.end()){
+        id_set.insert(entry->name);
+    }
+    else{
+        std::cout<<"DECLARATION ERROR "<<entry->name<<std::endl;
+        exit(1);
+    }
 }
 
 void Symtable::print(){
