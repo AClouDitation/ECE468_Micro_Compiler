@@ -28,7 +28,12 @@ void FltEntry::print(){
 
 // the symtable table
 Symtable::Symtable(std::string name){this->name = name;}
-Symtable::~Symtable(){}
+Symtable::~Symtable(){
+    for(auto it:entrylist){
+        delete it;
+    }
+}
+
 void Symtable::add(SymEntry* entry){
     entrylist.push_back(entry);
     if(id_set.find(entry->name)==id_set.end()){

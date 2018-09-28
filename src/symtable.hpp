@@ -11,7 +11,6 @@ public:
     SymEntry(std::string name);
     virtual ~SymEntry();
     virtual void print()=0;
-    //{std::cout << "This should not happen!" << std::endl;};
 };
 
 class StrEntry: public SymEntry{
