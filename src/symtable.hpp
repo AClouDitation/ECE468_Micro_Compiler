@@ -1,8 +1,7 @@
 #ifndef SYMTABLE_HPP
 #define SYMTABLE_HPP
 #include <vector>
-//#include <unordered_set> does not support c++ 11
-#include <set>
+#include <unordered_set>
 #include <string>
 #include <iostream>
 
@@ -40,7 +39,7 @@ public:
 class Symtable{
 
     std::vector<SymEntry*> entrylist;
-    std::set<std::string> id_set;
+    std::unordered_set<std::string> id_set;
     std::string name;
 public:
     Symtable(std::string name);
