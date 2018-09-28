@@ -18,11 +18,11 @@ compiler: ./src/*
 	mkdir -p build
 	flex -o generated/scanner.cpp src/scanner.ll
 	bison -d -o generated/parser.cpp src/parser.yy
-	$(CXX) -c generated/scanner.cpp -o build/scanner.o -ll -g
-	$(CXX) -c generated/parser.cpp -o build/parser.o -g
-	$(CXX) -c src/comp.cpp -o build/comp.o -g
-	$(CXX) -c src/symtable.cpp -o build/symtable.o -g
-	$(CXX) -o compiler build/comp.o build/parser.o build/scanner.o build/symtable.o -g
+	$(CXX) -std=c++98 -c generated/scanner.cpp -o build/scanner.o -ll -g
+	$(CXX) -std=c++98 -c generated/parser.cpp -o build/parser.o -g
+	$(CXX) -std=c++98 -c src/comp.cpp -o build/comp.o -g
+	$(CXX) -std=c++98 -c src/symtable.cpp -o build/symtable.o -g
+	$(CXX) -std=c++98 -o compiler build/comp.o build/parser.o build/scanner.o build/symtable.o -g
 
 clean:
 	rm -rf generated

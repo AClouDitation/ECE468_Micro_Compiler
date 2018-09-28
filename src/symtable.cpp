@@ -1,5 +1,6 @@
 #include "symtable.hpp"
 #include <iostream>
+#include <cstdlib>
 
 SymEntry::SymEntry(std::string name){this->name = name;}
 SymEntry::~SymEntry(){}
@@ -29,8 +30,8 @@ void FltEntry::print(){
 // the symtable table
 Symtable::Symtable(std::string name){this->name = name;}
 Symtable::~Symtable(){
-    for(auto it:entrylist){
-        delete it;
+    for(int i=0;i < entrylist.size(); i++){
+        delete entrylist[i];
     }
 }
 
@@ -41,7 +42,7 @@ void Symtable::add(SymEntry* entry){
     }
     else{
         std::cout<<"DECLARATION ERROR "<<entry->name<<std::endl;
-        exit(1);
+        std::exit(1);
     }
 }
 

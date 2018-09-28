@@ -4,6 +4,7 @@
     #include <stack>
     #include <vector>
     #include <iostream>
+    #include <sstream> //for c++ 98 int to string conversion
     #include "../src/symtable.hpp"
 
     extern int yylex();
@@ -197,8 +198,13 @@ mulop               :MUL | DIV;
 /* Complex Statements and Condition */ 
 if_stmt             :IF{
                         block_index++;
+                        std::ostringstream temp;
+                        temp << block_index;
+                        std::string index_literal = temp.str();
+                        //Symtable* current = new Symtable(
+                        //    "BLOCK "+std::to_string(block_index));
                         Symtable* current = new Symtable(
-                            "BLOCK "+std::to_string(block_index));
+                            "BLOCK "+ index_literal);
                         symtable_stack.push(current);
                         symtable_list.push_back(current);
                     } 
@@ -208,8 +214,13 @@ if_stmt             :IF{
                     else_part ENDIF;
 else_part           :ELSE{
                         block_index++;
+                        std::ostringstream temp;
+                        temp << block_index;
+                        std::string index_literal = temp.str();
+                        //Symtable* current = new Symtable(
+                        //    "BLOCK "+std::to_string(block_index));
                         Symtable* current = new Symtable(
-                            "BLOCK "+std::to_string(block_index));
+                            "BLOCK "+ index_literal);
                         symtable_stack.push(current);
                         symtable_list.push_back(current);
                     }
@@ -221,8 +232,13 @@ cond                :expr compop expr | TRUE | FALSE;
 compop              :LT | GT | EQ | NEQ | LEQ | GEQ;
 while_stmt          :WHILE{
                         block_index++;
+                        std::ostringstream temp;
+                        temp << block_index;
+                        std::string index_literal = temp.str();
+                        //Symtable* current = new Symtable(
+                        //    "BLOCK "+std::to_string(block_index));
                         Symtable* current = new Symtable(
-                            "BLOCK "+std::to_string(block_index));
+                            "BLOCK "+ index_literal);
                         symtable_stack.push(current);
                         symtable_list.push_back(current);
                     } 
@@ -239,6 +255,6 @@ loop_stmt           :while_stmt;
 //Epilouge
 void yyerror (const char* s){
     //fprintf(stderr,"Error Line %d token %s\n",yylineno,s);
-    fprintf(stdout,"Not Accepted");
+    std::cout << "Not Accepted" << std::endl;
     exit(1);
 }
