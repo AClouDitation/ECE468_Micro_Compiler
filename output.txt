@@ -1,0 +1,27 @@
+Commit ID tagged for submission: f98de24e87df01cbd7b7ff6ce5f49ff755a5336f
+Submission graded at: 2018-10-01 15:06:58
+
+rm -rf generated
+rm -rf build
+rm -rf compiler
+mkdir -p generated
+mkdir -p build
+flex -o generated/scanner.cpp src/scanner.ll
+bison -d -o generated/parser.cpp src/parser.yy
+g++ -std=c++0x -c generated/scanner.cpp -o build/scanner.o -ll -g
+g++ -std=c++0x -c generated/parser.cpp -o build/parser.o -g
+src/parser.yy: In function ‘int yyparse()’:
+src/parser.yy:201: error: call of overloaded ‘to_string(int&)’ is ambiguous
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/bits/basic_string.h:2604: note: candidates are: std::string std::to_string(long long int)
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/bits/basic_string.h:2610: note:                 std::string std::to_string(long long unsigned int)
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/bits/basic_string.h:2616: note:                 std::string std::to_string(long double)
+src/parser.yy:212: error: call of overloaded ‘to_string(int&)’ is ambiguous
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/bits/basic_string.h:2604: note: candidates are: std::string std::to_string(long long int)
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/bits/basic_string.h:2610: note:                 std::string std::to_string(long long unsigned int)
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/bits/basic_string.h:2616: note:                 std::string std::to_string(long double)
+src/parser.yy:225: error: call of overloaded ‘to_string(int&)’ is ambiguous
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/bits/basic_string.h:2604: note: candidates are: std::string std::to_string(long long int)
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/bits/basic_string.h:2610: note:                 std::string std::to_string(long long unsigned int)
+/usr/lib/gcc/x86_64-redhat-linux/4.4.7/../../../../include/c++/4.4.7/bits/basic_string.h:2616: note:                 std::string std::to_string(long double)
+make: *** [compiler] Error 1
+Make compiler doesn't work when running from the main folder
