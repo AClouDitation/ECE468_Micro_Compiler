@@ -22,5 +22,11 @@ int main(int argc, char** argv){
         if(i != symtable_list.size()-1)std::cout << std::endl;
     }        
 
+    for(auto table:symtable_list){
+        delete table;
+    }
+
+    fclose(fp);
+
     return 0;
 }

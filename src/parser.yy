@@ -81,7 +81,7 @@ program             :PROGRAM {
                         symtable_stack.push(current);
                         symtable_list.push_back(current);
                     }
-                    id BEGIN pgm_body END;
+                    id{delete $3;} BEGIN pgm_body END;
 
 id                  :IDENTIFIER{
                         $$ = new std::string($1);
@@ -94,6 +94,8 @@ string_decl         :STRING id ASSIGN str SEMICOLON {
                         Symtable* current = symtable_stack.top();
                         StrEntry* new_entry = new StrEntry(*$2,*$4);
                         current->add(new_entry);
+                        delete $2;
+                        delete $4;
                     };
 str                 :STRINGLITERAL{
                         $$ = new std::string($1);
@@ -115,6 +117,7 @@ var_decl            :{
                                 FltEntry* new_entry = new FltEntry(id_stack.top());
                                 current->add(new_entry);
                             }
+                            delete $2;
                             id_stack.pop();
                         }
                     };
@@ -133,10 +136,12 @@ any_type            :var_type{
 
 id_list             :id id_tail {
                         id_stack.push(*($1));
+                        delete $1;
                     };
 
 id_tail             :COMMA id id_tail{
                         id_stack.push(*($2));
+                        delete $2;
                     }
                     |/* empty */;
 
@@ -153,16 +158,21 @@ param_decl          :var_type id{
                             FltEntry* new_entry = new FltEntry(*$2);
                             current->add(new_entry);
                         }
+
+                        delete $1;
+                        delete $2;
                     };
 param_decl_tail     :COMMA param_decl param_decl_tail|/* empty */;
 
 /* Function Declarations */
 func_declarations   :func_decl func_declarations|/* empty */;
 func_decl           :FUNCTION any_type id {
-                        //std::cout << "fdecl:id:" << $3 << std::endl;
                         Symtable* current = new Symtable(*$3);
                         symtable_stack.push(current);
                         symtable_list.push_back(current);
+                        // for now
+                        delete $2;
+                        delete $3;
                     }
                     OPAREN param_decl_list CPAREN BEGIN func_body END{
                         symtable_stack.pop();
@@ -176,7 +186,7 @@ base_stmt           :assign_stmt|read_stmt|write_stmt|control_stmt;
 
 /* Basic Statements */
 assign_stmt         :assign_expr SEMICOLON;
-assign_expr         :id ASSIGN expr;
+assign_expr         :id{delete $1;} ASSIGN expr;
 read_stmt           :READ OPAREN id_list CPAREN SEMICOLON;
 write_stmt          :WRITE OPAREN id_list CPAREN SEMICOLON;
 return_stmt         :RETURN expr SEMICOLON;
@@ -187,10 +197,10 @@ expr_prefix         :expr_prefix factor addop | /* empty */;
 factor              :factor_prefix postfix_expr;
 factor_prefix       :factor_prefix postfix_expr mulop | /* empty */;
 postfix_expr        :primary | call_expr;
-call_expr           :id OPAREN expr_list CPAREN;
+call_expr           :id{delete $1;} OPAREN expr_list CPAREN;
 expr_list           :expr expr_list_tail | /* empty */;
 expr_list_tail      :COMMA expr expr_list_tail | /* empty */;
-primary             :OPAREN expr CPAREN | id | INTLITERAL | FLOATLITERAL;
+primary             :OPAREN expr CPAREN | id{delete $1;}| INTLITERAL | FLOATLITERAL;
 addop               :PLUS | MINUS;
 mulop               :MUL | DIV;
 
