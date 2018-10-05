@@ -1,5 +1,6 @@
 %{
     #include "../src/symtable.hpp"
+    #include "../src/ast.hpp"
     #include "../generated/parser.hpp"
     extern char* yytext;
     #include <stdio.h>

@@ -27,6 +27,4 @@ compiler: ./src/*
 clean:
 	rm -rf generated
 	rm -rf build
-	rm -rf compiler
-
 

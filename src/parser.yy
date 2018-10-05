@@ -4,7 +4,9 @@
     #include <stack>
     #include <vector>
     #include <iostream>
+    #include <bits/stdc++.h> //cstr
     #include "../src/symtable.hpp"
+    #include "../src/ast.hpp"
 
     extern int yylex();
     extern int yylineno;
@@ -17,15 +19,40 @@
     std::stack<Symtable*> symtable_stack;
     std::vector<Symtable*> symtable_list;
     std::stack<std::string> id_stack;
+    std::vector<StmtNode*> stmt_list;    
 
+
+    // search through the symbol table,
+    // return VarRef* with the name and type of the symbol.
+    VarRef* find_id(std::string& id){
+        std::stack<Symtable*> now_stack = symtable_stack;
+        Symtable* now = now_stack.top();
+        
+        SymEntry* entry = NULL;
+        while(!entry && !now_stack.empty()){
+            entry = now -> have(id);    
+        }
+        
+        if(!entry){
+            //error handling
+            
+            yyerror("does not exist in scope!\n");
+        }
+        
+        VarRef* new_ref = new VarRef(entry->name, entry->type);
+        return new_ref;
+    }
 }
 
 %define api.token.prefix{TOK_}
 %union {
-    char*   cstr;
-	int     ival;
-	float   fval;
-    std::string* sp;
+    char*           cstr;
+	int             ival;
+	float           fval;
+    char            ch;
+    std::string*    sp;
+    ExprNode*       en;
+    StmtNode*       sn;
 }
 
 /* Keywords */
@@ -72,6 +99,9 @@
 
 /*%type <entry> string_decl*/
 %type <sp> id str var_type any_type 
+%type <en> expr expr_prefix postfix_expr factor factor_prefix 
+%type <sn> assign_expr 
+%type <ch> addop mulop
 %start program
 %%
 /* Grammar rules */
@@ -83,7 +113,7 @@ program             :PROGRAM {
                     }
                     id{delete $3;} BEGIN pgm_body END;
 
-id                  :IDENTIFIER{
+id                  :IDENTIFIER {
                         $$ = new std::string($1);
                     };
 pgm_body            :decl func_declarations;
@@ -185,24 +215,52 @@ stmt                :base_stmt|if_stmt|loop_stmt;
 base_stmt           :assign_stmt|read_stmt|write_stmt|control_stmt;
 
 /* Basic Statements */
-assign_stmt         :assign_expr SEMICOLON;
-assign_expr         :id{delete $1;} ASSIGN expr;
+assign_stmt         :assign_expr SEMICOLON{
+                        stmt_list.push_back($1); 
+                    };
+
+assign_expr         :id ASSIGN expr{
+                        AssignStmtNode* new_assign = new AssignStmtNode(); 
+
+                        // search the current symbol stack to find the table;
+                        VarRef* to = find_id(*$1);
+
+                        new_assign -> to = to;
+                        delete $1;  //free memory of id
+                        // $3 should return a ExprNode*
+                        new_assign -> from = $3;
+                        $$ = new_assign;
+                    };
 read_stmt           :READ OPAREN id_list CPAREN SEMICOLON;
 write_stmt          :WRITE OPAREN id_list CPAREN SEMICOLON;
 return_stmt         :RETURN expr SEMICOLON;
 
 /* Expressions */
-expr                :expr_prefix factor;
-expr_prefix         :expr_prefix factor addop | /* empty */;
-factor              :factor_prefix postfix_expr;
-factor_prefix       :factor_prefix postfix_expr mulop | /* empty */;
+expr                :expr_prefix factor {
+                        $$ = $1; 
+                        $$ -> rnode = $2; // add right oprand to the exprnode
+                    };
+expr_prefix         :expr_prefix factor addop {
+                        $$ = new AddExprNode($3);
+                        $1 -> rnode = $2;
+                        $$ -> lnode = $1;
+                    } | /* empty */{$$ = NULL;};
+factor              :factor_prefix postfix_expr {
+                        $$ = $1;
+                        $$ -> rnode = $2;
+                    };
+factor_prefix       :factor_prefix postfix_expr mulop {
+                        $$ = new MulExprNode($3);
+                        $$ -> lnode = $1;
+                        $1 -> rnode = $2;
+                    } | /* empty */{$$ = NULL;};
 postfix_expr        :primary | call_expr;
 call_expr           :id{delete $1;} OPAREN expr_list CPAREN;
 expr_list           :expr expr_list_tail | /* empty */;
 expr_list_tail      :COMMA expr expr_list_tail | /* empty */;
 primary             :OPAREN expr CPAREN | id{delete $1;}| INTLITERAL | FLOATLITERAL;
-addop               :PLUS | MINUS;
-mulop               :MUL | DIV;
+addop               :PLUS{$$='+';} | MINUS{$$='-';};
+mulop               :MUL{$$='*';} | DIV{$$='/';};
 
 /* Complex Statements and Condition */ 
 if_stmt             :IF{

@@ -2,13 +2,15 @@
 #define SYMTABLE_HPP
 #include <vector>
 #include <unordered_set>
+#include <unordered_map>
 #include <string>
 #include <iostream>
 
 class SymEntry{
 public:
     std::string name;
-    SymEntry(std::string name);
+    std::string type;
+    SymEntry(std::string name, std::string type);
     virtual ~SymEntry();
     virtual void print()=0;
 };
@@ -38,14 +40,17 @@ public:
 
 class Symtable{
 
-    std::vector<SymEntry*> entrylist;
-    std::unordered_set<std::string> id_set;
+    std::vector<SymEntry*> entrylist;   // probably redundant, 
+                                        // will remove in future version
+    std::unordered_set<std::string> id_set; // same for this
+    std::unordered_map<std::string, SymEntry*> id_map; // this is better
     std::string name;
 public:
     Symtable(std::string name);
     virtual ~Symtable();
     virtual void add(SymEntry* SymEntry); 
     virtual void print();
+    virtual SymEntry* have(std::string id);
 };
 
 #endif
