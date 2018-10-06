@@ -17,6 +17,7 @@ int main(int argc, char** argv){
     yyin = fp;
     yyparse();
 
+    std::cout << "parsing finished" << std::endl;
     //std::cout<< "Accepted" << std::endl << std::endl;
     for(int i = 0;i < symtable_list.size();i++){
         symtable_list[i]->print();

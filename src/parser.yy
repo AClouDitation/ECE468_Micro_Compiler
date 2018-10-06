@@ -26,11 +26,13 @@
     // return VarRef* with the name and type of the symbol.
     VarRef* find_id(std::string& id){
         std::stack<Symtable*> now_stack = symtable_stack;
-        Symtable* now = now_stack.top();
         
         SymEntry* entry = NULL;
+
         while(!entry && !now_stack.empty()){
+            Symtable* now = now_stack.top();
             entry = now -> have(id);    
+            now_stack.pop();
         }
         
         if(!entry){
@@ -39,7 +41,10 @@
             yyerror("does not exist in scope!\n");
         }
         
-        VarRef* new_ref = new VarRef(entry->name, entry->type);
+        std::cout << "id found " << id << " ";
+        std::cout << "name: " << entry -> name << " ";
+        std::cout << "type: " << entry -> type << std::endl;
+        VarRef* new_ref = new VarRef(id, entry->type);
         return new_ref;
     }
 }
@@ -99,7 +104,7 @@
 
 /*%type <entry> string_decl*/
 %type <sp> id str var_type any_type 
-%type <en> expr expr_prefix postfix_expr factor factor_prefix 
+%type <en> expr expr_prefix postfix_expr factor factor_prefix primary call_expr 
 %type <sn> assign_expr 
 %type <ch> addop mulop
 %start program
@@ -147,9 +152,9 @@ var_decl            :{
                                 FltEntry* new_entry = new FltEntry(id_stack.top());
                                 current->add(new_entry);
                             }
-                            delete $2;
                             id_stack.pop();
                         }
+                        delete $2;
                     };
 var_type            :FLOAT{
                         $$ = new std::string("FLOAT");  
@@ -223,12 +228,12 @@ assign_expr         :id ASSIGN expr{
                         AssignStmtNode* new_assign = new AssignStmtNode(); 
 
                         // search the current symbol stack to find the table;
-                        VarRef* to = find_id(*$1);
-
-                        new_assign -> to = to;
+                        //VarRef* to = find_id(*$1);
                         delete $1;  //free memory of id
+
                         // $3 should return a ExprNode*
-                        new_assign -> from = $3;
+                        //new_assign -> to = to;
+                        //new_assign -> from = $3;
                         $$ = new_assign;
                     };
 read_stmt           :READ OPAREN id_list CPAREN SEMICOLON;
@@ -237,28 +242,66 @@ return_stmt         :RETURN expr SEMICOLON;
 
 /* Expressions */
 expr                :expr_prefix factor {
-                        $$ = $1; 
-                        $$ -> rnode = $2; // add right oprand to the exprnode
+                        /*
+                        if($1){
+                            $1 -> rnode = $2; // add right oprand to the exprnode
+                            $$ = $1;
+                        }
+                        else $1 = $2;
+                        */
                     };
 expr_prefix         :expr_prefix factor addop {
+                        /*
                         $$ = new AddExprNode($3);
-                        $1 -> rnode = $2;
-                        $$ -> lnode = $1;
+                        if($1){
+                            $1 -> rnode = $2;
+                            $$ -> lnode = $1;
+                        }
+                        else $$ -> lnode = $2; 
+                        */
                     } | /* empty */{$$ = NULL;};
 factor              :factor_prefix postfix_expr {
-                        $$ = $1;
-                        $$ -> rnode = $2;
+                        /*
+                        if($1){
+                            $$ = $1;
+                            $$ -> rnode = $2;
+                        }
+                        else $$ = $2;
+                        */
                     };
 factor_prefix       :factor_prefix postfix_expr mulop {
+                        /*
                         $$ = new MulExprNode($3);
-                        $$ -> lnode = $1;
-                        $1 -> rnode = $2;
+                        if($1){
+                            $$ -> lnode = $1;
+                            $1 -> rnode = $2;
+                        }
+                        else $$ -> lnode = $2; 
+                        */
                     } | /* empty */{$$ = NULL;};
 postfix_expr        :primary | call_expr;
-call_expr           :id{delete $1;} OPAREN expr_list CPAREN;
+call_expr           :id OPAREN expr_list CPAREN {
+                        //TODO: make a function call!
+                        CallExprNode* new_call = new CallExprNode(*$1);
+                        delete $1;
+                        $$ = new_call;
+                    };
 expr_list           :expr expr_list_tail | /* empty */;
 expr_list_tail      :COMMA expr expr_list_tail | /* empty */;
-primary             :OPAREN expr CPAREN | id{delete $1;}| INTLITERAL | FLOATLITERAL;
+primary             :OPAREN expr CPAREN {
+                        $$ = $2; 
+                    } | id{
+                        VarRef* new_var = find_id(*$1);
+                        // TODO: investigate why this cause double free 
+                        delete $1;
+                        $$ = new_var;
+                    } | INTLITERAL {
+                        LitRef* new_lit = new LitRef("INT",std::to_string($1));
+                        $$ = new_lit;
+                    } | FLOATLITERAL {
+                        LitRef* new_lit = new LitRef("FLOAT",std::to_string($1));
+                        $$ = new_lit;
+                    };
 addop               :PLUS{$$='+';} | MINUS{$$='-';};
 mulop               :MUL{$$='*';} | DIV{$$='/';};
 
