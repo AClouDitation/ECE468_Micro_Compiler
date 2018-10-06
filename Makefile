@@ -1,8 +1,5 @@
 CXX = g++
 CC = gcc
-src = comp.cpp
-obj = $(src:%.cpp=%.o)
-
 
 team:
 	@echo "Team: Compliation_Error\n"

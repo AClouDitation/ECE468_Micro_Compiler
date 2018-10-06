@@ -37,13 +37,9 @@
         
         if(!entry){
             //error handling
-            
             yyerror("does not exist in scope!\n");
         }
         
-        std::cout << "id found " << id << " ";
-        std::cout << "name: " << entry -> name << " ";
-        std::cout << "type: " << entry -> type << std::endl;
         VarRef* new_ref = new VarRef(id, entry->type);
         return new_ref;
     }
@@ -228,12 +224,12 @@ assign_expr         :id ASSIGN expr{
                         AssignStmtNode* new_assign = new AssignStmtNode(); 
 
                         // search the current symbol stack to find the table;
-                        //VarRef* to = find_id(*$1);
+                        VarRef* to = find_id(*$1);
                         delete $1;  //free memory of id
 
                         // $3 should return a ExprNode*
-                        //new_assign -> to = to;
-                        //new_assign -> from = $3;
+                        new_assign -> to = to;
+                        new_assign -> from = $3;
                         $$ = new_assign;
                     };
 read_stmt           :READ OPAREN id_list CPAREN SEMICOLON;
@@ -242,42 +238,34 @@ return_stmt         :RETURN expr SEMICOLON;
 
 /* Expressions */
 expr                :expr_prefix factor {
-                        /*
                         if($1){
                             $1 -> rnode = $2; // add right oprand to the exprnode
                             $$ = $1;
                         }
                         else $1 = $2;
-                        */
                     };
 expr_prefix         :expr_prefix factor addop {
-                        /*
                         $$ = new AddExprNode($3);
                         if($1){
                             $1 -> rnode = $2;
                             $$ -> lnode = $1;
                         }
                         else $$ -> lnode = $2; 
-                        */
                     } | /* empty */{$$ = NULL;};
 factor              :factor_prefix postfix_expr {
-                        /*
                         if($1){
                             $$ = $1;
                             $$ -> rnode = $2;
                         }
                         else $$ = $2;
-                        */
                     };
 factor_prefix       :factor_prefix postfix_expr mulop {
-                        /*
                         $$ = new MulExprNode($3);
                         if($1){
                             $$ -> lnode = $1;
                             $1 -> rnode = $2;
                         }
                         else $$ -> lnode = $2; 
-                        */
                     } | /* empty */{$$ = NULL;};
 postfix_expr        :primary | call_expr;
 call_expr           :id OPAREN expr_list CPAREN {
@@ -292,7 +280,6 @@ primary             :OPAREN expr CPAREN {
                         $$ = $2; 
                     } | id{
                         VarRef* new_var = find_id(*$1);
-                        // TODO: investigate why this cause double free 
                         delete $1;
                         $$ = new_var;
                     } | INTLITERAL {

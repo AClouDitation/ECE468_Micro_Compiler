@@ -41,7 +41,6 @@ Symtable::~Symtable(){
 void Symtable::add(SymEntry* entry){
     
     entrylist.push_back(entry); // will remove
-    std::cerr << "new entry " << entry -> type << " " << entry -> name << std::endl;
     /*
     if(id_set.find(entry->name)==id_set.end()){
         id_set.insert(entry->name);
