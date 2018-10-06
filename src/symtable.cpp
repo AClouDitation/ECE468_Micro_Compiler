@@ -33,7 +33,7 @@ void FltEntry::print(){
 // the symtable table
 Symtable::Symtable(std::string name){this->name = name;}
 Symtable::~Symtable(){
-    for(int i=0;i < entrylist.size(); i++){
+    for(unsigned int i=0;i < entrylist.size(); i++){
         delete entrylist[i];
     }
 }
@@ -61,7 +61,7 @@ void Symtable::add(SymEntry* entry){
 
 void Symtable::print(){
     std::cout << "Symbol table " << name << std::endl;
-    for(int i = 0;i < entrylist.size();i++)
+    for(unsigned int i = 0;i < entrylist.size();i++)
         entrylist[i]->print();
 }
 

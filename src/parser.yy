@@ -230,6 +230,9 @@ assign_expr         :id ASSIGN expr{
                         // $3 should return a ExprNode*
                         new_assign -> to = to;
                         new_assign -> from = $3;
+                        if(!new_assign -> from)std::cout << "err! from" << std::endl;
+                        if(!new_assign -> to)std::cout << "err! to" << std::endl;
+                        std::cout << std::endl;
                         $$ = new_assign;
                     };
 read_stmt           :READ OPAREN id_list CPAREN SEMICOLON;
@@ -242,7 +245,8 @@ expr                :expr_prefix factor {
                             $1 -> rnode = $2; // add right oprand to the exprnode
                             $$ = $1;
                         }
-                        else $1 = $2;
+                        else $$ = $2;
+
                     };
 expr_prefix         :expr_prefix factor addop {
                         $$ = new AddExprNode($3);
@@ -267,9 +271,14 @@ factor_prefix       :factor_prefix postfix_expr mulop {
                         }
                         else $$ -> lnode = $2; 
                     } | /* empty */{$$ = NULL;};
-postfix_expr        :primary | call_expr;
+postfix_expr        :primary {
+                        $$ = $1;
+                    } | call_expr {
+                        $$ = $1;
+                    };
 call_expr           :id OPAREN expr_list CPAREN {
-                        //TODO: make a function call!
+                        // TODO: make a function call!
+                        // dont care for now...
                         CallExprNode* new_call = new CallExprNode(*$1);
                         delete $1;
                         $$ = new_call;
