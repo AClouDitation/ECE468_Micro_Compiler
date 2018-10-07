@@ -230,9 +230,6 @@ assign_expr         :id ASSIGN expr{
                         // $3 should return a ExprNode*
                         new_assign -> to = to;
                         new_assign -> from = $3;
-                        if(!new_assign -> from)std::cout << "err! from" << std::endl;
-                        if(!new_assign -> to)std::cout << "err! to" << std::endl;
-                        std::cout << std::endl;
                         $$ = new_assign;
                     };
 read_stmt           :READ OPAREN id_list CPAREN SEMICOLON;
@@ -246,7 +243,6 @@ expr                :expr_prefix factor {
                             $$ = $1;
                         }
                         else $$ = $2;
-
                     };
 expr_prefix         :expr_prefix factor addop {
                         $$ = new AddExprNode($3);

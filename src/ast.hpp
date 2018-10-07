@@ -8,15 +8,16 @@
 static int temp_reg_index = 0;
 class ExprNode{
 public:
-    ExprNode(){};
+    ExprNode():type("INT"){};
     virtual ~ExprNode(){};
     virtual std::string translate(std::vector<std::string>&)=0;
     ExprNode* lnode;
     ExprNode* rnode;
+    std::string type;
 };
 
 class AddExprNode: public ExprNode{
-    char type;
+    char sign;
 public:
     AddExprNode(char);
     virtual ~AddExprNode();
@@ -24,7 +25,7 @@ public:
 };
 
 class MulExprNode: public ExprNode{
-    char type;
+    char sign;
 public:
     MulExprNode(char);
     virtual ~MulExprNode();
@@ -48,7 +49,6 @@ public:
     virtual ~VarRef();
     virtual std::string translate(std::vector<std::string>&);
     
-    std::string type;
     std::string name;
 };
 
@@ -58,7 +58,6 @@ public:
     virtual ~LitRef();
     virtual std::string translate(std::vector<std::string>&);
 
-    std::string type;
     std::string value;
 };
 

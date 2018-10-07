@@ -1,22 +1,23 @@
 #include "ast.hpp"
 #include <iostream>
 
-using namespace std;
 AddExprNode::AddExprNode(char type){
-    
-    cout << "new AddExprNode" << endl;  //debugging
-    this->type = type;
+    this->sign = sign;
     this->lnode = NULL;
     this->rnode = NULL;
 }
+
 AddExprNode::~AddExprNode(){}
 std::string AddExprNode::translate(std::vector<std::string>& code_block){
     std::string op1 = lnode->translate(code_block);
     std::string op2 = rnode->translate(code_block);
 
     std::string new_ir = "";
-    if(type == '+') new_ir += "ADDI ";
-    else new_ir += "SUBI ";
+    if(sign == '+') new_ir += "ADD";
+    else new_ir += "SUB";
+
+    if(type == "FLOAT") new_ir += "F ";
+    else new_ir += "I ";
 
     new_ir += op1+" "+op2;
     std::string res = "$T"+std::to_string(temp_reg_index);
@@ -28,10 +29,8 @@ std::string AddExprNode::translate(std::vector<std::string>& code_block){
     return res;
 }
 
-MulExprNode::MulExprNode(char type){
-
-    cout << "new MulExprNode" << endl;  //debugging
-    this->type = type;
+MulExprNode::MulExprNode(char sign){
+    this->sign = sign;
     this->lnode = NULL;
     this->rnode = NULL;
 }
@@ -41,9 +40,12 @@ std::string MulExprNode::translate(std::vector<std::string>& code_block){
     std::string op2 = rnode->translate(code_block);
 
     std::string new_ir = "";
-    if(type == '*') new_ir += "MULI ";
-    else new_ir += "DIVI ";
+    if(sign == '*') new_ir += "MUL";
+    else new_ir += "DIV";
 
+    if(type == "FLOAT") new_ir += "F ";
+    else new_ir += "I ";
+    
     new_ir += op1+" "+op2;
     std::string res = "$T"+std::to_string(temp_reg_index);
     new_ir += " " + res;
@@ -57,7 +59,6 @@ std::string MulExprNode::translate(std::vector<std::string>& code_block){
 // for now
 CallExprNode::CallExprNode(std::string fname){
 
-    cout << "new CallExprNode" << endl;  //debugging
     this->name = fname;
     // this->arg_list = args;
 }
@@ -70,7 +71,6 @@ std::string CallExprNode::translate(std::vector<std::string>& code_block){
 
 VarRef::VarRef(std::string name, std::string type){
 
-    cout << "new VarRef " << name << " " << type << endl;  //debugging
     this->name = name;
     this->type = type;
 
@@ -87,7 +87,6 @@ std::string VarRef::translate(std::vector<std::string>& code_block){
 
 LitRef::LitRef(std::string type, std::string val){
 
-    cout << "new LitRef " << val <<endl;  //debugging
     this->type = type;
     this->value = val;
 
@@ -104,7 +103,6 @@ std::string LitRef::translate(std::vector<std::string>& code_block){
 
 AssignStmtNode::AssignStmtNode(){
 
-    cout << "new AssignStmtNode" << endl;  //debugging
     this->to = NULL;
     this->from = NULL;
 }
@@ -112,7 +110,7 @@ AssignStmtNode::AssignStmtNode(){
 AssignStmtNode::~AssignStmtNode(){}
 std::vector<std::string>& AssignStmtNode::translate(){
     
-    vector<std::string>* code_block = new vector<std::string>;
+    std::vector<std::string>* code_block = new std::vector<std::string>;
     std::string res = from->translate(*code_block);
     std::string new_IR = "";
     if(to -> type == "INT") new_IR += "STOREI ";
