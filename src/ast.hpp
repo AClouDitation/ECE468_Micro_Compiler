@@ -78,4 +78,16 @@ public:
     ExprNode* from;
 };
 
+class FunctionDeclNode{
+public:
+    FunctionDeclNode(std::string, std::string);
+    virtual ~FunctionDeclNode();
+
+    void update_AST_type(ExprNode*);
+    std::vector<std::string>& translate();
+
+    std::vector<StmtNode*> stmt_list;    
+    std::string name;
+    std::string type;
+};
 #endif

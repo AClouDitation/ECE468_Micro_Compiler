@@ -121,3 +121,36 @@ std::vector<std::string>& AssignStmtNode::translate(){
     
     return *code_block;
 }
+
+FunctionDeclNode::FunctionDeclNode(std::string name, std::string type):
+    name(name),type(type){}
+
+FunctionDeclNode::~FunctionDeclNode(){}
+
+void FunctionDeclNode::update_AST_type(ExprNode* root){
+    if(!root->lnode && !root->rnode) return; // this is a Ref Node
+    if(root->lnode) update_AST_type(root->lnode);
+    if(root->rnode) update_AST_type(root->rnode);
+
+    if(root->lnode->type == "FLOAT" || root->rnode->type == "FLOAT"){
+        root->type = "FLOAT"; 
+    }
+}
+
+std::vector<std::string>& FunctionDeclNode::translate(){
+    
+    std::vector<std::string>* ir = new std::vector<std::string>;
+
+    ir->push_back("LABEL FUNC_"+name);
+    ir->push_back("LINK");
+
+    for(auto stmt: stmt_list){
+        update_AST_type(dynamic_cast<AssignStmtNode*>(stmt)->from); // for now
+        std::vector<std::string> code_block = stmt->translate();
+        ir->insert(ir->end(),code_block.begin(),code_block.end());
+    }
+
+    ir->push_back("RET"); //for now
+
+    return *ir;
+}

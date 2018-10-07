@@ -14,32 +14,10 @@ extern std::stack<Symtable*> symtable_stack; // should be empty,
                                              // were poped
 extern std::vector<Symtable*> symtable_list; // this is redundant 
                                              // however needed in step3
-extern std::vector<StmtNode*> stmt_list;    
+//extern std::vector<StmtNode*> stmt_list;    
+extern std::vector<FunctionDeclNode*> func_list;
 
 
-void update_AST_type(ExprNode* root){
-    if(!root->lnode && !root->rnode) return; // this is a Ref Node
-    if(root->lnode) update_AST_type(root->lnode);
-    if(root->rnode) update_AST_type(root->rnode);
-
-    if(root->lnode->type == "FLOAT" || root->rnode->type == "FLOAT"){
-        root->type = "FLOAT"; 
-    }
-}
-
-
-std::vector<std::string>& AST2IR(){
-    std::vector<std::string>* ir = new std::vector<std::string>;
-    for(auto stmt: stmt_list){
-        update_AST_type(dynamic_cast<AssignStmtNode*>(stmt)->from);
-        std::vector<std::string> code_block = stmt->translate();
-        ir->insert(ir->end(),code_block.begin(),code_block.end());
-
-       
-    }
-
-    return *ir;
-}
 int main(int argc, char** argv){
     
     FILE* fp = fopen(argv[1],"r");
@@ -57,13 +35,15 @@ int main(int argc, char** argv){
         delete table;
     }
 
-    std::vector<std::string>& ir = AST2IR(); 
-
-    // for debugging
-    for(auto line: ir){
-        std::cout << line << std::endl;
+    for(auto func_node: func_list){
+        std::vector<std::string>& ir = func_node->translate();
+        for(auto line: ir){
+            std::cout << line << std::endl;
+        }
+        std::cout << std::endl;
     }
-    //
+    //std::vector<std::string>& ir = AST2IR(); 
+
 
 
     fclose(fp);
