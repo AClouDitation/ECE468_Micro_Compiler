@@ -1,7 +1,7 @@
 #include "ast.hpp"
 #include <iostream>
 
-AddExprNode::AddExprNode(char type){
+AddExprNode::AddExprNode(char sign){
     this->sign = sign;
     this->lnode = NULL;
     this->rnode = NULL;
