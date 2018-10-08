@@ -85,6 +85,7 @@ public:
     WriteStmtNode();
     virtual ~WriteStmtNode();
     std::vector<std::string>& translate();
+    std::vector<VarRef*> id_list;
 };
 
 class ReadStmtNode: public StmtNode{

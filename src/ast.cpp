@@ -138,6 +138,15 @@ ReadStmtNode::ReadStmtNode(){}
 ReadStmtNode::~ReadStmtNode(){}
 std::vector<std::string>& ReadStmtNode::translate(){
     std::vector<std::string>* code_block = new std::vector<std::string>;
+    
+    for(auto id:id_list){
+        std::string new_IR = "";
+        if(id -> type == "INT") new_IR += "READI ";
+        else if(id -> type == "FLOAT") new_IR += "READF ";
+        new_IR += id->name;
+        code_block->push_back(new_IR);
+    }
+    
 
     return *code_block;
 }
