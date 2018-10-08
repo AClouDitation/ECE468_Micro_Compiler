@@ -72,6 +72,8 @@ class AssignStmtNode: public StmtNode{
 public:
     AssignStmtNode();
     virtual ~AssignStmtNode();
+
+    void update_AST_type(ExprNode*);
     std::vector<std::string>& translate();
     
     VarRef* to;
@@ -90,6 +92,7 @@ public:
     ReadStmtNode();
     virtual ~ReadStmtNode();
     std::vector<std::string>& translate();
+    std::vector<VarRef*> id_list;
 };
 
 class FunctionDeclNode{
@@ -97,7 +100,6 @@ public:
     FunctionDeclNode(std::string, std::string);
     virtual ~FunctionDeclNode();
 
-    void update_AST_type(ExprNode*);
     std::vector<std::string>& translate();
 
     std::vector<StmtNode*> stmt_list;    

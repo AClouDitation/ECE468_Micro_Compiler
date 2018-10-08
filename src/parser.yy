@@ -235,7 +235,17 @@ assign_expr         :id ASSIGN expr{
                         new_assign -> from = $3;
                         $$ = new_assign;
                     };
-read_stmt           :READ OPAREN id_list CPAREN SEMICOLON;
+read_stmt           :{
+                        while(!id_stack.empty())id_stack.pop();
+                    }
+                    READ OPAREN id_list CPAREN SEMICOLON{
+                        ReadStmtNode* new_read = new ReadStmtNode();
+                        while(!id_stack.empty()){
+                            new_read->id_list.push_back(find_id(id_stack.top()));
+                            id_stack.pop();
+                        }
+                        func_list.back()->stmt_list.push_back(new_read);
+                    };
 write_stmt          :WRITE OPAREN id_list CPAREN SEMICOLON{
                         WriteStmtNode* new_write = new WriteStmtNode();
                         //do something
