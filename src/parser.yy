@@ -236,7 +236,10 @@ assign_expr         :id ASSIGN expr{
                         $$ = new_assign;
                     };
 read_stmt           :READ OPAREN id_list CPAREN SEMICOLON;
-write_stmt          :WRITE OPAREN id_list CPAREN SEMICOLON;
+write_stmt          :WRITE OPAREN id_list CPAREN SEMICOLON{
+                        WriteStmtNode* new_write = new WriteStmtNode();
+                        //do something
+                    };
 return_stmt         :RETURN expr SEMICOLON;
 
 /* Expressions */

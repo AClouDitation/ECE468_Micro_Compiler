@@ -78,6 +78,20 @@ public:
     ExprNode* from;
 };
 
+class WriteStmtNode: public StmtNode{
+public:
+    WriteStmtNode();
+    virtual ~WriteStmtNode();
+    std::vector<std::string>& translate();
+};
+
+class ReadStmtNode: public StmtNode{
+public:
+    ReadStmtNode();
+    virtual ~ReadStmtNode();
+    std::vector<std::string>& translate();
+};
+
 class FunctionDeclNode{
 public:
     FunctionDeclNode(std::string, std::string);
