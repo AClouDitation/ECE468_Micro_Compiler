@@ -10,9 +10,8 @@
 
 
 extern FILE* yyin;
-extern std::stack<Symtable*> symtable_stack; // should be empty,
-                                             // contents should be freed when they
-                                             // were poped
+extern std::stack<Symtable*> symtable_stack; // should be size 1, with only the 
+                                             // global symbol table left
 extern std::vector<Symtable*> symtable_list; // this is redundant 
                                              // however needed in step3
 extern std::vector<FunctionDeclNode*> func_list;
@@ -248,26 +247,26 @@ int main(int argc, char** argv){
     }        
     */
 
-    for(auto table:symtable_list) delete table;
-    
-
-    std::vector<std::string> ops;
+    std::vector<std::string>& ops = symtable_stack.top()->decl();
     for(auto func_node: func_list){
         std::vector<std::string>& ir = func_node->translate();
+        std::vector<std::string>& op_decl = func_node->symtable->decl();
         std::vector<std::string>& op_block = ir2tiny(ir);
+        ops.insert(ops.end(),op_decl.begin(),op_decl.end());
         ops.insert(ops.end(),op_block.begin(),op_block.end());
+        /* printing IR for debugging purpose
         for(auto line: ir){
             std::cout << line << std::endl;
         }
         std::cout << std::endl;
+        */
     }
 
     for(auto op:ops){
         std::cout << op << std::endl;
     }
 
-
-
+    for(auto table:symtable_list) delete table;
     fclose(fp);
 
     return 0;

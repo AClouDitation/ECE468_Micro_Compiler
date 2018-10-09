@@ -172,12 +172,11 @@ std::vector<std::string>& WriteStmtNode::translate(){
     return *code_block;
 }
 
-FunctionDeclNode::FunctionDeclNode(std::string name, std::string type):
-    name(name),type(type){}
+FunctionDeclNode::FunctionDeclNode(std::string name, std::string type, 
+        Symtable* symtable):
+    name(name),type(type),symtable(symtable){}
 
 FunctionDeclNode::~FunctionDeclNode(){}
-
-
 
 std::vector<std::string>& FunctionDeclNode::translate(){
     
@@ -195,3 +194,4 @@ std::vector<std::string>& FunctionDeclNode::translate(){
 
     return *ir;
 }
+

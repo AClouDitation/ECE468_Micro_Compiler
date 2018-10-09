@@ -202,7 +202,7 @@ func_decl           :FUNCTION any_type id {
                         Symtable* current = new Symtable(*$3);
                         symtable_stack.push(current);
                         symtable_list.push_back(current);
-                        FunctionDeclNode* new_func = new FunctionDeclNode(*$3,*$2);
+                        FunctionDeclNode* new_func = new FunctionDeclNode(*$3,*$2,current);
                         func_list.push_back(new_func);
                         // for now
                         delete $2;

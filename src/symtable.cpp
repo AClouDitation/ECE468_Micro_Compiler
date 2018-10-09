@@ -31,7 +31,7 @@ void FltEntry::print(){
 
 
 // the symtable table
-Symtable::Symtable(std::string name){this->name = name;}
+Symtable::Symtable(std::string name):name(name){}
 Symtable::~Symtable(){
     for(unsigned int i=0;i < entrylist.size(); i++){
         delete entrylist[i];
@@ -41,15 +41,6 @@ Symtable::~Symtable(){
 void Symtable::add(SymEntry* entry){
     
     entrylist.push_back(entry); // will remove
-    /*
-    if(id_set.find(entry->name)==id_set.end()){
-        id_set.insert(entry->name);
-    }
-    else{
-        std::cout<<"DECLARATION ERROR "<<entry->name<<std::endl;
-        std::exit(1);
-    }
-    */
     if(id_map.find(entry->name)==id_map.end()){
         id_map[entry->name] = entry;
     }
@@ -63,6 +54,15 @@ void Symtable::print(){
     std::cout << "Symbol table " << name << std::endl;
     for(unsigned int i = 0;i < entrylist.size();i++)
         entrylist[i]->print();
+}
+
+std::vector<std::string>& Symtable::decl(){
+    std::vector<std::string>* decl_ops = new std::vector<std::string>;
+    for(auto kv:id_map){
+        decl_ops->push_back("var "+kv.first);
+    }
+
+    return *decl_ops;
 }
 
 SymEntry* Symtable::have(std::string id){

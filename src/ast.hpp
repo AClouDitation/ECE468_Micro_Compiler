@@ -2,6 +2,7 @@
 #define AST_HPP
 #include <string>
 #include <vector>
+#include "../src/symtable.hpp"
 
 // expressions
 
@@ -98,13 +99,13 @@ public:
 
 class FunctionDeclNode{
 public:
-    FunctionDeclNode(std::string, std::string);
+    FunctionDeclNode(std::string, std::string, Symtable* symtable);
     virtual ~FunctionDeclNode();
 
     std::vector<std::string>& translate();
-
     std::vector<StmtNode*> stmt_list;    
     std::string name;
     std::string type;
+    Symtable* symtable; 
 };
 #endif

@@ -39,7 +39,6 @@ public:
 
 
 class Symtable{
-
     std::vector<SymEntry*> entrylist;   // probably redundant, 
                                         // will remove in future version
     std::unordered_set<std::string> id_set; // same for this
@@ -50,6 +49,7 @@ public:
     virtual ~Symtable();
     virtual void add(SymEntry* SymEntry); 
     virtual void print();
+    virtual std::vector<std::string>& decl();
     virtual SymEntry* have(std::string id);
 };
 
