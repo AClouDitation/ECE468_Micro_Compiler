@@ -16,8 +16,8 @@ public:
 };
 
 class StrEntry: public SymEntry{
-    std::string literal;
 public:
+    std::string literal;
     StrEntry(std::string name, std::string lit);
     virtual ~StrEntry(){};
     void print();
