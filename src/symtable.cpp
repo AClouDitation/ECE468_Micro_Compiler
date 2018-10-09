@@ -59,9 +59,13 @@ void Symtable::print(){
 std::vector<std::string>& Symtable::decl(){
     std::vector<std::string>* decl_ops = new std::vector<std::string>;
     for(auto kv:id_map){
-        std::string new_decl = "var "+kv.first;
+        std::string new_decl = "";
         if(kv.second->type == "STRING"){
-            new_decl += " " + dynamic_cast<StrEntry*>(kv.second)->literal;
+            new_decl += "str " + kv.first + " "
+                + dynamic_cast<StrEntry*>(kv.second)->literal;
+        }
+        else{
+            new_decl += "var "+kv.first;
         }
         decl_ops->push_back(new_decl);
     }

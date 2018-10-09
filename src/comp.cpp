@@ -129,7 +129,7 @@ std::vector<std::string>& ir2tiny(std::vector<std::string>& irs){
 
             std::string new_tiny_op = "move " + op1 + " " + target_reg;
             tiny->push_back(new_tiny_op);
-            new_tiny_op = "addf " + op2 + " " + target_reg;
+            new_tiny_op = "addr " + op2 + " " + target_reg;
             tiny->push_back(new_tiny_op);
         }
         else if(items[0] == "SUBF"){
@@ -145,7 +145,7 @@ std::vector<std::string>& ir2tiny(std::vector<std::string>& irs){
 
             std::string new_tiny_op = "move " + op1 + " " + target_reg;
             tiny->push_back(new_tiny_op);
-            new_tiny_op = "subf " + op2 + " " + target_reg;
+            new_tiny_op = "subr " + op2 + " " + target_reg;
             tiny->push_back(new_tiny_op);
         }
         else if(items[0] == "MULF"){
@@ -161,7 +161,7 @@ std::vector<std::string>& ir2tiny(std::vector<std::string>& irs){
 
             std::string new_tiny_op = "move " + op1 + " " + target_reg;
             tiny->push_back(new_tiny_op);
-            new_tiny_op = "mulf " + op2 + " " + target_reg;
+            new_tiny_op = "mulr " + op2 + " " + target_reg;
             tiny->push_back(new_tiny_op);
         }
         else if(items[0] == "DIVF"){
@@ -177,7 +177,7 @@ std::vector<std::string>& ir2tiny(std::vector<std::string>& irs){
 
             std::string new_tiny_op = "move " + op1 + " " + target_reg;
             tiny->push_back(new_tiny_op);
-            new_tiny_op = "divf " + op2 + " " + target_reg;
+            new_tiny_op = "divr " + op2 + " " + target_reg;
             tiny->push_back(new_tiny_op);
         }
         else if(items[0] == "STOREI"){
@@ -210,7 +210,7 @@ std::vector<std::string>& ir2tiny(std::vector<std::string>& irs){
             tiny->push_back(new_tiny_op);
         }
         else if(items[0] == "READF"){
-            std::string new_tiny_op = "sys readf ";
+            std::string new_tiny_op = "sys readr ";
             new_tiny_op += items[1];
             tiny->push_back(new_tiny_op);
         }
@@ -220,7 +220,7 @@ std::vector<std::string>& ir2tiny(std::vector<std::string>& irs){
             tiny->push_back(new_tiny_op);
         }
         else if(items[0] == "WRITEF"){
-            std::string new_tiny_op = "sys writef ";
+            std::string new_tiny_op = "sys writer ";
             new_tiny_op += items[1];
             tiny->push_back(new_tiny_op);
         }
