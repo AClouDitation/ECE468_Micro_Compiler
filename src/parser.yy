@@ -246,8 +246,16 @@ read_stmt           :{
                         }
                         func_list.back()->stmt_list.push_back(new_read);
                     };
-write_stmt          :WRITE OPAREN id_list CPAREN SEMICOLON{
+write_stmt          :{
+                        while(!id_stack.empty())id_stack.pop();
+                    }WRITE OPAREN id_list CPAREN SEMICOLON{
                         WriteStmtNode* new_write = new WriteStmtNode();
+                        while(!id_stack.empty()){
+                            new_write->id_list.push_back(find_id(id_stack.top()));
+                            id_stack.pop();
+                        }
+                        func_list.back()->stmt_list.push_back(new_write);
+
                         //do something
                     };
 return_stmt         :RETURN expr SEMICOLON;

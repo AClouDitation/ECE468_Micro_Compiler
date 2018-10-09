@@ -254,7 +254,8 @@ int main(int argc, char** argv){
         std::vector<std::string>& op_block = ir2tiny(ir);
         ops.insert(ops.end(),op_decl.begin(),op_decl.end());
         ops.insert(ops.end(),op_block.begin(),op_block.end());
-        /* printing IR for debugging purpose
+        //printing IR for debugging purpose
+        /*
         for(auto line: ir){
             std::cout << line << std::endl;
         }

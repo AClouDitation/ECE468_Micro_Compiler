@@ -159,7 +159,6 @@ std::vector<std::string>& ReadStmtNode::translate(){
         code_block->push_back(new_IR);
     }
     
-
     return *code_block;
 }
 
@@ -168,7 +167,16 @@ WriteStmtNode::WriteStmtNode(){}
 WriteStmtNode::~WriteStmtNode(){}
 std::vector<std::string>& WriteStmtNode::translate(){
     std::vector<std::string>* code_block = new std::vector<std::string>;
-
+    
+    for(auto id:id_list){
+        std::string new_IR = "";
+        if(id -> type == "INT") new_IR += "WRITEI ";
+        else if(id -> type == "FLOAT") new_IR += "WRITEF ";
+        else if(id -> type == "STRING") new_IR += "WRITES ";
+        new_IR += id->name;
+        code_block->push_back(new_IR);
+    }
+    
     return *code_block;
 }
 
