@@ -317,7 +317,7 @@ primary             :OPAREN expr CPAREN {
                         $$ = new_lit;
                     } | FLOATLITERAL {
                         LitRef* new_lit = new LitRef("FLOAT",
-                            std::to_string(static_cast<double>($1)));
+                            std::to_string(static_cast<long double>($1)));
                         $$ = new_lit;
                     };
 addop               :PLUS{$$='+';} | MINUS{$$='-';};
