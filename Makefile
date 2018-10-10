@@ -1,4 +1,4 @@
-export PATH := /opt/gcc/gcc-7.1.0:$(PATH)
+export PATH:=/opt/gcc/7.1.0/bin:$(PATH)
 CXX = g++
 CC = gcc
 
