@@ -21,7 +21,7 @@ compiler: ./src/*
 	$(CXX_ECN) -std=c++0x -c src/ast.cpp -o build/ast.o -g -static-libstdc++
 	$(CXX_ECN) -std=c++0x -c src/opt.cpp -o build/opt.o -g -static-libstdc++
 	$(CXX_ECN) -std=c++0x -c src/symtable.cpp -o build/symtable.o -g -static-libstdc++
-	$(CXX_ECN) -std=c++0x -o compiler build/scanner.o build/parser.o build/comp.o build/ast.o build/symtable.o -g -static-libstdc++
+	$(CXX_ECN) -std=c++0x -o compiler build/*.o -g -static-libstdc++
 
 compiler_local: ./src/*
 	mkdir -p generated
