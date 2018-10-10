@@ -233,7 +233,8 @@ int main(int argc, char** argv){
 
     std::vector<std::string>& ops = symtable_stack.top()->decl();
     for(auto func_node: func_list){
-        std::vector<std::string>& ir = func_node->translate();
+        std::vector<std::vector<std::string>>& ir = split_irs(func_node->translate());
+
         //live_ana(ir);
         std::vector<std::string>& op_decl = func_node->symtable->decl();
         std::vector<std::string>& op_block = ir2tiny(ir);
