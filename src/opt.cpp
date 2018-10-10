@@ -115,11 +115,20 @@ void constant_swap(std::vector<std::vector<std::string>>& irs)
         }
         else if((*ir)[0] == "WRITEI" || (*ir)[0] == "WRITEF"){
             if(const_refs.find((*ir)[1]) != const_refs.end()){
-                (*ir)[1] = const_refs[(*ir)[1]];
+                //store back to register for priting
+                std::vector<std::string> str_ir;
+                if((*ir)[0] == "WRITEI")str_ir.push_back("STOREI");
+                else if((*ir)[0] == "WRITEF")str_ir.push_back("STOREF");
+                str_ir.push_back(const_refs[(*ir)[1]]);
+                str_ir.push_back("$T"+std::to_string(temp_reg_index)); // store to register
+                (*ir)[1] = "$T" + std::to_string(temp_reg_index++);
+                irs.insert(ir,str_ir);
+                ir++;
             }
             ir++;
         }
         else{
+            // should be WRITES only
             ir++;
         }
 

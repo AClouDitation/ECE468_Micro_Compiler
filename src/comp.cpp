@@ -200,12 +200,22 @@ std::vector<std::string>& ir2tiny(std::vector<std::vector<std::string>>& irs){
         }
         else if(items[0] == "WRITEI"){
             std::string new_tiny_op = "sys writei ";
-            new_tiny_op += items[1];
+            std::string op1;
+
+            if(items[1][0] == '$') op1 = t2r(items[1]);
+            else op1 = items[1];
+
+            new_tiny_op += op1;
             tiny->push_back(new_tiny_op);
         }
         else if(items[0] == "WRITEF"){
             std::string new_tiny_op = "sys writer ";
-            new_tiny_op += items[1];
+            std::string op1;
+
+            if(items[1][0] == '$') op1 = t2r(items[1]);
+            else op1 = items[1];
+
+            new_tiny_op += op1;
             tiny->push_back(new_tiny_op);
         }
         else if(items[0] == "WRITES"){
@@ -234,14 +244,6 @@ int main(int argc, char** argv){
     std::vector<std::string>& ops = symtable_stack.top()->decl();
     for(auto func_node: func_list){
         std::vector<std::vector<std::string>>& ir = split_irs(func_node->translate());
-        for(auto line: ir){
-            for(auto item:line){
-                std::cout << item << " ";
-            }
-            std::cout << std::endl;
-        }
-        std::cout << std::endl;
-        
 
         OOOptmize(ir);
 
@@ -250,8 +252,9 @@ int main(int argc, char** argv){
         std::vector<std::string>& op_block = ir2tiny(ir);
         ops.insert(ops.end(),op_decl.begin(),op_decl.end());
         ops.insert(ops.end(),op_block.begin(),op_block.end());
+
         //printing IR for debugging purpose
-        
+        /*
         for(auto line: ir){
             for(auto item:line){
                 std::cout << item << " ";
@@ -259,7 +262,7 @@ int main(int argc, char** argv){
             std::cout << std::endl;
         }
         std::cout << std::endl;
-        
+        */
     }
 
     for(auto op:ops){

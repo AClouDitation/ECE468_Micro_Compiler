@@ -1,4 +1,4 @@
-#include "ast.hpp"
+#include "../src/ast.hpp"
 #include <iostream>
 
 AddExprNode::AddExprNode(char sign){
