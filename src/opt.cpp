@@ -42,7 +42,6 @@ bool _is_constant(std::string lit){
 void constant_swap(std::vector<std::vector<std::string>>& irs)
 {
     extern int temp_reg_index;
-    std::cout << "before opt " << temp_reg_index << std::endl;
     std::unordered_map<std::string, std::string> const_refs;
     
     for(auto ir = irs.begin(); ir != irs.end();)
