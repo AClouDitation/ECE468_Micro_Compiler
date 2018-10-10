@@ -3,9 +3,10 @@
 
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 std::vector<std::string> SplitString(const std::string&, const std::string&);
 std::vector<std::vector<std::string>>& split_irs(std::vector<std::string>& irs);
-void live_ana(std::vector<std::string>&);
 
+void OOOptmize(std::vector<std::vector<std::string>>&);
 #endif
