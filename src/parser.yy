@@ -312,10 +312,12 @@ primary             :OPAREN expr CPAREN {
                         delete $1;
                         $$ = new_var;
                     } | INTLITERAL {
-                        LitRef* new_lit = new LitRef("INT",std::to_string($1));
+                        LitRef* new_lit = new LitRef("INT",
+                            std::to_string(static_cast<long long int>($1)));
                         $$ = new_lit;
                     } | FLOATLITERAL {
-                        LitRef* new_lit = new LitRef("FLOAT",std::to_string($1));
+                        LitRef* new_lit = new LitRef("FLOAT",
+                            std::to_string(static_cast<double>($1)));
                         $$ = new_lit;
                     };
 addop               :PLUS{$$='+';} | MINUS{$$='-';};
@@ -325,7 +327,8 @@ mulop               :MUL{$$='*';} | DIV{$$='/';};
 if_stmt             :IF{
                         block_index++;
                         Symtable* current = new Symtable(
-                            "BLOCK "+std::to_string(block_index));
+                            "BLOCK "+
+                            std::to_string(static_cast<long long int>(block_index)));
                         symtable_stack.push(current);
                         symtable_list.push_back(current);
                     } 
@@ -336,7 +339,8 @@ if_stmt             :IF{
 else_part           :ELSE{
                         block_index++;
                         Symtable* current = new Symtable(
-                            "BLOCK "+std::to_string(block_index));
+                            "BLOCK "+
+                            std::to_string(static_cast<long long int>(block_index)));
                         symtable_stack.push(current);
                         symtable_list.push_back(current);
                     }
@@ -349,7 +353,8 @@ compop              :LT | GT | EQ | NEQ | LEQ | GEQ;
 while_stmt          :WHILE{
                         block_index++;
                         Symtable* current = new Symtable(
-                            "BLOCK "+std::to_string(block_index));
+                            "BLOCK "+
+                            std::to_string(static_cast<long long int>(block_index)));
                         symtable_stack.push(current);
                         symtable_list.push_back(current);
                     } 
