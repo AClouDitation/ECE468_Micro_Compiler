@@ -240,7 +240,8 @@ int main(int argc, char** argv){
         if(i != symtable_list.size()-1)std::cout << std::endl;
     }        
     */
-
+    extern int temp_reg_index;
+    temp_reg_index = 0;
     std::vector<std::string>& ops = symtable_stack.top()->decl();
     for(auto func_node: func_list){
         std::vector<std::vector<std::string>>& ir = split_irs(func_node->translate());

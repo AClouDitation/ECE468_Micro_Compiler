@@ -6,7 +6,6 @@
 
 // expressions
 
-static int temp_reg_index = 0;
 class ExprNode{
 public:
     ExprNode():type("INT"){};

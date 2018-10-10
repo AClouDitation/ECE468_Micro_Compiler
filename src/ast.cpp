@@ -1,6 +1,7 @@
 #include "../src/ast.hpp"
 #include <iostream>
 
+int temp_reg_index;
 AddExprNode::AddExprNode(char sign){
     this->sign = sign;
     this->lnode = NULL;
