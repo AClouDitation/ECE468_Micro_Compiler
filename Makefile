@@ -1,4 +1,3 @@
-export PATH:=/opt/gcc/7.1.0/bin:$(PATH)
 CXX = g++
 CXX_ECN = /opt/gcc/7.1.0/bin/g++
 CC = gcc
