@@ -245,7 +245,15 @@ int main(int argc, char** argv){
     std::vector<std::string>& ops = symtable_stack.top()->decl();
     for(auto func_node: func_list){
         std::vector<std::vector<std::string>>& ir = split_irs(func_node->translate());
-
+        /*
+        for(auto line: ir){
+            for(auto item:line){
+                std::cout << item << " ";
+            }
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
+        */
         OOOptmize(ir);
 
         //live_ana(ir);

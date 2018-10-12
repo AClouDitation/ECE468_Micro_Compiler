@@ -100,6 +100,7 @@ LitRef::LitRef(std::string type, std::string val){
 LitRef::~LitRef(){}
 std::string LitRef::translate(std::vector<std::string>& code_block){
 
+    /*
     std::string new_ir = "STORE";
     if(type == "FLOAT") new_ir += "F ";
     else new_ir += "I ";
@@ -110,8 +111,9 @@ std::string LitRef::translate(std::vector<std::string>& code_block){
 
     code_block.push_back(new_ir); // only integers for now, will modify later
     temp_reg_index++;
+    */
 
-    return res;
+    return value;
 }
 
 AssignStmtNode::AssignStmtNode(){

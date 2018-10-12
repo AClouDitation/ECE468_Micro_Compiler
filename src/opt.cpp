@@ -137,14 +137,79 @@ void constant_swap(std::vector<std::vector<std::string>>& irs)
     }
 }
 
-void live_ana(std::vector<std::string>& irs){
-    std::vector<std::string> live_list;
+// cross_out dead exprs
+void _cross_out(std::unordered_map<std::string,std::string>& reg_content,
+                std::string& target)
+{
+    std::cerr << "Looking for " << target << std::endl;
+    for(auto it = reg_content.begin();it != reg_content.end();){
+        std::vector<std::string>items = SplitString(it->first," ");
+        std::cerr << items[0] << " " << items[1] << " " << items[2] << std::endl;
+        if(target == items[1] || target == items[2]){
+            std::cerr << "RM " << it->first << std::endl;
+            it = reg_content.erase(it);        
+        }
+        else it++;
+    }
+}
+
+void live_ana(std::vector<std::vector<std::string>>& irs){    
+
+    std::unordered_map<std::string,std::string> reg_content;
+    //                  ^expr       ^reg
     for(auto ir:irs){
-        std::cout << ir << std::endl;
+        std::cout << ";";
+        for(auto item:ir){
+            std::cout << item << " ";
+        }
+        std::cout << std::endl;
+    }
+    for(auto ir = irs.begin(); ir != irs.end();){
+
+        if((*ir)[0] == "READI" || (*ir)[0] == "READF")
+        {
+            std::string target = (*ir)[1];
+            _cross_out(reg_content, target);
+        }
+        else if((*ir)[0] == "STOREI" || (*ir)[0] == "STOREF")
+        {
+            std::string target = (*ir)[2];
+            _cross_out(reg_content, target);
+        }
+        else if((*ir)[0] == "MULI" || (*ir)[0] == "MULF" ||
+            (*ir)[0] == "ADDI" || (*ir)[0] == "ADDF" ||
+            (*ir)[0] == "DIVI" || (*ir)[0] == "DIVF" ||
+            (*ir)[0] == "SUBI" || (*ir)[0] == "SUBF")
+        {
+            std::string target = (*ir)[3];
+            std::string content = (*ir)[0] + " " + (*ir)[1] + " " + (*ir)[2];
+            if(reg_content.find(content) == reg_content.end())
+            {
+                reg_content[content] = target;
+            }
+            else
+            {
+                std::string target = (*ir)[3];
+                (*ir).pop_back();
+                (*ir)[0] = "STORE" + (*ir)[0].substr(3);
+                (*ir)[1] = reg_content[content];
+                (*ir)[2] = target;
+            }
+            _cross_out(reg_content, target);
+        }
+        ir++;
     }
 
+    for(auto ir:irs){
+        std::cout << ";";
+        for(auto item:ir){
+            std::cout << item << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
 void OOOptmize(std::vector<std::vector<std::string>>& irs){
     constant_swap(irs);
+    live_ana(irs);
 }
