@@ -141,12 +141,12 @@ void constant_swap(std::vector<std::vector<std::string>>& irs)
 void _cross_out(std::unordered_map<std::string,std::string>& reg_content,
                 std::string& target)
 {
-    std::cerr << "Looking for " << target << std::endl;
+    //std::cerr << "Looking for " << target << std::endl;
     for(auto it = reg_content.begin();it != reg_content.end();){
         std::vector<std::string>items = SplitString(it->first," ");
-        std::cerr << items[0] << " " << items[1] << " " << items[2] << std::endl;
+        //std::cerr << items[0] << " " << items[1] << " " << items[2] << std::endl;
         if(target == items[1] || target == items[2]){
-            std::cerr << "RM " << it->first << std::endl;
+            //std::cerr << "RM " << it->first << std::endl;
             it = reg_content.erase(it);        
         }
         else it++;
@@ -157,13 +157,7 @@ void live_ana(std::vector<std::vector<std::string>>& irs){
 
     std::unordered_map<std::string,std::string> reg_content;
     //                  ^expr       ^reg
-    for(auto ir:irs){
-        std::cout << ";";
-        for(auto item:ir){
-            std::cout << item << " ";
-        }
-        std::cout << std::endl;
-    }
+    
     for(auto ir = irs.begin(); ir != irs.end();){
 
         if((*ir)[0] == "READI" || (*ir)[0] == "READF")
@@ -198,14 +192,6 @@ void live_ana(std::vector<std::vector<std::string>>& irs){
             _cross_out(reg_content, target);
         }
         ir++;
-    }
-
-    for(auto ir:irs){
-        std::cout << ";";
-        for(auto item:ir){
-            std::cout << item << " ";
-        }
-        std::cout << std::endl;
     }
 }
 
