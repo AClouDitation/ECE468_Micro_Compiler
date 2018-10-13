@@ -79,10 +79,20 @@ std::vector<std::string>& ir2tiny(std::vector<std::vector<std::string>>& irs){
             if(items[2][0] == '$') op2 = t2r(items[2]);
             else op2 = items[2];
 
-            std::string new_tiny_op = "move " + op1 + " " + target_reg;
-            tiny->push_back(new_tiny_op);
-            new_tiny_op = "muli " + op2 + " " + target_reg;
-            tiny->push_back(new_tiny_op);
+            std::string new_tiny_op;
+            if(op1 == "1"){
+                new_tiny_op = "move "+op2+" "+target_reg;     
+                tiny->push_back(new_tiny_op);
+            }
+            else{
+                new_tiny_op = "move " + op1 + " " + target_reg;
+                tiny->push_back(new_tiny_op);
+                if(op2 != "1"){
+                new_tiny_op = "muli " + op2 + " " + target_reg;
+                tiny->push_back(new_tiny_op);
+                }
+            }
+
         }
         else if(items[0] == "DIVI"){
             std::string target_reg = t2r(items[3]); 
