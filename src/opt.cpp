@@ -43,7 +43,7 @@ void constant_swap(std::vector<std::vector<std::string>>& irs)
 {
     extern int temp_reg_index;
     std::unordered_map<std::string, std::string> const_refs;
-    
+
     for(auto ir = irs.begin(); ir != irs.end();)
     {
         if((*ir)[0] == "STOREI" || (*ir)[0] == "STOREF")
@@ -74,9 +74,9 @@ void constant_swap(std::vector<std::vector<std::string>>& irs)
                 (*ir)[0] == "SUBI" || (*ir)[0] == "SUBF")
         {
             if((_is_constant((*ir)[1]) ||   // op1 is a literal
-                const_refs.find((*ir)[1]) != const_refs.end()) && // or const ref
-               (_is_constant((*ir)[2]) || 
-                const_refs.find((*ir)[2]) != const_refs.end()))
+                        const_refs.find((*ir)[1]) != const_refs.end()) && // or const ref
+                    (_is_constant((*ir)[2]) || 
+                     const_refs.find((*ir)[2]) != const_refs.end()))
             {
                 // op1 and op2 are constant
                 if((*ir)[0][3] == 'I'){
@@ -139,7 +139,7 @@ void constant_swap(std::vector<std::vector<std::string>>& irs)
 
 // cross_out dead exprs
 void _cross_out(std::unordered_map<std::string,std::string>& reg_content,
-                std::string& target)
+        std::string& target)
 {
     //std::cerr << "Looking for " << target << std::endl;
     for(auto it = reg_content.begin();it != reg_content.end();){
@@ -157,7 +157,7 @@ void live_ana(std::vector<std::vector<std::string>>& irs){
 
     std::unordered_map<std::string,std::string> reg_content;
     //                  ^expr       ^reg
-    
+
     for(auto ir = irs.begin(); ir != irs.end();){
 
         if((*ir)[0] == "READI" || (*ir)[0] == "READF")
@@ -171,9 +171,9 @@ void live_ana(std::vector<std::vector<std::string>>& irs){
             _cross_out(reg_content, target);
         }
         else if((*ir)[0] == "MULI" || (*ir)[0] == "MULF" ||
-            (*ir)[0] == "ADDI" || (*ir)[0] == "ADDF" ||
-            (*ir)[0] == "DIVI" || (*ir)[0] == "DIVF" ||
-            (*ir)[0] == "SUBI" || (*ir)[0] == "SUBF")
+                (*ir)[0] == "ADDI" || (*ir)[0] == "ADDF" ||
+                (*ir)[0] == "DIVI" || (*ir)[0] == "DIVF" ||
+                (*ir)[0] == "SUBI" || (*ir)[0] == "SUBF")
         {
             std::string target = (*ir)[3];
             std::string content = (*ir)[0] + " " + (*ir)[1] + " " + (*ir)[2];
@@ -195,7 +195,65 @@ void live_ana(std::vector<std::vector<std::string>>& irs){
     }
 }
 
+void rm_useless_move(std::vector<std::vector<std::string>>& irs){
+}
+
+void dead_store_eli(std::vector<std::vector<std::string>>& irs){
+
+    for(auto ir = irs.begin(); ir != irs.end();ir++){
+        if((*ir)[0] == "STOREI" || (*ir)[0] == "STOREF"){
+            // go through the code to see what happens next...
+         
+            bool need_this_store = false;
+            std::string target = (*ir)[2];
+            auto nir = ir;
+            nir++;
+            for(;nir != irs.end();nir++){
+
+                if((*nir)[0] == "READI" || (*nir)[0] == "READF")
+                {
+                    std::string new_target = (*nir)[1];
+                    if(new_target == target)break;
+                }
+                else if((*nir)[0] == "STOREI" || (*nir)[0] == "STOREF")
+                {
+                    std::string new_target = (*nir)[2];
+                    std::string op1 = (*nir)[1];
+                    if(op1 == target){need_this_store = true;break;}
+                    if(new_target == target)break;
+                }
+                else if((*nir)[0] == "MULI" || (*nir)[0] == "MULF" ||
+                        (*nir)[0] == "ADDI" || (*nir)[0] == "ADDF" ||
+                        (*nir)[0] == "DIVI" || (*nir)[0] == "DIVF" ||
+                        (*nir)[0] == "SUBI" || (*nir)[0] == "SUBF")
+                {
+                    std::string op1 = (*nir)[1];
+                    std::string op2 = (*nir)[2];
+                    std::string new_target = (*ir)[3];
+                    if(op1 == target || op2 == target){need_this_store = true;break;}
+                    if(new_target == target)break;
+                }
+                else if((*nir)[0] == "WRITEI" || (*nir)[0] == "WRITEF"){
+                    std::string new_target = (*nir)[1];
+                    if(new_target == target){need_this_store = true;break;}
+                }
+            }
+             
+            if(!need_this_store){
+                ir = irs.erase(ir);
+                ir--;
+            }
+        }
+    }
+}
+
 void OOOptmize(std::vector<std::vector<std::string>>& irs){
     constant_swap(irs);
     live_ana(irs);
+
+    unsigned int len;
+    do{
+        len = irs.size();
+        dead_store_eli(irs);
+    }while(irs.size() < len);
 }

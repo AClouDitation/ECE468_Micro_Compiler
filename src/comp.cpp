@@ -254,6 +254,7 @@ int main(int argc, char** argv){
         }
         std::cout << std::endl;
         */
+
         OOOptmize(ir);
 
         //live_ana(ir);
@@ -263,15 +264,16 @@ int main(int argc, char** argv){
         ops.insert(ops.end(),op_block.begin(),op_block.end());
 
         //printing IR for debugging purpose
-        /*
+        
         for(auto line: ir){
+            std::cout << ";";
             for(auto item:line){
                 std::cout << item << " ";
             }
             std::cout << std::endl;
         }
         std::cout << std::endl;
-        */
+        
     }
 
     for(auto op:ops){
