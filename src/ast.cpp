@@ -1,6 +1,8 @@
 #include "../src/ast.hpp"
 #include <iostream>
 
+using namespace std;
+
 int temp_reg_index;
 AddExprNode::AddExprNode(char sign){
     this->sign = sign;
@@ -9,11 +11,11 @@ AddExprNode::AddExprNode(char sign){
 }
 
 AddExprNode::~AddExprNode(){}
-std::string AddExprNode::translate(std::vector<std::string>& code_block){
-    std::string op1 = lnode->translate(code_block);
-    std::string op2 = rnode->translate(code_block);
+string AddExprNode::translate(vector<string>& code_block){
+    string op1 = lnode->translate(code_block);
+    string op2 = rnode->translate(code_block);
 
-    std::string new_ir = "";
+    string new_ir = "";
     if(sign == '+') new_ir += "ADD";
     else new_ir += "SUB";
 
@@ -21,7 +23,7 @@ std::string AddExprNode::translate(std::vector<std::string>& code_block){
     else new_ir += "I ";
 
     new_ir += op1+" "+op2;
-    std::string res = "$T"+std::to_string(temp_reg_index);
+    string res = "$T"+to_string(temp_reg_index);
     new_ir += " " + res;
 
     code_block.push_back(new_ir); // only integers for now, will modify later
@@ -36,11 +38,11 @@ MulExprNode::MulExprNode(char sign){
     this->rnode = NULL;
 }
 MulExprNode::~MulExprNode(){}
-std::string MulExprNode::translate(std::vector<std::string>& code_block){
-    std::string op1 = lnode->translate(code_block);
-    std::string op2 = rnode->translate(code_block);
+string MulExprNode::translate(vector<string>& code_block){
+    string op1 = lnode->translate(code_block);
+    string op2 = rnode->translate(code_block);
 
-    std::string new_ir = "";
+    string new_ir = "";
     if(sign == '*') new_ir += "MUL";
     else new_ir += "DIV";
 
@@ -48,7 +50,7 @@ std::string MulExprNode::translate(std::vector<std::string>& code_block){
     else new_ir += "I ";
     
     new_ir += op1+" "+op2;
-    std::string res = "$T"+std::to_string(temp_reg_index);
+    string res = "$T"+to_string(temp_reg_index);
     new_ir += " " + res;
 
     code_block.push_back(new_ir); // only integers for now, will modify later
@@ -58,19 +60,36 @@ std::string MulExprNode::translate(std::vector<std::string>& code_block){
 }
 
 // for now
-CallExprNode::CallExprNode(std::string fname){
+CallExprNode::CallExprNode(string fname){
 
     this->name = fname;
     // this->arg_list = args;
 }
+
 CallExprNode::~CallExprNode(){}
-std::string CallExprNode::translate(std::vector<std::string>& code_block){
-    std::string res("not now...");
+string CallExprNode::translate(vector<string>& code_block){
+    string res("not now...");
     return res;
 }
 
+CondExprNode::CondExprNode(string cmp):
+    cmp(cmp)
+{}
 
-VarRef::VarRef(std::string name, std::string type){
+CondExprNode::~CondExprNode(){}
+
+string CondExprNode::translate(vector<string>& code_block){
+
+    string op1 = lnode->translate(code_block);
+    string op2 = rnode->translate(code_block);
+
+    //cmp op1 op2 label
+    string new_ir = cmp + " " + op1 + " " + op2 + " LABEL_FOR_NOW";
+    return cmp;
+}
+
+
+VarRef::VarRef(string name, string type){
 
     this->name = name;
     this->type = type;
@@ -81,12 +100,13 @@ VarRef::VarRef(std::string name, std::string type){
     this->lnode = NULL;
     this->rnode = NULL;
 }
+
 VarRef::~VarRef(){}
-std::string VarRef::translate(std::vector<std::string>& code_block){
+string VarRef::translate(vector<string>& code_block){
     return name;
 }  
 
-LitRef::LitRef(std::string type, std::string val){
+LitRef::LitRef(string type, string val){
 
     this->type = type;
     this->value = val;
@@ -97,16 +117,17 @@ LitRef::LitRef(std::string type, std::string val){
     this->lnode = NULL;
     this->rnode = NULL;
 }
+
 LitRef::~LitRef(){}
-std::string LitRef::translate(std::vector<std::string>& code_block){
+string LitRef::translate(vector<string>& code_block){
 
     /*
-    std::string new_ir = "STORE";
+    string new_ir = "STORE";
     if(type == "FLOAT") new_ir += "F ";
     else new_ir += "I ";
     
     new_ir += value;
-    std::string res = "$T"+std::to_string(temp_reg_index);
+    string res = "$T"+to_string(temp_reg_index);
     new_ir += " "+res;
 
     code_block.push_back(new_ir); // only integers for now, will modify later
@@ -133,12 +154,12 @@ void AssignStmtNode::update_AST_type(ExprNode* root){
     }
 }
 
-std::vector<std::string>& AssignStmtNode::translate(){
+vector<string>& AssignStmtNode::translate(){
     
     update_AST_type(from); // for now
-    std::vector<std::string>* code_block = new std::vector<std::string>;
-    std::string res = from->translate(*code_block);
-    std::string new_IR = "";
+    vector<string>* code_block = new vector<string>;
+    string res = from->translate(*code_block);
+    string new_IR = "";
     if(to -> type == "INT") new_IR += "STOREI ";
     else if(to -> type == "FLOAT") new_IR += "STOREF ";
     
@@ -151,11 +172,11 @@ std::vector<std::string>& AssignStmtNode::translate(){
 
 ReadStmtNode::ReadStmtNode(){}
 ReadStmtNode::~ReadStmtNode(){}
-std::vector<std::string>& ReadStmtNode::translate(){
-    std::vector<std::string>* code_block = new std::vector<std::string>;
+vector<string>& ReadStmtNode::translate(){
+    vector<string>* code_block = new vector<string>;
     
     for(auto id:id_list){
-        std::string new_IR = "";
+        string new_IR = "";
         if(id -> type == "INT") new_IR += "READI ";
         else if(id -> type == "FLOAT") new_IR += "READF ";
         new_IR += id->name;
@@ -168,11 +189,11 @@ std::vector<std::string>& ReadStmtNode::translate(){
 
 WriteStmtNode::WriteStmtNode(){}
 WriteStmtNode::~WriteStmtNode(){}
-std::vector<std::string>& WriteStmtNode::translate(){
-    std::vector<std::string>* code_block = new std::vector<std::string>;
+vector<string>& WriteStmtNode::translate(){
+    vector<string>* code_block = new vector<string>;
     
     for(auto id:id_list){
-        std::string new_IR = "";
+        string new_IR = "";
         if(id -> type == "INT") new_IR += "WRITEI ";
         else if(id -> type == "FLOAT") new_IR += "WRITEF ";
         else if(id -> type == "STRING") new_IR += "WRITES ";
@@ -183,21 +204,21 @@ std::vector<std::string>& WriteStmtNode::translate(){
     return *code_block;
 }
 
-FunctionDeclNode::FunctionDeclNode(std::string name, std::string type, 
+FunctionDeclNode::FunctionDeclNode(string name, string type, 
         Symtable* symtable):
     name(name),type(type),symtable(symtable){}
 
 FunctionDeclNode::~FunctionDeclNode(){}
 
-std::vector<std::string>& FunctionDeclNode::translate(){
+vector<string>& FunctionDeclNode::translate(){
     
-    std::vector<std::string>* ir = new std::vector<std::string>;
+    vector<string>* ir = new vector<string>;
 
     ir->push_back("LABEL FUNC_"+name);
     ir->push_back("LINK");
 
     for(auto stmt: stmt_list){
-        std::vector<std::string> code_block = stmt->translate();
+        vector<string> code_block = stmt->translate();
         ir->insert(ir->end(),code_block.begin(),code_block.end());
     }
 
@@ -206,3 +227,13 @@ std::vector<std::string>& FunctionDeclNode::translate(){
     return *ir;
 }
 
+IfStmtNode::IfStmtNode(CondExprNode* cond):
+    cond(cond){}
+
+IfStmtNode::~IfStmtNode(){}
+
+vector<string>& IfStmtNode::translate(){
+    vector<string>* ir = new vector<string>;
+
+    return *ir;
+}

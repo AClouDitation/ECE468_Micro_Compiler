@@ -84,16 +84,16 @@
 %token <cstr>    STRINGLITERAL
 
 %token          ASSIGN 
-%token          NEQ 
-%token          LEQ
-%token          GEQ 
-%token          PLUS
-%token          MINUS 
-%token          MUL 
-%token          DIV
-%token          EQ
-%token          LT
-%token          GT 
+%token <cstr>   NEQ 
+%token <cstr>   LEQ
+%token <cstr>   GEQ 
+%token <cstr>   PLUS
+%token <cstr>   MINUS
+%token <cstr>   MUL 
+%token <cstr>   DIV
+%token <cstr>   EQ
+%token <cstr>   LT
+%token <cstr>   GT 
 %token          OPAREN
 %token          CPAREN
 %token          SEMICOLON
@@ -101,9 +101,10 @@
 
 /*%type <entry> string_decl*/
 %type <sp> id str var_type any_type 
-%type <en> expr expr_prefix postfix_expr factor factor_prefix primary call_expr 
+%type <en> expr expr_prefix postfix_expr factor factor_prefix primary call_expr cond 
 %type <sn> assign_expr 
 %type <ch> addop mulop
+%type <cstr> compop
 %start program
 %%
 /* Grammar rules */
@@ -333,6 +334,9 @@ if_stmt             :IF{
                         symtable_list.push_back(current);
                     } 
                     OPAREN cond CPAREN decl stmt_list {
+                        // $3 // cond
+                        IfStmtNode* new_if = new IfStmtNode(static_cast<CondExprNode*>($4));
+                        func_list.back()->stmt_list.push_back(new_if); 
                         symtable_stack.pop();
                     }
                     else_part ENDIF;
@@ -348,8 +352,16 @@ else_part           :ELSE{
                         symtable_stack.pop(); 
                     } 
                     | /* empty */;
-cond                :expr compop expr | TRUE | FALSE;
-compop              :LT | GT | EQ | NEQ | LEQ | GEQ;
+cond                :expr compop expr{
+                        CondExprNode* new_cond = new CondExprNode((string)$2);
+                    }
+                    | TRUE {
+                        CondExprNode* new_lit = new CondExprNode("TRUE");
+                    }
+                    | FALSE{
+                        CondExprNode* new_lit = new CondExprNode("FALSE");
+                    };
+compop              :LT | GT | EQ | NEQ | LEQ | GEQ; /* reutrn $1 by default */
 while_stmt          :WHILE{
                         block_index++;
                         Symtable* current = new Symtable(

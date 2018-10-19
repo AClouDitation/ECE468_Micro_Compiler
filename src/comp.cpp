@@ -244,18 +244,11 @@ int main(int argc, char** argv){
     yyin = fp;
     yyparse();
 
-    /* for step 3
-    for(int i = 0;i < symtable_list.size();i++){
-        symtable_list[i]->print();
-        if(i != symtable_list.size()-1)std::cout << std::endl;
-    }        
-    */
     extern int temp_reg_index;
     temp_reg_index = 0;
     std::vector<std::string>& ops = symtable_stack.top()->decl();
     for(auto func_node: func_list){
         std::vector<std::vector<std::string>>& ir = split_irs(func_node->translate());
-        /*
         for(auto line: ir){
             for(auto item:line){
                 std::cout << item << " ";
@@ -263,11 +256,8 @@ int main(int argc, char** argv){
             std::cout << std::endl;
         }
         std::cout << std::endl;
-        */
 
-        OOOptmize(ir);
-
-        //live_ana(ir);
+        //OOOptmize(ir);
         std::vector<std::string>& op_decl = func_node->symtable->decl();
         std::vector<std::string>& op_block = ir2tiny(ir);
         ops.insert(ops.end(),op_decl.begin(),op_decl.end());
