@@ -88,8 +88,8 @@ std::vector<std::string>& ir2tiny(std::vector<std::vector<std::string>>& irs){
                 new_tiny_op = "move " + op1 + " " + target_reg;
                 tiny->push_back(new_tiny_op);
                 if(op2 != "1"){
-                new_tiny_op = "muli " + op2 + " " + target_reg;
-                tiny->push_back(new_tiny_op);
+                    new_tiny_op = "muli " + op2 + " " + target_reg;
+                    tiny->push_back(new_tiny_op);
                 }
             }
 
@@ -275,6 +275,7 @@ int main(int argc, char** argv){
 
         //printing IR for debugging purpose
         
+        /*
         for(auto line: ir){
             std::cout << ";";
             for(auto item:line){
@@ -283,7 +284,7 @@ int main(int argc, char** argv){
             std::cout << std::endl;
         }
         std::cout << std::endl;
-        
+        */ 
     }
 
     for(auto op:ops){
