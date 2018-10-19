@@ -80,11 +80,14 @@ CondExprNode::~CondExprNode(){}
 
 string CondExprNode::translate(vector<string>& code_block){
 
+    cout << "BAKA!" << cmp << endl;
     string op1 = lnode->translate(code_block);
     string op2 = rnode->translate(code_block);
 
     //cmp op1 op2 label
     string new_ir = cmp + " " + op1 + " " + op2 + " LABEL_FOR_NOW";
+    cout << op1 << " " << op2 << " " << new_ir << endl;
+    code_block.push_back(new_ir);
     return cmp;
 }
 
@@ -235,5 +238,8 @@ IfStmtNode::~IfStmtNode(){}
 vector<string>& IfStmtNode::translate(){
     vector<string>* ir = new vector<string>;
 
+    cout << "This is a if node" << endl;
+    cond->translate(*ir);
+    cout << "translated..." << endl;
     return *ir;
 }

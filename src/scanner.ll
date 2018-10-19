@@ -63,16 +63,31 @@ EATUPWHITESPACE     [ \t\r\n]+
                     }
 
 ":="                { return TOK_ASSIGN; }
-"!="                { return TOK_NEQ; }
-"<="                { return TOK_LEQ; }
-">="                { return TOK_GEQ; }
+"!="                {   
+                        yylval.cstr = "NE"; 
+                        return TOK_NEQ; 
+                    }
+"<="                { 
+                        yylval.cstr = "LE";
+                        return TOK_LEQ; 
+                    }
+">="                { 
+                        yylval.cstr = "GE";
+                        return TOK_GEQ; 
+                    }
 "+"	                { return TOK_PLUS; }
 "-"                 { return TOK_MINUS; }
 "*"                 { return TOK_MUL; }
 "/"                 { return TOK_DIV; }
 "="                 { return TOK_EQ; }
-"<"                 { return TOK_LT; }
-">"                 { return TOK_GT; }
+"<"                 { 
+                        yylval.cstr = "LT"; 
+                        return TOK_LT; 
+                    }
+">"                 { 
+                        yylval.cstr = "GT"; 
+                        return TOK_GT; 
+                    }
 "("                 { return TOK_OPAREN; }
 ")"                 { return TOK_CPAREN; }
 ";"                 { return TOK_SEMICOLON; }
