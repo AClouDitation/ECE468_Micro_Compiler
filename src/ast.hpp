@@ -44,11 +44,12 @@ public:
 };
 
 class CondExprNode: public ExprNode{
-    string cmp;
 public:
     CondExprNode(string);
     virtual ~CondExprNode();    
     virtual string translate(vector<string>&);
+
+    string cmp;
 };
 
 // variable references
@@ -105,26 +106,33 @@ public:
     vector<VarRef*> id_list;
 };
 
-class FunctionDeclNode{
+class BlockNode: public StmtNode{
+public:
+    BlockNode();
+    virtual ~BlockNode();
+    vector<StmtNode*> stmt_list;
+    Symtable* symtable;
+};
+
+class FunctionDeclNode: public BlockNode{
 public:
     FunctionDeclNode(string, string, Symtable* symtable);
     virtual ~FunctionDeclNode();
 
     vector<string>& translate();
-    vector<StmtNode*> stmt_list;    
     string name;
     string type;
-    Symtable* symtable; 
 };
 
-class IfStmtNode: public StmtNode{
+class IfStmtNode: public BlockNode{
 public:
     IfStmtNode(CondExprNode*);
     virtual ~IfStmtNode();
+    vector<string>& translate(); 
+
     string LabelName;
     string invCmp;
 
     CondExprNode* cond;
-    vector<string>& translate(); 
 };
 #endif

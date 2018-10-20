@@ -207,6 +207,7 @@ vector<string>& WriteStmtNode::translate(){
     return *code_block;
 }
 
+
 FunctionDeclNode::FunctionDeclNode(string name, string type, 
         Symtable* symtable):
     name(name),type(type),symtable(symtable){}

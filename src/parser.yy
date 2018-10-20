@@ -354,6 +354,9 @@ else_part           :ELSE{
                     | /* empty */;
 cond                :expr compop expr{
                         CondExprNode* new_cond = new CondExprNode((string)$2);
+                        new_cond->lnode = $1;
+                        new_cond->rnode = $3;
+                        $$ = new_cond;
                     }
                     | TRUE {
                         CondExprNode* new_lit = new CondExprNode("TRUE");
