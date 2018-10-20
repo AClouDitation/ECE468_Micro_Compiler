@@ -1,9 +1,6 @@
-#include <string>
-#include <string.h>
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
-#include <stack>
+#include "../src.utility.hpp"
+
+using namespace std;
 
 // translate $T** to r**,
 // probably remove in the future 
