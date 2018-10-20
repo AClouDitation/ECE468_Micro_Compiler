@@ -221,6 +221,7 @@ FunctionDeclNode::~FunctionDeclNode(){}
 
 vector<string>& FunctionDeclNode::translate(){
     
+    cout << "FU" << endl;
     vector<string>* ir = new vector<string>;
 
     ir->push_back("LABEL FUNC_"+name);
@@ -243,6 +244,7 @@ IfStmtNode::IfStmtNode(CondExprNode* cond, Symtable* symtable):
 IfStmtNode::~IfStmtNode(){}
 
 vector<string>& IfStmtNode::translate(){
+    cout << "CK" << endl;
     vector<string>* ir = new vector<string>;
 
     cout << "This is a if node" << endl;

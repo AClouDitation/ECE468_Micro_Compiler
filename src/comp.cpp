@@ -16,7 +16,7 @@ extern std::stack<Symtable*> symtable_stack; // should be size 1, with only the
                                              // global symbol table left
 extern std::vector<Symtable*> symtable_list; // this is redundant 
                                              // however needed in step3
-extern std::vector<FunctionDeclNode*> block_list;
+extern std::vector<FunctionDeclNode*> func_list;
 
 
 
@@ -294,4 +294,49 @@ std::vector<std::string>& ir2tiny(std::vector<std::vector<std::string>>& irs){
 
 */
 
+<<<<<<< HEAD
 
+=======
+    extern int temp_reg_index;
+    temp_reg_index = 0;
+    std::vector<std::string>& ops = symtable_stack.top()->decl();
+    for(auto block_node: func_list){
+        std::vector<std::vector<std::string>>& ir = split_irs(block_node->translate());
+        for(auto line: ir){
+            for(auto item:line){
+                std::cout << item << " ";
+            }
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
+
+        //OOOptmize(ir);
+        std::vector<std::string>& op_decl = block_node->symtable->decl();
+        std::vector<std::string>& op_block = ir2tiny(ir);
+        ops.insert(ops.end(),op_decl.begin(),op_decl.end());
+        ops.insert(ops.end(),op_block.begin(),op_block.end());
+
+        //printing IR for debugging purpose
+        
+        /*
+        for(auto line: ir){
+            std::cout << ";";
+            for(auto item:line){
+                std::cout << item << " ";
+            }
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
+        */ 
+    }
+
+    for(auto op:ops){
+        std::cout << op << std::endl;
+    }
+
+    for(auto table:symtable_list) delete table;
+    fclose(fp);
+
+    return 0;
+}
+>>>>>>> 2a8d9031503057b5f909e3cb9ff457a5530aa417

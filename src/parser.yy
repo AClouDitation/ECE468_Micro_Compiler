@@ -21,6 +21,7 @@
     std::stack<std::string> id_stack;
     std::vector<StmtNode*> stmt_list;   //will remove
     std::vector<BlockNode*> block_list;
+    std::vector<FunctionDeclNode*> func_list;
 
 
     // search through the symbol table,
@@ -205,6 +206,7 @@ func_decl           :FUNCTION any_type id {
                         symtable_list.push_back(current);
                         FunctionDeclNode* new_func = new FunctionDeclNode(*$3,*$2,current);
                         block_list.push_back(new_func);
+                        func_list.push_back(new_func);
                         // for now
                         delete $2;
                         delete $3;
