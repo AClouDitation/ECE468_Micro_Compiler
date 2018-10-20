@@ -84,7 +84,7 @@ string CondExprNode::translate(vector<string>& code_block){
     string op2 = rnode->translate(code_block);
 
     //cmp op1 op2 label
-    string new_ir = cmp + " " + op1 + " " + op2 + " LABEL SUCCESS_";
+    string new_ir = cmp + " " + op1 + " " + op2 + " SUCCESS_";
     code_block.push_back(new_ir);
     return cmp;
 }
@@ -284,4 +284,29 @@ vector<string>& ElseStmtNode::translate(){
     return *ir;
 }
 
+WhileStmtNode::WhileStmtNode(CondExprNode* cond, Symtable* symtable, string index):
+    BlockNode(symtable),
+    cond(cond),index(index){}
 
+WhileStmtNode::~WhileStmtNode(){}
+
+vector<string>& WhileStmtNode::translate(){
+    vector<string>* ir = new vector<string>;
+
+    ir->push_back("LABEL WHILE_START_"+index);
+    cond->translate(*ir);
+    ir->back() += index;
+
+    ir->push_back("JUMP OUT_"+index);
+    ir->push_back("LABEL SUCCESS_"+index);
+    for(auto stmt: stmt_list){
+        vector<string> code_block = stmt->translate();
+        ir->insert(ir->end(),code_block.begin(),code_block.end());
+    }
+
+    ir->push_back("JUMP WHILE_START_"+index);
+    
+    ir->push_back("LABEL OUT_"+index);
+    return *ir;
+
+}

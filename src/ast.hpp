@@ -148,10 +148,11 @@ public:
 
 class WhileStmtNode: public BlockNode{
 public:
-    WhileStmtNode(CondExprNode*);
+    WhileStmtNode(CondExprNode*, Symtable*, string);
     virtual ~WhileStmtNode();
     vector<string>& translate();
 
     CondExprNode* cond;
+    string index;
 };
 #endif
