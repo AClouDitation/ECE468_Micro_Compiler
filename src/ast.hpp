@@ -130,12 +130,21 @@ class IfStmtNode: public BlockNode{
 public:
     IfStmtNode(CondExprNode*, Symtable*);
     virtual ~IfStmtNode();
+    
     virtual vector<string>& translate(); 
 
     string LabelName;
     string invCmp;
 
     CondExprNode* cond;
+};
+
+class ElseStmtNode: public BlockNode{
+public:
+    ElseStmtNode(Symtable*);
+    virtual ~ElseStmtNode();
+    virtual vector<string>& translate();
+
 };
 
 class WhileStmtNode: public BlockNode{

@@ -354,9 +354,12 @@ else_part           :ELSE{
                             std::to_string(static_cast<long long int>(block_index)));
                         symtable_stack.push(current);
                         symtable_list.push_back(current);
+
+                        // allocate a new else node
                     }
                     decl stmt_list{
                         symtable_stack.pop(); 
+                        block_list.pop_back();
                     } 
                     | /* empty */;
 cond                :expr compop expr{

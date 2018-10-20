@@ -7,11 +7,12 @@
 #include <fstream>
 #include <iostream>
 #include <stack>
+#include <vector>
 
 using namespace std;
 
-std::string t2r(std::string& t);
+string t2r(string& t);
 
-std::vector<std::string>& ir2tiny(std::vector<std::vector<std::string>>& irs);
+vector<string>& ir2tiny(vector<vector<string>>& irs);
 
 #endif

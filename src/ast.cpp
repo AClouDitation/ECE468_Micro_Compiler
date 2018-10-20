@@ -258,3 +258,26 @@ vector<string>& IfStmtNode::translate(){
     cout << "translated..." << endl;
     return *ir;
 }
+
+ElseStmtNode::ElseStmtNode(Symtable* symtable):
+    BlockNode(symtable)
+{}
+
+ElseStmtNode::~ElseStmtNode(){}
+
+vector<string>& ElseStmtNode::translate(){
+    cout << "CK" << endl;
+    vector<string>* ir = new vector<string>;
+
+    cout << "This is the else part node" << endl;
+
+    for(auto stmt: stmt_list){
+        vector<string> code_block = stmt->translate();
+        ir->insert(ir->end(),code_block.begin(),code_block.end());
+    }
+
+    cout << "translated..." << endl;
+    return *ir;
+}
+
+
