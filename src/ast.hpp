@@ -108,7 +108,7 @@ public:
 
 class BlockNode: public StmtNode{
 public:
-    BlockNode();
+    BlockNode(Symtable*);
     virtual ~BlockNode();
     vector<StmtNode*> stmt_list;
     Symtable* symtable;
@@ -126,12 +126,21 @@ public:
 
 class IfStmtNode: public BlockNode{
 public:
-    IfStmtNode(CondExprNode*);
+    IfStmtNode(CondExprNode*, Symtable*);
     virtual ~IfStmtNode();
     vector<string>& translate(); 
 
     string LabelName;
     string invCmp;
+
+    CondExprNode* cond;
+};
+
+class WhileStmtNode: public BlockNode{
+public:
+    WhileStmtNode(CondExprNode*);
+    virtual ~WhileStmtNode();
+    vector<string>& translate();
 
     CondExprNode* cond;
 };

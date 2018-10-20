@@ -207,10 +207,15 @@ vector<string>& WriteStmtNode::translate(){
     return *code_block;
 }
 
+BlockNode::BlockNode(Symtable* symtable):
+    symtable(symtable){}
+
+BlockNode::~BlockNode(){}
 
 FunctionDeclNode::FunctionDeclNode(string name, string type, 
         Symtable* symtable):
-    name(name),type(type),symtable(symtable){}
+    BlockNode(symtable),
+    name(name),type(type){}
 
 FunctionDeclNode::~FunctionDeclNode(){}
 
@@ -231,7 +236,8 @@ vector<string>& FunctionDeclNode::translate(){
     return *ir;
 }
 
-IfStmtNode::IfStmtNode(CondExprNode* cond):
+IfStmtNode::IfStmtNode(CondExprNode* cond, Symtable* symtable):
+    BlockNode(symtable),
     cond(cond){}
 
 IfStmtNode::~IfStmtNode(){}
@@ -241,6 +247,12 @@ vector<string>& IfStmtNode::translate(){
 
     cout << "This is a if node" << endl;
     cond->translate(*ir);
+
+    for(auto stmt: stmt_list){
+        vector<string> code_block = stmt->translate();
+        ir->insert(ir->end(),code_block.begin(),code_block.end());
+    }
+
     cout << "translated..." << endl;
     return *ir;
 }

@@ -20,7 +20,7 @@
     std::vector<Symtable*> symtable_list;
     std::stack<std::string> id_stack;
     std::vector<StmtNode*> stmt_list;   //will remove
-    std::vector<FunctionDeclNode*> func_list;
+    std::vector<BlockNode*> block_list;
 
 
     // search through the symbol table,
@@ -204,13 +204,14 @@ func_decl           :FUNCTION any_type id {
                         symtable_stack.push(current);
                         symtable_list.push_back(current);
                         FunctionDeclNode* new_func = new FunctionDeclNode(*$3,*$2,current);
-                        func_list.push_back(new_func);
+                        block_list.push_back(new_func);
                         // for now
                         delete $2;
                         delete $3;
                     }
                     OPAREN param_decl_list CPAREN BEGIN func_body END{
                         symtable_stack.pop();
+                        block_list.pop_back();
                     };
 func_body           :decl stmt_list;
 
@@ -221,7 +222,7 @@ base_stmt           :assign_stmt|read_stmt|write_stmt|control_stmt;
 
 /* Basic Statements */
 assign_stmt         :assign_expr SEMICOLON{
-                        func_list.back()->stmt_list.push_back($1); 
+                        block_list.back()->stmt_list.push_back($1); 
                     };
 
 assign_expr         :id ASSIGN expr{
@@ -245,7 +246,7 @@ read_stmt           :{
                             new_read->id_list.push_back(find_id(id_stack.top()));
                             id_stack.pop();
                         }
-                        func_list.back()->stmt_list.push_back(new_read);
+                        block_list.back()->stmt_list.push_back(new_read);
                     };
 write_stmt          :{
                         while(!id_stack.empty())id_stack.pop();
@@ -255,7 +256,7 @@ write_stmt          :{
                             new_write->id_list.push_back(find_id(id_stack.top()));
                             id_stack.pop();
                         }
-                        func_list.back()->stmt_list.push_back(new_write);
+                        block_list.back()->stmt_list.push_back(new_write);
 
                         //do something
                     };
@@ -325,19 +326,23 @@ addop               :PLUS{$$='+';} | MINUS{$$='-';};
 mulop               :MUL{$$='*';} | DIV{$$='/';};
 
 /* Complex Statements and Condition */ 
-if_stmt             :IF{
+if_stmt             :IF OPAREN cond CPAREN decl{
+                        // allocate a new block
                         block_index++;
                         Symtable* current = new Symtable(
                             "BLOCK "+
                             std::to_string(static_cast<long long int>(block_index)));
                         symtable_stack.push(current);
                         symtable_list.push_back(current);
-                    } 
-                    OPAREN cond CPAREN decl stmt_list {
-                        // $3 // cond
-                        IfStmtNode* new_if = new IfStmtNode(static_cast<CondExprNode*>($4));
-                        func_list.back()->stmt_list.push_back(new_if); 
-                        symtable_stack.pop();
+
+                        // allocate a new if node
+                        IfStmtNode* new_if = new IfStmtNode(dynamic_cast<CondExprNode*>($3),current);
+                        block_list.back()->stmt_list.push_back(new_if); 
+                        block_list.push_back(new_if);
+                    }
+                    stmt_list{
+                        symtable_stack.pop();                    
+                        block_list.pop_back();
                     }
                     else_part ENDIF;
 else_part           :ELSE{
