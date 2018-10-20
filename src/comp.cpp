@@ -15,7 +15,7 @@ extern std::stack<Symtable*> symtable_stack; // should be size 1, with only the
                                              // global symbol table left
 extern std::vector<Symtable*> symtable_list; // this is redundant 
                                              // however needed in step3
-extern std::vector<FunctionDeclNode*> block_list;
+extern std::vector<FunctionDeclNode*> func_list;
 
 
 // translate $T** to r**,
@@ -247,7 +247,7 @@ int main(int argc, char** argv){
     extern int temp_reg_index;
     temp_reg_index = 0;
     std::vector<std::string>& ops = symtable_stack.top()->decl();
-    for(auto block_node: block_list){
+    for(auto block_node: func_list){
         std::vector<std::vector<std::string>>& ir = split_irs(block_node->translate());
         for(auto line: ir){
             for(auto item:line){
@@ -258,7 +258,7 @@ int main(int argc, char** argv){
         std::cout << std::endl;
 
         //OOOptmize(ir);
-        std::vector<std::string>& op_decl = func_node->symtable->decl();
+        std::vector<std::string>& op_decl = block_node->symtable->decl();
         std::vector<std::string>& op_block = ir2tiny(ir);
         ops.insert(ops.end(),op_decl.begin(),op_decl.end());
         ops.insert(ops.end(),op_block.begin(),op_block.end());
