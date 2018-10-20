@@ -80,13 +80,11 @@ CondExprNode::~CondExprNode(){}
 
 string CondExprNode::translate(vector<string>& code_block){
 
-    cout << "BAKA!" << cmp << endl;
     string op1 = lnode->translate(code_block);
     string op2 = rnode->translate(code_block);
 
     //cmp op1 op2 label
-    string new_ir = cmp + " " + op1 + " " + op2 + " LABEL_FOR_NOW";
-    cout << op1 << " " << op2 << " " << new_ir << endl;
+    string new_ir = cmp + " " + op1 + " " + op2 + " LABEL SUCCESS_";
     code_block.push_back(new_ir);
     return cmp;
 }
@@ -221,7 +219,6 @@ FunctionDeclNode::~FunctionDeclNode(){}
 
 vector<string>& FunctionDeclNode::translate(){
     
-    cout << "FU" << endl;
     vector<string>* ir = new vector<string>;
 
     ir->push_back("LABEL FUNC_"+name);
@@ -237,25 +234,33 @@ vector<string>& FunctionDeclNode::translate(){
     return *ir;
 }
 
-IfStmtNode::IfStmtNode(CondExprNode* cond, Symtable* symtable):
+IfStmtNode::IfStmtNode(CondExprNode* cond, Symtable* symtable, string index):
     BlockNode(symtable),
-    cond(cond){}
+    cond(cond),elseNode(NULL),index(index){}
 
 IfStmtNode::~IfStmtNode(){}
 
 vector<string>& IfStmtNode::translate(){
-    cout << "CK" << endl;
     vector<string>* ir = new vector<string>;
 
-    cout << "This is a if node" << endl;
     cond->translate(*ir);
+    ir->back() += index;
 
+    if(elseNode){
+        vector<string> code_block = elseNode->translate();
+        ir->insert(ir->end(),code_block.begin(),code_block.end());
+    }
+
+
+    ir->push_back("JUMP OUT_"+index);
+    ir->push_back("LABEL SUCCESS_"+index);
     for(auto stmt: stmt_list){
         vector<string> code_block = stmt->translate();
         ir->insert(ir->end(),code_block.begin(),code_block.end());
     }
 
-    cout << "translated..." << endl;
+    
+    ir->push_back("LABEL OUT_"+index);
     return *ir;
 }
 
@@ -266,7 +271,6 @@ ElseStmtNode::ElseStmtNode(Symtable* symtable):
 ElseStmtNode::~ElseStmtNode(){}
 
 vector<string>& ElseStmtNode::translate(){
-    cout << "CK" << endl;
     vector<string>* ir = new vector<string>;
 
     cout << "This is the else part node" << endl;

@@ -56,6 +56,7 @@
     std::string*    sp;
     ExprNode*       en;
     StmtNode*       sn;
+    ElseStmtNode*       elsen;
 }
 
 /* Keywords */
@@ -104,6 +105,7 @@
 %type <sp> id str var_type any_type 
 %type <en> expr expr_prefix postfix_expr factor factor_prefix primary call_expr cond 
 %type <sn> assign_expr 
+%type <elsen> else_part
 %type <ch> addop mulop
 %type <cstr> compop
 %start program
@@ -338,15 +340,17 @@ if_stmt             :IF OPAREN cond CPAREN decl{
                         symtable_list.push_back(current);
 
                         // allocate a new if node
-                        IfStmtNode* new_if = new IfStmtNode(dynamic_cast<CondExprNode*>($3),current);
+                        IfStmtNode* new_if = new IfStmtNode(dynamic_cast<CondExprNode*>($3),current,
+                            std::to_string(static_cast<long long int>(block_index)));
                         block_list.back()->stmt_list.push_back(new_if); 
                         block_list.push_back(new_if);
                     }
                     stmt_list{
                         symtable_stack.pop();                    
-                        block_list.pop_back();
                     }
-                    else_part ENDIF;
+                    else_part ENDIF{
+                        block_list.pop_back();
+                    };
 else_part           :ELSE{
                         block_index++;
                         Symtable* current = new Symtable(
@@ -356,6 +360,9 @@ else_part           :ELSE{
                         symtable_list.push_back(current);
 
                         // allocate a new else node
+                        ElseStmtNode* new_else = new ElseStmtNode(current);
+                        dynamic_cast<IfStmtNode*>(block_list.back())->elseNode = new_else;
+                        block_list.push_back(new_else);
                     }
                     decl stmt_list{
                         symtable_stack.pop(); 

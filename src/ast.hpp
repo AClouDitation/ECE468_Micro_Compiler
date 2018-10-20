@@ -126,25 +126,24 @@ public:
     string type;
 };
 
-class IfStmtNode: public BlockNode{
-public:
-    IfStmtNode(CondExprNode*, Symtable*);
-    virtual ~IfStmtNode();
-    
-    virtual vector<string>& translate(); 
-
-    string LabelName;
-    string invCmp;
-
-    CondExprNode* cond;
-};
-
 class ElseStmtNode: public BlockNode{
 public:
     ElseStmtNode(Symtable*);
     virtual ~ElseStmtNode();
     virtual vector<string>& translate();
 
+};
+
+class IfStmtNode: public BlockNode{
+public:
+    IfStmtNode(CondExprNode*, Symtable*, string);
+    virtual ~IfStmtNode();
+    
+    virtual vector<string>& translate(); 
+
+    CondExprNode* cond;
+    ElseStmtNode* elseNode;
+    string index;
 };
 
 class WhileStmtNode: public BlockNode{
