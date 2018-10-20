@@ -14,10 +14,23 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
 
     for(auto items:irs){
         if(items[0] == "LABEL"){
-            // TODO: fill this in the following steps;
+            tiny->push_back("label "+items[1]);
         }
         else if(items[0] == "LINK"){
             // TODO: fill this in the following steps;
+        }
+        else if(items[0] == "JUMP"){
+            tiny->push_back("jmp "+items[1]); 
+        }
+        else if(items[0] == "LT" || items[0] == "LE" ||
+                items[0] == "GT" || items[0] == "GE" ||
+                items[0] == "EQ" || items[0] == "NE")
+        {
+            tiny->push_back("cmpi " + items[1] + " " + items[2]);
+            string op = "";
+            op += items[0][0] + 'a' - 'A';
+            op += items[0][1] + 'a' - 'A';
+            tiny->push_back("j" + op + " " + items[3]);
         }
         else if(items[0] == "ADDI"){
             string target_reg = t2r(items[3]); 

@@ -84,6 +84,17 @@ string CondExprNode::translate(vector<string>& code_block){
     string op2 = rnode->translate(code_block);
 
     //cmp op1 op2 label
+    if(op2[0] != '$'){ // op2 is a regeister
+        // Move it to one
+        string res = "$T"+to_string(temp_reg_index);
+        string new_ir = "STORE";
+        if(rnode->type=="INT") new_ir+="I";
+        else new_ir+="F";
+        new_ir += " " + op2 + " " + res;
+        code_block.push_back(new_ir);
+        op2 = res;
+    }
+
     string new_ir = cmp + " " + op1 + " " + op2 + " SUCCESS_";
     code_block.push_back(new_ir);
     return cmp;
