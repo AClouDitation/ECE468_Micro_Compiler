@@ -90,6 +90,7 @@ string CondExprNode::translate(vector<string>& code_block){
         new_ir += " " + op2 + " " + res;
         code_block.push_back(new_ir);
         op2 = res;
+        temp_reg_index++;
     }
 
     string new_ir = cmp + " " + op1 + " " + op2 + " SUCCESS_";

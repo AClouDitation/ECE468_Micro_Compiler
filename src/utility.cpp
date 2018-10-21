@@ -26,11 +26,20 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
                 items[0] == "GT" || items[0] == "GE" ||
                 items[0] == "EQ" || items[0] == "NE")
         {
-            tiny->push_back("cmpi " + items[1] + " " + items[2]);
-            string op = "";
-            op += items[0][0] + 'a' - 'A';
-            op += items[0][1] + 'a' - 'A';
-            tiny->push_back("j" + op + " " + items[3]);
+            string op1;
+            string op2;
+
+            if(items[1][0] == '$') op1 = t2r(items[1]);
+            else op1 = items[1];
+
+            if(items[2][0] == '$') op2 = t2r(items[2]);
+            else op2 = items[2];
+
+            tiny->push_back("cmpi " + op1  + " " + op2);
+            string cmp = "";
+            cmp += items[0][0] + 'a' - 'A';
+            cmp += items[0][1] + 'a' - 'A';
+            tiny->push_back("j" + cmp + " " + items[3]);
         }
         else if(items[0] == "ADDI"){
             string target_reg = t2r(items[3]); 

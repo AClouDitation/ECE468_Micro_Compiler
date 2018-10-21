@@ -13,12 +13,12 @@ team:
 	@echo "wang2590"
 	
 compiler: CXX := $(CXX_ECN)
-compiler: compile
+compiler: main
 
 compiler_local: CXX := $(CXX_LOCAL)
-compiler_local: compile
+compiler_local: main
 
-compile: ./src/*
+main: ./src/*
 	mkdir -p generated
 	mkdir -p build
 	flex -o generated/scanner.cpp src/scanner.ll

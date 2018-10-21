@@ -381,16 +381,23 @@ cond                :expr compop expr{
                         CondExprNode* new_lit = new CondExprNode("FALSE");
                     };
 compop              :LT | GT | EQ | NEQ | LEQ | GEQ; /* reutrn $1 by default */
-while_stmt          :WHILE{
+while_stmt          :WHILE OPAREN cond CPAREN {
                         block_index++;
                         Symtable* current = new Symtable(
                             "BLOCK "+
                             std::to_string(static_cast<long long int>(block_index)));
                         symtable_stack.push(current);
                         symtable_list.push_back(current);
+
+                        // allocate a new while node
+                        WhileStmtNode* new_while = new WhileStmtNode(dynamic_cast<CondExprNode*>($3),current,
+                            std::to_string(static_cast<long long int>(block_index)));
+                        block_list.back()->stmt_list.push_back(new_while); 
+                        block_list.push_back(new_while);
                     } 
-                    OPAREN cond CPAREN decl stmt_list ENDWHILE{
+                    decl stmt_list ENDWHILE{
                         symtable_stack.pop(); 
+                        block_list.pop_back();
                     };
 
 
