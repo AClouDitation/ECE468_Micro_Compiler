@@ -1,6 +1,7 @@
 %{
-    #include "../src/symtable.hpp"
-    #include "../src/ast.hpp"
+    #include "../src/symtable/symtable.hpp"
+    #include "../src/ast/ExprNode.hpp"
+    #include "../src/ast/StmtNode.hpp"
     #include "../generated/parser.hpp"
     extern char* yytext;
     #include <stdio.h>
@@ -64,15 +65,15 @@ EATUPWHITESPACE     [ \t\r\n]+
 
 ":="                { return TOK_ASSIGN; }
 "!="                {   
-                        yylval.cstr = "NE"; 
+                        yylval.cstr = (char*)"NE"; 
                         return TOK_NEQ; 
                     }
 "<="                { 
-                        yylval.cstr = "LE";
+                        yylval.cstr = (char*)"LE";
                         return TOK_LEQ; 
                     }
 ">="                { 
-                        yylval.cstr = "GE";
+                        yylval.cstr = (char*)"GE";
                         return TOK_GEQ; 
                     }
 "+"	                { return TOK_PLUS; }
@@ -81,11 +82,11 @@ EATUPWHITESPACE     [ \t\r\n]+
 "/"                 { return TOK_DIV; }
 "="                 { return TOK_EQ; }
 "<"                 { 
-                        yylval.cstr = "LT"; 
+                        yylval.cstr = (char*)"LT"; 
                         return TOK_LT; 
                     }
 ">"                 { 
-                        yylval.cstr = "GT"; 
+                        yylval.cstr = (char*)"GT"; 
                         return TOK_GT; 
                     }
 "("                 { return TOK_OPAREN; }

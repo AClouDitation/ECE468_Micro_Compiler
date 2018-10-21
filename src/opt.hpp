@@ -4,10 +4,11 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
-#include "../src/ast.hpp"
 
-std::vector<std::string> SplitString(const std::string&, const std::string&);
-std::vector<std::vector<std::string>>& split_irs(std::vector<std::string>& irs);
+using namespace std;
 
-void OOOptmize(std::vector<std::vector<std::string>>&);
+vector<string> SplitString(const string&, const string&);
+vector<vector<string>>& split_irs(vector<string>& irs);
+
+void OOOptmize(vector<vector<string>>&);
 #endif

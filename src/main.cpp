@@ -4,8 +4,9 @@
 #include <fstream>
 #include <iostream>
 #include <stack>
-#include "../src/symtable.hpp"
-#include "../src/ast.hpp"
+#include "../src/symtable/symtable.hpp"
+#include "../src/ast/ExprNode.hpp"
+#include "../src/ast/StmtNode.hpp"
 #include "../src/opt.hpp"
 #include "../generated/parser.hpp"
 #include "../src/utility.hpp"///////new add utility.cpp
@@ -29,13 +30,6 @@ int main(int argc, char** argv){
     vector<string>& ops = symtable_stack.top()->decl();
     for(auto block_node: func_list){
         vector<vector<string>>& ir = split_irs(block_node->translate());
-        for(auto line: ir){
-            for(auto item:line){
-                cout << item << " ";
-            }
-            cout << endl;
-        }
-        cout << endl;
 
         //OOOptmize(ir);
         vector<string>& op_decl = block_node->symtable->decl();
@@ -45,16 +39,16 @@ int main(int argc, char** argv){
 
         //printing IR for debugging purpose
 
-        /*
-           for(auto line: ir){
-           cout << ";";
-           for(auto item:line){
-           cout << item << " ";
-           }
-           cout << endl;
-           }
-           cout << endl;
-           */ 
+        
+        for(auto line: ir){
+            cout << ";";
+            for(auto item:line){
+                cout << item << " ";
+            }
+            cout << endl;
+        }
+        cout << endl;
+
     }
 
     for(auto op:ops){

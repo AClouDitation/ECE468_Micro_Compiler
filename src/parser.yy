@@ -5,8 +5,9 @@
     #include <vector>
     #include <iostream>
     #include <bits/stdc++.h> //cstr
-    #include "../src/symtable.hpp"
-    #include "../src/ast.hpp"
+    #include "../src/symtable/symtable.hpp"
+    #include "../src/ast/ExprNode.hpp"
+    #include "../src/ast/StmtNode.hpp"
 
     extern int yylex();
     extern int yylineno;
@@ -56,7 +57,6 @@
     std::string*    sp;
     ExprNode*       en;
     StmtNode*       sn;
-    ElseStmtNode*       elsen;
 }
 
 /* Keywords */
@@ -105,7 +105,6 @@
 %type <sp> id str var_type any_type 
 %type <en> expr expr_prefix postfix_expr factor factor_prefix primary call_expr cond 
 %type <sn> assign_expr 
-%type <elsen> else_part
 %type <ch> addop mulop
 %type <cstr> compop
 %start program
