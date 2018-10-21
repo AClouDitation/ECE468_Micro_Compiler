@@ -380,7 +380,12 @@ cond                :expr compop expr{
                     | FALSE{
                         CondExprNode* new_lit = new CondExprNode("FALSE");
                     };
-compop              :LT | GT | EQ | NEQ | LEQ | GEQ; /* reutrn $1 by default */
+compop              :LT{$$=$1;} | 
+                     GT{$$=$1;} | 
+                     EQ{$$=$1;} | 
+                     NEQ{$$=$1;} | 
+                     LEQ{$$=$1;} | 
+                     GEQ{$$=$1;}; /* reutrn $1 by default */
 while_stmt          :WHILE OPAREN cond CPAREN {
                         block_index++;
                         Symtable* current = new Symtable(

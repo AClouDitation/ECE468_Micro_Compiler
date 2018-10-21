@@ -80,7 +80,10 @@ EATUPWHITESPACE     [ \t\r\n]+
 "-"                 { return TOK_MINUS; }
 "*"                 { return TOK_MUL; }
 "/"                 { return TOK_DIV; }
-"="                 { return TOK_EQ; }
+"="                 {
+                        yylval.cstr = (char*)"EQ";
+                        return TOK_EQ; 
+                    }
 "<"                 { 
                         yylval.cstr = (char*)"LT"; 
                         return TOK_LT; 

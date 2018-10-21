@@ -98,7 +98,6 @@ string CondExprNode::translate(vector<string>& code_block){
         type = "FLOAT";        
     }
 
-
     string new_ir = cmp + " " + type + " " + op1 + " " + op2 + " SUCCESS_";
     code_block.push_back(new_ir);
     return cmp;
