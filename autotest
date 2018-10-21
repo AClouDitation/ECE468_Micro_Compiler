@@ -1,17 +1,19 @@
 #! /bin/bash
 
-for fn in ./input_files/*
+for fp in ./input_files/*.micro
 do
+    fn="${fp##*/}"
+
+    echo ------------------------------------------------------------------------------------
     echo testing...$fn
-	./compiler $fn > test.out
-	output=$(diff -d test.out ./output_files/${fn:14:${#fn}-19}out)
-	if [[ $output ]]
-	then 
-	    echo TEST FAILED
-	    break
-	else 
-	    echo "ACCEPTED $fn"
-	fi
+	./compiler ./input_files/$fn > test.tiny
+    # RUN TEST.tiny
+    cat ${fp%.micro}.input | ./tiny test.tiny
+    echo =============================sample output==========================================
+    cat ${fp%.micro}.input | ./tiny ./output_files/${fn%.micro}.out
+
+    echo ------------------------------------------------------------------------------------
+	#output=$(diff -d test.out ./output_files/${fn:14:${#fn}-19}out)
 
 done
 

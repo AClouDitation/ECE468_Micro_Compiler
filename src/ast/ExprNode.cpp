@@ -93,7 +93,13 @@ string CondExprNode::translate(vector<string>& code_block){
         temp_reg_index++;
     }
 
-    string new_ir = cmp + " " + op1 + " " + op2 + " SUCCESS_";
+    string type = "INT";
+    if(lnode->type == "FLOAT" || rnode->type == "FLOAT"){
+        type = "FLOAT";        
+    }
+
+
+    string new_ir = cmp + " " + type + " " + op1 + " " + op2 + " SUCCESS_";
     code_block.push_back(new_ir);
     return cmp;
 }
@@ -103,6 +109,7 @@ VarRef::VarRef(string name, string type){
 
     this->name = name;
     this->type = type;
+    this->is_var = true;
 
     // this is a design flaw
     // VarRef should not have lnode/rnode
@@ -112,9 +119,7 @@ VarRef::VarRef(string name, string type){
 }
 
 VarRef::~VarRef(){}
-string VarRef::translate(vector<string>& code_block){
-    return name;
-}  
+string VarRef::translate(vector<string>& code_block){return name;}  
 
 LitRef::LitRef(string type, string val){
 

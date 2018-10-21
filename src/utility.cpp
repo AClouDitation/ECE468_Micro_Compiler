@@ -29,17 +29,18 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
             string op1;
             string op2;
 
-            if(items[1][0] == '$') op1 = t2r(items[1]);
-            else op1 = items[1];
+            if(items[2][0] == '$') op1 = t2r(items[2]);
+            else op1 = items[2];
 
-            if(items[2][0] == '$') op2 = t2r(items[2]);
-            else op2 = items[2];
+            if(items[3][0] == '$') op2 = t2r(items[3]);
+            else op2 = items[3];
 
-            tiny->push_back("cmpi " + op1  + " " + op2);
+            string type = items[1]=="INT"?"i":"r";
+            tiny->push_back("cmp" + type + " " + op1  + " " + op2);
             string cmp = "";
             cmp += items[0][0] + 'a' - 'A';
             cmp += items[0][1] + 'a' - 'A';
-            tiny->push_back("j" + cmp + " " + items[3]);
+            tiny->push_back("j" + cmp + " " + items[4]);
         }
         else if(items[0] == "ADDI"){
             string target_reg = t2r(items[3]); 

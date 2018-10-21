@@ -8,12 +8,13 @@ using namespace std;
 
 class ExprNode{
 public:
-    ExprNode():type("INT"){};
+    ExprNode():type("INT"),is_var(false){};
     virtual ~ExprNode(){};
     virtual string translate(vector<string>&)=0;
     ExprNode* lnode;
     ExprNode* rnode;
     string type;
+    bool is_var;    // walkaround to move <memref> <memref>
 };
 
 class AddExprNode: public ExprNode{
