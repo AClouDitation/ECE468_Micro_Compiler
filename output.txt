@@ -1,0 +1,57 @@
+Commit ID tagged for submission: 42fbccde1c7a62b014837b2116d9c3eaeb001d70
+Submission graded at: 2018-10-22 01:04:24
+
+rm -rf generated
+rm -rf build
+mkdir -p generated
+mkdir -p build
+flex -o generated/scanner.cpp src/scanner.ll
+bison -d -o generated/parser.cpp src/parser.yy
+/opt/gcc/7.1.0/bin/g++ -std=c++0x -g -static-libstdc++ -c generated/scanner.cpp -o build/scanner.o -ll
+/opt/gcc/7.1.0/bin/g++ -std=c++0x -g -static-libstdc++ -c generated/parser.cpp -o build/parser.o 
+/opt/gcc/7.1.0/bin/g++ -std=c++0x -g -static-libstdc++ -c src/main.cpp -o build/comp.o
+/opt/gcc/7.1.0/bin/g++ -std=c++0x -g -static-libstdc++ -c src/utility.cpp -o build/utility.o
+/opt/gcc/7.1.0/bin/g++ -std=c++0x -g -static-libstdc++ -c src/ast/ExprNode.cpp -o build/ExprNode.o 
+/opt/gcc/7.1.0/bin/g++ -std=c++0x -g -static-libstdc++ -c src/ast/StmtNode.cpp -o build/StmtNode.o 
+/opt/gcc/7.1.0/bin/g++ -std=c++0x -g -static-libstdc++ -c src/opt.cpp -o build/opt.o 
+/opt/gcc/7.1.0/bin/g++ -std=c++0x -g -static-libstdc++ -c src/symtable/symtable.cpp -o build/symtable.o 
+/opt/gcc/7.1.0/bin/g++ -std=c++0x -g -static-libstdc++ -o compiler build/*.o 	
+Testing..... step5_test3.micro
+Key output:
+ 2.72029 5
+
+
+Student output:
+ 2.72029 5
+
+
+Testing..... step5_test4.micro
+Key output:
+ 2.64575
+
+
+Student output:
+ 2.64575
+
+
+Testing..... step5_test1.micro
+Key output:
+ 73
+
+Student output:
+ 73
+
+Testing..... step5_test2.micro
+Key output:
+ 142123244
+
+Student output:
+ 142123244
+
+Testing..... step5_test5.micro
+Key output:
+ 91
+
+Student output:
+ 91
+
