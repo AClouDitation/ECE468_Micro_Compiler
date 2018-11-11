@@ -1,14 +1,14 @@
 #! /bin/bash
 
-for i in {1..5}
+for i in {1..3}
 do
-    wget https://engineering.purdue.edu/EE468/project/step-${1}/testcases/input/step5_test${i}.input
-    wget https://engineering.purdue.edu/EE468/project/step-${1}/testcases/input/step5_test${i}.micro
+    wget https://engineering.purdue.edu/EE468/project/step-${1}/testcases/input/step${1}_test${i}.input
+    wget https://engineering.purdue.edu/EE468/project/step-${1}/testcases/input/step${1}_test${i}.micro
 done
 
-for i in {1..5}
+for i in {1..3}
 do
-    wget https://engineering.purdue.edu/EE468/project/step-${1}/testcases/output/step5_test${i}.out
+    wget https://engineering.purdue.edu/EE468/project/step-${1}/testcases/output/step${1}_test${i}.out
 done
 
 rm -rf input_files && mkdir input_files

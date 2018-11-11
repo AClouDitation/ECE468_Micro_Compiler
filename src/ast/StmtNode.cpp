@@ -179,3 +179,15 @@ vector<string>& WhileStmtNode::translate(){
     return *ir;
 
 }
+
+ReturnStmtNode::ReturnStmtNode(ExprNode* expr):
+    expr(expr){}
+
+ReturnStmtNode::~ReturnStmtNode(){}
+
+vector<string>& ReturnStmtNode::translate(){
+    vector<string>* ir = new vector<string>;
+    string ret = expr->translate(*ir);
+//    ir->push_back("RETURN "+ret);
+    return *ir;
+}

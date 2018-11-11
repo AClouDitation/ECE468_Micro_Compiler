@@ -34,6 +34,7 @@ MulExprNode::MulExprNode(char sign){
     this->lnode = NULL;
     this->rnode = NULL;
 }
+
 MulExprNode::~MulExprNode(){}
 string MulExprNode::translate(vector<string>& code_block){
     string op1 = lnode->translate(code_block);
@@ -58,14 +59,45 @@ string MulExprNode::translate(vector<string>& code_block){
 
 // for now
 CallExprNode::CallExprNode(string fname){
-
     this->name = fname;
     // this->arg_list = args;
 }
 
 CallExprNode::~CallExprNode(){}
+
 string CallExprNode::translate(vector<string>& code_block){
-    string res("not now...");
+
+    vector<string> args;
+    int argc = 0;
+    // prepare arguments
+    while(!exprStack.empty()){
+        argc++;
+        string ret = exprStack.top()->translate(code_block);
+        args.push_back(ret);
+        exprStack.pop();
+    }
+
+    // push registers
+    code_block.push_back("PUSH");
+    // push a empty space to store return value of function
+    code_block.push_back("PUSHREGS");
+    // push arguments on stack
+    for(auto argToPush: args){
+        code_block.push_back("PUSH " + argToPush);
+    }
+        
+    // call function
+    code_block.push_back("JSR FUNC_" + name);
+
+    // pop arguments
+    for(int i = 0;i < argc;i++){
+        code_block.push_back("POP");
+    }
+    // pop registers
+    code_block.push_back("POPREGS");
+    // pop return value
+    string res = "$T"+to_string(temp_reg_index);
+    code_block.push_back("POP " + res);
     return res;
 }
 

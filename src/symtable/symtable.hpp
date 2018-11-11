@@ -10,47 +10,51 @@ class SymEntry{
 public:
     std::string name;
     std::string type;
-    SymEntry(std::string name, std::string type);
+    SymEntry(std::string, std::string);
     virtual ~SymEntry();
-    virtual void print()=0;
+    virtual void print();
 };
 
 class StrEntry: public SymEntry{
 public:
     std::string literal;
-    StrEntry(std::string name, std::string lit);
+    StrEntry(std::string, std::string);
     virtual ~StrEntry(){};
     void print();
 };
 
 class IntEntry: public SymEntry{
 public:
-    IntEntry(std::string name);
+    IntEntry(std::string);
     virtual ~IntEntry(){};
-    void print();
 };
 
 class FltEntry: public SymEntry{
 public:
-    FltEntry(std::string name);
+    FltEntry(std::string);
     virtual ~FltEntry(){};
-    void print();
 };
 
+class FuncEntry: public SymEntry{
+    int argc;
+public:
+    FuncEntry(std::string, std::string, int);
+    virtual ~FuncEntry(){};
+    void print();
+
+    virtual int getArgCnt();
+};
 
 class Symtable{
-    std::vector<SymEntry*> entrylist;   // probably redundant, 
-                                        // will remove in future version
-    std::unordered_set<std::string> id_set; // same for this
     std::unordered_map<std::string, SymEntry*> id_map; // this is better
     std::string name;
 public:
     Symtable(std::string name);
     virtual ~Symtable();
-    virtual void add(SymEntry* SymEntry); 
+    virtual void add(SymEntry*); 
     virtual void print();
     virtual std::vector<std::string>& decl();
-    virtual SymEntry* have(std::string id);
+    virtual SymEntry* have(std::string);
 };
 
 #endif

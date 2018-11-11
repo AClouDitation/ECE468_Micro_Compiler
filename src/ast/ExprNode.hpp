@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <stack>
 #include <iostream>
 
 using namespace std;
@@ -41,7 +42,7 @@ public:
     virtual string translate(vector<string>&);
 
     string name;
-    vector<string> arg_list;
+    stack<ExprNode*> exprStack;
 };
 
 class CondExprNode: public ExprNode{

@@ -91,4 +91,14 @@ public:
     CondExprNode* cond;
     string index;
 };
+
+class ReturnStmtNode: public StmtNode{
+    ExprNode* expr;
+public:
+    ReturnStmtNode(ExprNode*);
+    virtual ~ReturnStmtNode();
+    virtual vector<string>& translate();
+};
+
 #endif
+

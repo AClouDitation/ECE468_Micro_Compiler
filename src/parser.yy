@@ -17,12 +17,16 @@
 
 %code{
     int block_index = 0;
+    Symtable* globalSymtable;
     std::stack<Symtable*> symtable_stack;
-    std::vector<Symtable*> symtable_list;
     std::stack<std::string> id_stack;
     std::vector<StmtNode*> stmt_list;   //will remove
     std::vector<BlockNode*> block_list;
     std::vector<FunctionDeclNode*> func_list;
+    std::stack<ExprNode*>* expr_stack_ptr; // used when calling function...
+    std::stack<std::stack<ExprNode*>*> expr_stack_ptr_stack; // this is soooo f**king dumb
+                                                             // however has to be here for the f**king sake
+                                                             // of nested function call
 
 
     // search through the symbol table,
@@ -107,14 +111,15 @@
 %type <sn> assign_expr 
 %type <ch> addop mulop
 %type <cstr> compop
+%type <ival> param_decl_list param_decl_tail
 %start program
 %%
 /* Grammar rules */
 /* Program */
 program             :PROGRAM {
                         Symtable* current = new Symtable("GLOBAL");
+                        globalSymtable = current;
                         symtable_stack.push(current);
-                        symtable_list.push_back(current);
                     }
                     id{delete $3;} BEGIN pgm_body END;
 
@@ -182,7 +187,9 @@ id_tail             :COMMA id id_tail{
 
 /* Function Paramater List */
 
-param_decl_list     :param_decl param_decl_tail|/* empty */;
+param_decl_list     :param_decl param_decl_tail{$$ = $2 + 1;}
+                    |/* empty */{$$ = 0;};
+
 param_decl          :var_type id{
                         Symtable* current = symtable_stack.top(); 
                         if(*$1 == "INT"){
@@ -197,14 +204,21 @@ param_decl          :var_type id{
                         delete $1;
                         delete $2;
                     };
-param_decl_tail     :COMMA param_decl param_decl_tail|/* empty */;
+param_decl_tail     :COMMA param_decl param_decl_tail{$$ = $3 + 1;}|/* empty */{$$ = 0;};
 
 /* Function Declarations */
 func_declarations   :func_decl func_declarations|/* empty */;
-func_decl           :FUNCTION any_type id {
-                        Symtable* current = new Symtable(*$3);
+func_decl           :FUNCTION any_type id OPAREN param_decl_list CPAREN {
+                    
+                        // add function declaration to the symbol table
+                        Symtable* current = symtable_stack.top();
+                        FuncEntry* new_entry = new FuncEntry(*$3, *$2, $5); 
+                        current->add(new_entry); 
+
+                        // allocate symboltable for the new function
+                        current = new Symtable(*$3);
                         symtable_stack.push(current);
-                        symtable_list.push_back(current);
+                        //symtable_list.push_back(current);
                         FunctionDeclNode* new_func = new FunctionDeclNode(*$3,*$2,current);
                         block_list.push_back(new_func);
                         func_list.push_back(new_func);
@@ -212,7 +226,7 @@ func_decl           :FUNCTION any_type id {
                         delete $2;
                         delete $3;
                     }
-                    OPAREN param_decl_list CPAREN BEGIN func_body END{
+                    BEGIN func_body END{
                         symtable_stack.pop();
                         block_list.pop_back();
                     };
@@ -263,7 +277,9 @@ write_stmt          :{
 
                         //do something
                     };
-return_stmt         :RETURN expr SEMICOLON;
+return_stmt         :RETURN expr SEMICOLON{
+                        block_list.back()->stmt_list.push_back(new ReturnStmtNode($2)); 
+                    };
 
 /* Expressions */
 expr                :expr_prefix factor {
@@ -301,15 +317,29 @@ postfix_expr        :primary {
                     } | call_expr {
                         $$ = $1;
                     };
-call_expr           :id OPAREN expr_list CPAREN {
-                        // TODO: make a function call!
-                        // dont care for now...
+call_expr           :id{
+                        // TODO:check if the amount of argument match 
+                        if(!globalSymtable->have(*$1)) yyerror("undeclared function"); 
+                        if(expr_stack_ptr) expr_stack_ptr_stack.push(expr_stack_ptr);
+                        expr_stack_ptr = new std::stack<ExprNode*>();
+                    }OPAREN expr_list CPAREN {
                         CallExprNode* new_call = new CallExprNode(*$1);
+                        new_call->exprStack = *expr_stack_ptr;
+                        delete expr_stack_ptr;
+                        if(!expr_stack_ptr_stack.empty()) {
+                            expr_stack_ptr = expr_stack_ptr_stack.top();
+                            expr_stack_ptr_stack.pop();
+                        }
+
                         delete $1;
                         $$ = new_call;
                     };
-expr_list           :expr expr_list_tail | /* empty */;
-expr_list_tail      :COMMA expr expr_list_tail | /* empty */;
+expr_list           :expr expr_list_tail {
+                        expr_stack_ptr->push($1);  
+                    }| /* empty */;
+expr_list_tail      :COMMA expr expr_list_tail {
+                        expr_stack_ptr->push($2);  
+                    }| /* empty */;
 primary             :OPAREN expr CPAREN {
                         $$ = $2; 
                     } | id{
@@ -336,7 +366,7 @@ if_stmt             :IF OPAREN cond CPAREN decl{
                             "BLOCK "+
                             std::to_string(static_cast<long long int>(block_index)));
                         symtable_stack.push(current);
-                        symtable_list.push_back(current);
+                        //symtable_list.push_back(current);
 
                         // allocate a new if node
                         IfStmtNode* new_if = new IfStmtNode(dynamic_cast<CondExprNode*>($3),current,
@@ -356,7 +386,7 @@ else_part           :ELSE{
                             "BLOCK "+
                             std::to_string(static_cast<long long int>(block_index)));
                         symtable_stack.push(current);
-                        symtable_list.push_back(current);
+                        //symtable_list.push_back(current);
 
                         // allocate a new else node
                         ElseStmtNode* new_else = new ElseStmtNode(current);
@@ -380,19 +410,13 @@ cond                :expr compop expr{
                     | FALSE{
                         CondExprNode* new_lit = new CondExprNode("FALSE");
                     };
-compop              :LT{$$=$1;} | 
-                     GT{$$=$1;} | 
-                     EQ{$$=$1;} | 
-                     NEQ{$$=$1;} | 
-                     LEQ{$$=$1;} | 
-                     GEQ{$$=$1;}; /* reutrn $1 by default */
+compop              :LT| GT| EQ| NEQ| LEQ| GEQ; /* reutrn $1 by default */
 while_stmt          :WHILE OPAREN cond CPAREN {
                         block_index++;
                         Symtable* current = new Symtable(
                             "BLOCK "+
                             std::to_string(static_cast<long long int>(block_index)));
                         symtable_stack.push(current);
-                        symtable_list.push_back(current);
 
                         // allocate a new while node
                         WhileStmtNode* new_while = new WhileStmtNode(dynamic_cast<CondExprNode*>($3),current,
@@ -413,7 +437,6 @@ loop_stmt           :while_stmt;
 %%
 //Epilouge
 void yyerror (const char* s){
-    //fprintf(stderr,"Error Line %d token %s\n",yylineno,s);
     std::cout << "Not Accepted" << std::endl;
     exit(1);
 }

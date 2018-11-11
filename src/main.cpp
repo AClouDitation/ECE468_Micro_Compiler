@@ -16,8 +16,6 @@ using namespace std;
 extern FILE* yyin;
 extern stack<Symtable*> symtable_stack; // should be size 1, with only the 
 // global symbol table left
-extern vector<Symtable*> symtable_list; // this is redundant 
-// however needed in step3
 extern vector<FunctionDeclNode*> func_list;
 
 int main(int argc, char** argv){
@@ -55,7 +53,6 @@ int main(int argc, char** argv){
         cout << op << endl;
     }
 
-    for(auto table:symtable_list) delete table;
     fclose(fp);
 
     return 0;

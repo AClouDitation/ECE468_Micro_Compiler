@@ -2,64 +2,69 @@
 #include <iostream>
 #include <cstdlib>
 
-SymEntry::SymEntry(std::string name, std::string type){
+using namespace std;
+
+SymEntry::SymEntry(string name, string type){
     this->name = name;
     this->type = type;
 }
+
 SymEntry::~SymEntry(){}
 
+void SymEntry::print(){
+    cout<<"name "<<name<<" type "<<type<<endl;
+}
 
 // different entry types
-StrEntry::StrEntry(std::string name, std::string lit)
+StrEntry::StrEntry(string name, string lit)
     :SymEntry(name,"STRING")
 {
     literal = lit;
 }
 void StrEntry::print(){
-    std::cout<<"name "<<name<<" type STRING"<<" value "<<literal<<std::endl;
+    cout<<"name "<<name<<" type STRING"<<" value "<<literal<<endl;
 }
 
-IntEntry::IntEntry(std::string name):SymEntry(name,"INT"){}
-void IntEntry::print(){
-    std::cout<<"name "<<name<<" type INT"<<std::endl;
+IntEntry::IntEntry(string name):SymEntry(name,"INT"){}
+
+FltEntry::FltEntry(string name):SymEntry(name,"FLOAT"){}
+
+FuncEntry::FuncEntry(string name, string type, int argc):
+    SymEntry(name, type),argc(argc){}
+
+void FuncEntry::print(){
+    cout<<"Function name "<<name<<" type "<< type << endl;
 }
 
-FltEntry::FltEntry(std::string name):SymEntry(name,"FLOAT"){}
-void FltEntry::print(){
-    std::cout<<"name "<<name<<" type FLOAT"<<std::endl;
+int FuncEntry::getArgCnt(){
+    return argc;
 }
-
-
 // the symtable table
-Symtable::Symtable(std::string name):name(name){}
+Symtable::Symtable(string name):name(name){}
 Symtable::~Symtable(){
-    for(unsigned int i=0;i < entrylist.size(); i++){
-        delete entrylist[i];
-    }
+    for(auto id:id_map) delete id.second;
 }
 
 void Symtable::add(SymEntry* entry){
     
-    entrylist.push_back(entry); // will remove
     if(id_map.find(entry->name)==id_map.end()){
         id_map[entry->name] = entry;
     }
     else{
-        std::cout<<"DECLARATION ERROR "<<entry->name<<std::endl;
-        std::exit(1);
+        cout<<"DECLARATION ERROR "<<entry->name<<endl;
+        exit(1);
     }
 }
 
 void Symtable::print(){
-    std::cout << "Symbol table " << name << std::endl;
-    for(unsigned int i = 0;i < entrylist.size();i++)
-        entrylist[i]->print();
+    cout << "Symbol table " << name << endl;
+    for(auto id:id_map)    id.second->print();
 }
 
-std::vector<std::string>& Symtable::decl(){
-    std::vector<std::string>* decl_ops = new std::vector<std::string>;
+vector<string>& Symtable::decl(){
+    vector<string>* decl_ops = new vector<string>;
     for(auto kv:id_map){
-        std::string new_decl = "";
+        string new_decl = "";
         if(kv.second->type == "STRING"){
             new_decl += "str " + kv.first + " "
                 + dynamic_cast<StrEntry*>(kv.second)->literal;
@@ -73,7 +78,7 @@ std::vector<std::string>& Symtable::decl(){
     return *decl_ops;
 }
 
-SymEntry* Symtable::have(std::string id){
+SymEntry* Symtable::have(string id){
     if(id_map.find(id) != id_map.end()) return id_map[id];
     return NULL;
 }
