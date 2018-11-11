@@ -36,12 +36,12 @@ public:
 };
 
 class CallExprNode: public ExprNode{
+    string name;
 public:
     CallExprNode(string);
     virtual ~CallExprNode();
     virtual string translate(vector<string>&);
 
-    string name;
     stack<ExprNode*> exprStack;
 };
 

@@ -29,18 +29,20 @@ IntEntry::IntEntry(string name):SymEntry(name,"INT"){}
 
 FltEntry::FltEntry(string name):SymEntry(name,"FLOAT"){}
 
-FuncEntry::FuncEntry(string name, string type, int argc):
-    SymEntry(name, type),argc(argc){}
+FuncEntry::FuncEntry(string name, string type):
+    SymEntry(name, type),argc(0){}
 
 void FuncEntry::print(){
     cout<<"Function name "<<name<<" type "<< type << endl;
 }
 
-int FuncEntry::getArgCnt(){
-    return argc;
-}
+void FuncEntry::setArgCnt(int argc){this->argc = argc;};
+int FuncEntry::getArgCnt(){return argc;}
+
 // the symtable table
-Symtable::Symtable(string name):name(name){}
+// start from 2 since $1 is the frame pointer 
+// NOT SURE!!! TODO: make sure this...
+Symtable::Symtable(string name):name(name),nextIndex(-2){}
 Symtable::~Symtable(){
     for(auto id:id_map) delete id.second;
 }
@@ -48,6 +50,7 @@ Symtable::~Symtable(){
 void Symtable::add(SymEntry* entry){
     
     if(id_map.find(entry->name)==id_map.end()){
+        entry->index = nextIndex--;
         id_map[entry->name] = entry;
     }
     else{
@@ -81,5 +84,14 @@ vector<string>& Symtable::decl(){
 SymEntry* Symtable::have(string id){
     if(id_map.find(id) != id_map.end()) return id_map[id];
     return NULL;
+}
+
+int Symtable::size() {return id_map.size();}
+
+void Symtable::offsetFuncParam(){
+   for(auto entry: id_map) {
+        entry.second->index *= -1;
+   }
+   nextIndex = -1;
 }
 

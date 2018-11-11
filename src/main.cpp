@@ -30,9 +30,11 @@ int main(int argc, char** argv){
         vector<vector<string>>& ir = split_irs(block_node->translate());
 
         //OOOptmize(ir);
-        vector<string>& op_decl = block_node->symtable->decl();
+        //TODO: get those by frame pointer and offsets
+        //vector<string>& op_decl = block_node->symtable->decl();
+        
         vector<string>& op_block = ir2tiny(ir);
-        ops.insert(ops.end(),op_decl.begin(),op_decl.end());
+        //ops.insert(ops.end(),op_decl.begin(),op_decl.end());
         ops.insert(ops.end(),op_block.begin(),op_block.end());
 
         //printing IR for debugging purpose

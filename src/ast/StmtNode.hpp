@@ -54,12 +54,13 @@ public:
 
 class FunctionDeclNode: public BlockNode{
 public:
-    FunctionDeclNode(string, string, Symtable* symtable);
+    FunctionDeclNode(string, string, int, Symtable* symtable);
     virtual ~FunctionDeclNode();
 
     virtual vector<string>& translate();
     string name;
     string type;
+    int argc;
 };
 
 class ElseStmtNode: public BlockNode{
@@ -93,9 +94,10 @@ public:
 };
 
 class ReturnStmtNode: public StmtNode{
+    int retLoc;
     ExprNode* expr;
 public:
-    ReturnStmtNode(ExprNode*);
+    ReturnStmtNode(ExprNode*, int);
     virtual ~ReturnStmtNode();
     virtual vector<string>& translate();
 };

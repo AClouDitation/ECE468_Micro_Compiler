@@ -58,10 +58,8 @@ string MulExprNode::translate(vector<string>& code_block){
 }
 
 // for now
-CallExprNode::CallExprNode(string fname){
-    this->name = fname;
-    // this->arg_list = args;
-}
+CallExprNode::CallExprNode(string fname):
+    name(fname){}
 
 CallExprNode::~CallExprNode(){}
 
@@ -78,9 +76,9 @@ string CallExprNode::translate(vector<string>& code_block){
     }
 
     // push registers
-    code_block.push_back("PUSH");
-    // push a empty space to store return value of function
     code_block.push_back("PUSHREGS");
+    // push a empty space to store return value of function
+    code_block.push_back("PUSH");
     // push arguments on stack
     for(auto argToPush: args){
         code_block.push_back("PUSH " + argToPush);
@@ -93,11 +91,11 @@ string CallExprNode::translate(vector<string>& code_block){
     for(int i = 0;i < argc;i++){
         code_block.push_back("POP");
     }
-    // pop registers
-    code_block.push_back("POPREGS");
     // pop return value
     string res = "$T"+to_string(temp_reg_index);
     code_block.push_back("POP " + res);
+    // pop registers
+    code_block.push_back("POPREGS");
     return res;
 }
 

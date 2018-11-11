@@ -44,10 +44,17 @@
         
         if(!entry){
             //error handling
-            yyerror("does not exist in scope!\n");
+            cout << id;
+            yyerror(" does not exist in scope!\n");
         }
         
-        VarRef* new_ref = new VarRef(id, entry->type);
+        VarRef* new_ref;
+        if(now_stack.empty()){
+            new_ref = new VarRef(id, entry->type);
+        }
+        else{
+            new_ref = new VarRef("$"+std::to_string(entry->index), entry->type);
+        }
         return new_ref;
     }
 }
@@ -208,20 +215,28 @@ param_decl_tail     :COMMA param_decl param_decl_tail{$$ = $3 + 1;}|/* empty */{
 
 /* Function Declarations */
 func_declarations   :func_decl func_declarations|/* empty */;
-func_decl           :FUNCTION any_type id OPAREN param_decl_list CPAREN {
-                    
+func_decl           :FUNCTION any_type id {
                         // add function declaration to the symbol table
                         Symtable* current = symtable_stack.top();
-                        FuncEntry* new_entry = new FuncEntry(*$3, *$2, $5); 
+                        FuncEntry* new_entry = new FuncEntry(*$3, *$2); 
                         current->add(new_entry); 
-
                         // allocate symboltable for the new function
-                        current = new Symtable(*$3);
-                        symtable_stack.push(current);
-                        //symtable_list.push_back(current);
-                        FunctionDeclNode* new_func = new FunctionDeclNode(*$3,*$2,current);
+                        symtable_stack.push(new Symtable(*$3));
+                    }OPAREN param_decl_list CPAREN {
+                        
+                        // set argc for the new function
+                        FuncEntry* thisFunc = static_cast<FuncEntry*>(globalSymtable->have(*$3));
+                        assert(thisFunc);
+                        thisFunc->setArgCnt($6);
+
+                        // get the symbol table of this function
+                        Symtable* current = symtable_stack.top();
+                        current->offsetFuncParam();
+                        FunctionDeclNode* new_func = new FunctionDeclNode(*$3,*$2,$6,current);
+
                         block_list.push_back(new_func);
-                        func_list.push_back(new_func);
+                        func_list.push_back(new_func); // for easier to find them in main
+
                         // for now
                         delete $2;
                         delete $3;
@@ -278,7 +293,14 @@ write_stmt          :{
                         //do something
                     };
 return_stmt         :RETURN expr SEMICOLON{
-                        block_list.back()->stmt_list.push_back(new ReturnStmtNode($2)); 
+                        // interesting
+                        // seems like expr is guaranteed not empty
+                        
+                        FunctionDeclNode* lastFuncDecl = func_list.back();
+                        assert(lastFuncDecl);
+                        int retLoc = lastFuncDecl->argc+ 2;
+                        
+                        block_list.back()->stmt_list.push_back(new ReturnStmtNode($2, retLoc)); 
                     };
 
 /* Expressions */
@@ -319,12 +341,20 @@ postfix_expr        :primary {
                     };
 call_expr           :id{
                         // TODO:check if the amount of argument match 
-                        if(!globalSymtable->have(*$1)) yyerror("undeclared function"); 
+                        if(!globalSymtable->have(*$1)){
+                            std::cout << "undeclared function " << *$1 << std::endl;
+                            yyerror("undeclared function"); 
+                        }
+                        // push last expr list onto stack
                         if(expr_stack_ptr) expr_stack_ptr_stack.push(expr_stack_ptr);
+                        // allocate new expr list
                         expr_stack_ptr = new std::stack<ExprNode*>();
                     }OPAREN expr_list CPAREN {
+                        
                         CallExprNode* new_call = new CallExprNode(*$1);
-                        new_call->exprStack = *expr_stack_ptr;
+                        new_call->exprStack = *expr_stack_ptr;  // copy expr list in to call expr node
+
+                        // free and pop
                         delete expr_stack_ptr;
                         if(!expr_stack_ptr_stack.empty()) {
                             expr_stack_ptr = expr_stack_ptr_stack.top();
@@ -436,7 +466,8 @@ loop_stmt           :while_stmt;
 
 %%
 //Epilouge
-void yyerror (const char* s){
+void yyerror (const char* s){   
+    std::cout << s << std::endl;
     std::cout << "Not Accepted" << std::endl;
     exit(1);
 }

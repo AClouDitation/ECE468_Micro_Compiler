@@ -82,10 +82,9 @@ BlockNode::BlockNode(Symtable* symtable):
 
 BlockNode::~BlockNode(){}
 
-FunctionDeclNode::FunctionDeclNode(string name, string type, 
-        Symtable* symtable):
-    BlockNode(symtable),
-    name(name),type(type){}
+FunctionDeclNode::FunctionDeclNode
+    (string name, string type, int argc, Symtable* symtable):
+    BlockNode(symtable),name(name),type(type),argc(argc){}
 
 FunctionDeclNode::~FunctionDeclNode(){}
 
@@ -94,14 +93,16 @@ vector<string>& FunctionDeclNode::translate(){
     vector<string>* ir = new vector<string>;
 
     ir->push_back("LABEL FUNC_"+name);
-    ir->push_back("LINK");
+    ir->push_back("LINK " + to_string(symtable->size() - argc));
 
     for(auto stmt: stmt_list){
         vector<string> code_block = stmt->translate();
         ir->insert(ir->end(),code_block.begin(),code_block.end());
     }
 
-    ir->push_back("RET"); //for now
+    // return if reach the end of function
+    ir->push_back("UNLINK");
+    ir->push_back("RET");
 
     return *ir;
 }
@@ -180,14 +181,16 @@ vector<string>& WhileStmtNode::translate(){
 
 }
 
-ReturnStmtNode::ReturnStmtNode(ExprNode* expr):
-    expr(expr){}
+ReturnStmtNode::ReturnStmtNode(ExprNode* expr, int retLoc):
+    expr(expr), retLoc(retLoc){}
 
 ReturnStmtNode::~ReturnStmtNode(){}
 
 vector<string>& ReturnStmtNode::translate(){
     vector<string>* ir = new vector<string>;
     string ret = expr->translate(*ir);
-//    ir->push_back("RETURN "+ret);
+    ir->push_back("MOVE " + ret + " $"+to_string(retLoc));
+    ir->push_back("UNLINK");
+    ir->push_back("RET");
     return *ir;
 }

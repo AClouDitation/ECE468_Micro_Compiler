@@ -8,6 +8,7 @@
 
 class SymEntry{
 public:
+    int index;
     std::string name;
     std::string type;
     SymEntry(std::string, std::string);
@@ -38,16 +39,19 @@ public:
 class FuncEntry: public SymEntry{
     int argc;
 public:
-    FuncEntry(std::string, std::string, int);
+    FuncEntry(std::string, std::string);
     virtual ~FuncEntry(){};
     void print();
 
+    virtual void setArgCnt(int);
     virtual int getArgCnt();
 };
 
 class Symtable{
     std::unordered_map<std::string, SymEntry*> id_map; // this is better
     std::string name;
+    int nextIndex;
+
 public:
     Symtable(std::string name);
     virtual ~Symtable();
@@ -55,6 +59,8 @@ public:
     virtual void print();
     virtual std::vector<std::string>& decl();
     virtual SymEntry* have(std::string);
+    virtual int size();
+    virtual void offsetFuncParam();
 };
 
 #endif
