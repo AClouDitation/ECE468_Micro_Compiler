@@ -206,6 +206,7 @@ vector<string>& ReturnStmtNode::translate(regManager& regMan){
 
     string newReg = regMan.takeReg();
     ir->push_back("MOVE " + ret + " " + newReg);
+    ir->push_back("MOVE " + newReg + " " + "$"+to_string(retLoc));
     ir->push_back("UNLINK");
     ir->push_back("RET");
     return *ir;

@@ -26,8 +26,11 @@ int main(int argc, char** argv){
     extern int temp_reg_index;
     temp_reg_index = 0;
     vector<string>& ops = symtable_stack.top()->decl();
-    ops.push_back("jsr FUNC_main");
-    ops.push_back("sys halt");
+
+    ops.push_back("push");          // push a space for return value of main
+    ops.push_back("jsr FUNC_main"); // call main
+    ops.push_back("sys halt");      // end
+
     for(auto block_node: func_list){
         vector<vector<string>>& ir = split_irs(block_node->translate());
 

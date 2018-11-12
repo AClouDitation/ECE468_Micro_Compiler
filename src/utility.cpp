@@ -30,14 +30,14 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
             tiny->push_back("jmp "+items[1]); 
         }
         else if(items[0] == "PUSH"){
-            string  pushOp = "push";
+            string pushOp = "push";
             if(items.size() == 2){
                 pushOp += " " + t2r(items[1]);
             }
             tiny->push_back(pushOp);
         }
         else if(items[0] == "POP"){
-            string  popOp = "pop";
+            string popOp = "pop";
             if(items.size() == 2){
                 popOp += " " + t2r(items[1]);
             }
@@ -45,6 +45,18 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
         }
         else if(items[0] == "JSR"){
             tiny->push_back("jsr " + items[1]);
+        }
+        else if(items[0] == "MOVE"){
+            string moveOp = "move ";
+            string op1;
+            string op2;
+
+            if(items[1][0] == '$') op1 = t2r(items[1]);
+            else op1 = items[1];
+
+            if(items[2][0] == '$') op2 = t2r(items[2]);
+            else op2 = items[2];
+            tiny->push_back(moveOp + op1 + " " + op2);
         }
         else if(items[0] == "LT" || items[0] == "LE" ||
                 items[0] == "GT" || items[0] == "GE" ||
