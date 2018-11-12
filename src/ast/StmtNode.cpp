@@ -27,11 +27,10 @@ vector<string>& AssignStmtNode::translate(regManager& regMan){
     string new_IR = "";
     if(to -> type == "INT") new_IR += "STOREI ";
     else if(to -> type == "FLOAT") new_IR += "STOREF ";
+
     // this is because of the error in the tiny simulator
     // causing that in a move instruction, you cannot make
     // both operand memory refs
-    
-    //extern int temp_reg_index;
     if(from->is_var){
         string newReg = regMan.takeReg();
         code_block->push_back(new_IR + res + newReg);

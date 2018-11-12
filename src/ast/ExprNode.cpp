@@ -122,7 +122,7 @@ string CondExprNode::translate(vector<string>& code_block, regManager& regMan){
     string op2 = rnode->translate(code_block, regMan);
 
     //cmp op1 op2 label
-    if(op2[0] != '$'){ // op2 is a regeister
+    if(!(op2[0] == '$' && op2[1] == 'T')){ // op2 is not a regeister
         // Move it to one
         string newReg = regMan.takeReg();
         string new_ir = "STORE";
