@@ -1,21 +1,20 @@
-#ifndef EXPRNODE_HPP
-#define EXPRNODE_HPP
+#ifndef EXPRNODE_HPP_
+#define EXPRNODE_HPP_
 
 #include <string>
 #include <vector>
 #include <stack>
 #include <iostream>
-
-using namespace std;
+#include "../regman/regman.hpp"
 
 class ExprNode{
 public:
     ExprNode():type("INT"),is_var(false){};
     virtual ~ExprNode(){};
-    virtual string translate(vector<string>&)=0;
+    virtual std::string translate(std::vector<std::string>&, regManager&)=0;
     ExprNode* lnode;
     ExprNode* rnode;
-    string type;
+    std::string type;
     bool is_var;    // walkaround to move <memref> <memref>
 };
 
@@ -24,7 +23,7 @@ class AddExprNode: public ExprNode{
 public:
     AddExprNode(char);
     virtual ~AddExprNode();
-    virtual string translate(vector<string>&);
+    virtual std::string translate(std::vector<std::string>&, regManager&);
 };
 
 class MulExprNode: public ExprNode{
@@ -32,45 +31,45 @@ class MulExprNode: public ExprNode{
 public:
     MulExprNode(char);
     virtual ~MulExprNode();
-    virtual string translate(vector<string>&);
+    virtual std::string translate(std::vector<std::string>&, regManager&);
 };
 
 class CallExprNode: public ExprNode{
-    string name;
+    std::string name;
 public:
-    CallExprNode(string);
+    CallExprNode(std::string);
     virtual ~CallExprNode();
-    virtual string translate(vector<string>&);
+    virtual std::string translate(std::vector<std::string>&, regManager&);
 
-    stack<ExprNode*> exprStack;
+    std::stack<ExprNode*> exprStack;
 };
 
 class CondExprNode: public ExprNode{
 public:
-    CondExprNode(string);
+    CondExprNode(std::string);
     virtual ~CondExprNode();    
-    virtual string translate(vector<string>&);
+    virtual std::string translate(std::vector<std::string>&, regManager&);
 
-    string cmp;
+    std::string cmp;
 };
 
 // variable references
 class VarRef: public ExprNode{
 public:
-    VarRef(string, string);
+    VarRef(std::string, std::string);
     virtual ~VarRef();
-    virtual string translate(vector<string>&);
+    virtual std::string translate(std::vector<std::string>&, regManager&);
     
-    string name;
+    std::string name;
 };
 
 class LitRef: public ExprNode{
 public:
-    LitRef(string, string);
+    LitRef(std::string, std::string);
     virtual ~LitRef();
-    virtual string translate(vector<string>&);
+    virtual std::string translate(std::vector<std::string>&, regManager&);
 
-    string value;
+    std::string value;
 };
 
 #endif

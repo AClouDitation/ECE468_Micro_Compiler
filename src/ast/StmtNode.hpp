@@ -4,6 +4,7 @@
 #include <string>
 #include "../symtable/symtable.hpp"
 #include "../ast/ExprNode.hpp"
+#include "../regman/regman.hpp"
 
 using namespace std;
 
@@ -11,7 +12,7 @@ class StmtNode{
 public:
     StmtNode(){};
     virtual ~StmtNode(){};
-    virtual vector<string>& translate()=0;
+    virtual vector<string>& translate(regManager&)=0;
 };
 
 class AssignStmtNode: public StmtNode{
@@ -20,7 +21,7 @@ public:
     virtual ~AssignStmtNode();
 
     void update_AST_type(ExprNode*);
-    vector<string>& translate();
+    vector<string>& translate(regManager&);
     
     VarRef* to;
     ExprNode* from;
@@ -30,7 +31,7 @@ class WriteStmtNode: public StmtNode{
 public:
     WriteStmtNode();
     virtual ~WriteStmtNode();
-    vector<string>& translate();
+    vector<string>& translate(regManager&);
     vector<VarRef*> id_list;
 };
 
@@ -38,7 +39,7 @@ class ReadStmtNode: public StmtNode{
 public:
     ReadStmtNode();
     virtual ~ReadStmtNode();
-    vector<string>& translate();
+    vector<string>& translate(regManager&);
     vector<VarRef*> id_list;
 };
 
@@ -46,7 +47,7 @@ class BlockNode: public StmtNode{
 public:
     BlockNode(Symtable*);
     virtual ~BlockNode();
-    virtual vector<string>& translate()=0;
+    virtual vector<string>& translate(regManager&)=0;
 
     vector<StmtNode*> stmt_list;
     Symtable* symtable;
@@ -57,17 +58,19 @@ public:
     FunctionDeclNode(string, string, int, Symtable* symtable);
     virtual ~FunctionDeclNode();
 
+    virtual vector<string>& translate(regManager&);
     virtual vector<string>& translate();
     string name;
     string type;
     int argc;
+    regManager regMan;
 };
 
 class ElseStmtNode: public BlockNode{
 public:
     ElseStmtNode(Symtable*);
     virtual ~ElseStmtNode();
-    virtual vector<string>& translate();
+    virtual vector<string>& translate(regManager&);
 
 };
 
@@ -76,7 +79,7 @@ public:
     IfStmtNode(CondExprNode*, Symtable*, string);
     virtual ~IfStmtNode();
     
-    virtual vector<string>& translate(); 
+    virtual vector<string>& translate(regManager&); 
 
     CondExprNode* cond;
     ElseStmtNode* elseNode;
@@ -87,20 +90,19 @@ class WhileStmtNode: public BlockNode{
 public:
     WhileStmtNode(CondExprNode*, Symtable*, string);
     virtual ~WhileStmtNode();
-    vector<string>& translate();
+    vector<string>& translate(regManager&);
 
     CondExprNode* cond;
     string index;
 };
 
 class ReturnStmtNode: public StmtNode{
-    int retLoc;
     ExprNode* expr;
+    int retLoc;
 public:
     ReturnStmtNode(ExprNode*, int);
     virtual ~ReturnStmtNode();
-    virtual vector<string>& translate();
+    virtual vector<string>& translate(regManager&);
 };
 
 #endif
-

@@ -1,4 +1,5 @@
 #include "StmtNode.hpp"
+#include <assert.h>
 
 AssignStmtNode::AssignStmtNode(){
     this->to = NULL;
@@ -17,23 +18,24 @@ void AssignStmtNode::update_AST_type(ExprNode* root){
     }
 }
 
-vector<string>& AssignStmtNode::translate(){
+
+vector<string>& AssignStmtNode::translate(regManager& regMan){
     
     update_AST_type(from); // for now
     vector<string>* code_block = new vector<string>;
-    string res = from->translate(*code_block);
+    string res = from->translate(*code_block, regMan);
     string new_IR = "";
     if(to -> type == "INT") new_IR += "STOREI ";
     else if(to -> type == "FLOAT") new_IR += "STOREF ";
-
     // this is because of the error in the tiny simulator
     // causing that in a move instruction, you cannot make
     // both operand memory refs
     
-    extern int temp_reg_index;
+    //extern int temp_reg_index;
     if(from->is_var){
-        code_block->push_back(new_IR + res + " $T" + to_string(temp_reg_index));
-        res = "$T"+to_string(temp_reg_index++);
+        string newReg = regMan.takeReg();
+        code_block->push_back(new_IR + res + newReg);
+        res = newReg;
     }
 
     new_IR += res + " " + to->name;
@@ -45,7 +47,7 @@ vector<string>& AssignStmtNode::translate(){
 
 ReadStmtNode::ReadStmtNode(){}
 ReadStmtNode::~ReadStmtNode(){}
-vector<string>& ReadStmtNode::translate(){
+vector<string>& ReadStmtNode::translate(regManager& regMan){
     vector<string>* code_block = new vector<string>;
     
     for(auto id:id_list){
@@ -62,7 +64,7 @@ vector<string>& ReadStmtNode::translate(){
 
 WriteStmtNode::WriteStmtNode(){}
 WriteStmtNode::~WriteStmtNode(){}
-vector<string>& WriteStmtNode::translate(){
+vector<string>& WriteStmtNode::translate(regManager& regMan){
     vector<string>* code_block = new vector<string>;
     
     for(auto id:id_list){
@@ -84,9 +86,20 @@ BlockNode::~BlockNode(){}
 
 FunctionDeclNode::FunctionDeclNode
     (string name, string type, int argc, Symtable* symtable):
-    BlockNode(symtable),name(name),type(type),argc(argc){}
+    BlockNode(symtable),name(name),type(type),argc(argc),regMan(200){}
+    // using 200 for now, assume no limit for number of registers
+    // will do better later
+    // TODO: better register allocation
 
 FunctionDeclNode::~FunctionDeclNode(){}
+
+// this is here only for the sake of polymorphism
+// should never be used
+vector<string>& FunctionDeclNode::translate(regManager& regMan) {
+    assert(false);
+    vector<string>* ir = new vector<string>;
+    return *ir;
+}
 
 vector<string>& FunctionDeclNode::translate(){
     
@@ -96,7 +109,7 @@ vector<string>& FunctionDeclNode::translate(){
     ir->push_back("LINK " + to_string(symtable->size() - argc));
 
     for(auto stmt: stmt_list){
-        vector<string> code_block = stmt->translate();
+        vector<string> code_block = stmt->translate(regMan);
         ir->insert(ir->end(),code_block.begin(),code_block.end());
     }
 
@@ -113,14 +126,14 @@ IfStmtNode::IfStmtNode(CondExprNode* cond, Symtable* symtable, string index):
 
 IfStmtNode::~IfStmtNode(){}
 
-vector<string>& IfStmtNode::translate(){
+vector<string>& IfStmtNode::translate(regManager& regMan){
     vector<string>* ir = new vector<string>;
 
-    cond->translate(*ir);
+    cond->translate(*ir, regMan);
     ir->back() += index;
 
     if(elseNode){
-        vector<string> code_block = elseNode->translate();
+        vector<string> code_block = elseNode->translate(regMan);
         ir->insert(ir->end(),code_block.begin(),code_block.end());
     }
 
@@ -128,7 +141,7 @@ vector<string>& IfStmtNode::translate(){
     ir->push_back("JUMP OUT_"+index);
     ir->push_back("LABEL SUCCESS_"+index);
     for(auto stmt: stmt_list){
-        vector<string> code_block = stmt->translate();
+        vector<string> code_block = stmt->translate(regMan);
         ir->insert(ir->end(),code_block.begin(),code_block.end());
     }
 
@@ -143,11 +156,11 @@ ElseStmtNode::ElseStmtNode(Symtable* symtable):
 
 ElseStmtNode::~ElseStmtNode(){}
 
-vector<string>& ElseStmtNode::translate(){
+vector<string>& ElseStmtNode::translate(regManager& regMan){
     vector<string>* ir = new vector<string>;
 
     for(auto stmt: stmt_list){
-        vector<string> code_block = stmt->translate();
+        vector<string> code_block = stmt->translate(regMan);
         ir->insert(ir->end(),code_block.begin(),code_block.end());
     }
 
@@ -160,17 +173,17 @@ WhileStmtNode::WhileStmtNode(CondExprNode* cond, Symtable* symtable, string inde
 
 WhileStmtNode::~WhileStmtNode(){}
 
-vector<string>& WhileStmtNode::translate(){
+vector<string>& WhileStmtNode::translate(regManager& regMan){
     vector<string>* ir = new vector<string>;
 
     ir->push_back("LABEL WHILE_START_"+index);
-    cond->translate(*ir);
+    cond->translate(*ir, regMan);
     ir->back() += index;
 
     ir->push_back("JUMP OUT_"+index);
     ir->push_back("LABEL SUCCESS_"+index);
     for(auto stmt: stmt_list){
-        vector<string> code_block = stmt->translate();
+        vector<string> code_block = stmt->translate(regMan);
         ir->insert(ir->end(),code_block.begin(),code_block.end());
     }
 
@@ -186,10 +199,12 @@ ReturnStmtNode::ReturnStmtNode(ExprNode* expr, int retLoc):
 
 ReturnStmtNode::~ReturnStmtNode(){}
 
-vector<string>& ReturnStmtNode::translate(){
+vector<string>& ReturnStmtNode::translate(regManager& regMan){
     vector<string>* ir = new vector<string>;
-    string ret = expr->translate(*ir);
-    ir->push_back("MOVE " + ret + " $"+to_string(retLoc));
+    string ret = expr->translate(*ir, regMan);
+
+    string newReg = regMan.takeReg();
+    ir->push_back("MOVE " + ret + " " + newReg);
     ir->push_back("UNLINK");
     ir->push_back("RET");
     return *ir;

@@ -1,5 +1,7 @@
 #include "ExprNode.hpp"
 
+using namespace std;
+
 int temp_reg_index;
 AddExprNode::AddExprNode(char sign){
     this->sign = sign;
@@ -8,9 +10,9 @@ AddExprNode::AddExprNode(char sign){
 }
 
 AddExprNode::~AddExprNode(){}
-string AddExprNode::translate(vector<string>& code_block){
-    string op1 = lnode->translate(code_block);
-    string op2 = rnode->translate(code_block);
+string AddExprNode::translate(vector<string>& code_block, regManager& regMan){
+    string op1 = lnode->translate(code_block, regMan);
+    string op2 = rnode->translate(code_block, regMan);
 
     string new_ir = "";
     if(sign == '+') new_ir += "ADD";
@@ -20,13 +22,14 @@ string AddExprNode::translate(vector<string>& code_block){
     else new_ir += "I ";
 
     new_ir += op1+" "+op2;
-    string res = "$T"+to_string(temp_reg_index);
-    new_ir += " " + res;
+    //string res = "$T"+to_string(temp_reg_index);
+    string newReg = regMan.takeReg();
+    new_ir += " " + newReg;
 
     code_block.push_back(new_ir); // only integers for now, will modify later
     temp_reg_index++;
 
-    return res;
+    return newReg;
 }
 
 MulExprNode::MulExprNode(char sign){
@@ -36,9 +39,9 @@ MulExprNode::MulExprNode(char sign){
 }
 
 MulExprNode::~MulExprNode(){}
-string MulExprNode::translate(vector<string>& code_block){
-    string op1 = lnode->translate(code_block);
-    string op2 = rnode->translate(code_block);
+string MulExprNode::translate(vector<string>& code_block, regManager& regMan){
+    string op1 = lnode->translate(code_block, regMan);
+    string op2 = rnode->translate(code_block, regMan);
 
     string new_ir = "";
     if(sign == '*') new_ir += "MUL";
@@ -48,13 +51,14 @@ string MulExprNode::translate(vector<string>& code_block){
     else new_ir += "I ";
     
     new_ir += op1+" "+op2;
-    string res = "$T"+to_string(temp_reg_index);
-    new_ir += " " + res;
+    //string res = "$T"+to_string(temp_reg_index);
+    string newReg = regMan.takeReg();
+    new_ir += " " + newReg;
 
     code_block.push_back(new_ir); // only integers for now, will modify later
     temp_reg_index++;
 
-    return res;
+    return newReg;
 }
 
 // for now
@@ -63,14 +67,14 @@ CallExprNode::CallExprNode(string fname):
 
 CallExprNode::~CallExprNode(){}
 
-string CallExprNode::translate(vector<string>& code_block){
+string CallExprNode::translate(vector<string>& code_block, regManager& regMan){
 
     vector<string> args;
     int argc = 0;
     // prepare arguments
     while(!exprStack.empty()){
         argc++;
-        string ret = exprStack.top()->translate(code_block);
+        string ret = exprStack.top()->translate(code_block, regMan);
         args.push_back(ret);
         exprStack.pop();
     }
@@ -92,11 +96,11 @@ string CallExprNode::translate(vector<string>& code_block){
         code_block.push_back("POP");
     }
     // pop return value
-    string res = "$T"+to_string(temp_reg_index);
-    code_block.push_back("POP " + res);
+    string newReg = regMan.takeReg();
+    code_block.push_back("POP " + newReg);
     // pop registers
     code_block.push_back("POPREGS");
-    return res;
+    return newReg;
 }
 
 CondExprNode::CondExprNode(string cmp):
@@ -105,10 +109,10 @@ CondExprNode::CondExprNode(string cmp):
 
 CondExprNode::~CondExprNode(){}
 
-string CondExprNode::translate(vector<string>& code_block){
+string CondExprNode::translate(vector<string>& code_block, regManager& regMan){
 
-    string op1 = lnode->translate(code_block);
-    string op2 = rnode->translate(code_block);
+    string op1 = lnode->translate(code_block, regMan);
+    string op2 = rnode->translate(code_block, regMan);
 
     //cmp op1 op2 label
     if(op2[0] != '$'){ // op2 is a regeister
@@ -148,7 +152,9 @@ VarRef::VarRef(string name, string type){
 }
 
 VarRef::~VarRef(){}
-string VarRef::translate(vector<string>& code_block){return name;}  
+string VarRef::translate(vector<string>& code_block, regManager& regMan) {
+    return name;
+}  
 
 LitRef::LitRef(string type, string val){
 
@@ -163,4 +169,4 @@ LitRef::LitRef(string type, string val){
 }
 
 LitRef::~LitRef(){}
-string LitRef::translate(vector<string>& code_block){return value;}
+string LitRef::translate(vector<string>& code_block, regManager& regMan){return value;}

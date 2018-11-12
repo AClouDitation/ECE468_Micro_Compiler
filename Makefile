@@ -29,6 +29,7 @@ main: ./src/*
 	$(CXX) $(CXXFLAGS) -c src/utility.cpp -o build/utility.o
 	$(CXX) $(CXXFLAGS) -c src/ast/ExprNode.cpp -o build/ExprNode.o 
 	$(CXX) $(CXXFLAGS) -c src/ast/StmtNode.cpp -o build/StmtNode.o 
+	$(CXX) $(CXXFLAGS) -c src/regman/regman.cpp -o build/regman.o 
 	$(CXX) $(CXXFLAGS) -c src/opt.cpp -o build/opt.o 
 	$(CXX) $(CXXFLAGS) -c src/symtable/symtable.cpp -o build/symtable.o 
 	$(CXX) $(CXXFLAGS) -o compiler build/*.o 	
