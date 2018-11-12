@@ -5,7 +5,8 @@
 // probably remove in the future 
 // and re-implement translate()
 string t2r(string& t){
-    return "r" + t.substr(2);
+    if(t[1] == 'T') return "r" + t.substr(2);
+    return t;
 }
 
 vector<string>& ir2tiny(vector<vector<string>>& irs){
@@ -17,10 +18,33 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
             tiny->push_back("label "+items[1]);
         }
         else if(items[0] == "LINK"){
-            // TODO: fill this in the following steps;
+            tiny->push_back("link "+items[1]);
+        }
+        else if(items[0] == "UNLINK"){
+            tiny->push_back("unlnk");
+        }
+        else if(items[0] == "RET"){
+            tiny->push_back("ret");
         }
         else if(items[0] == "JUMP"){
             tiny->push_back("jmp "+items[1]); 
+        }
+        else if(items[0] == "PUSH"){
+            string  pushOp = "push";
+            if(items.size() == 2){
+                pushOp += " " + t2r(items[1]);
+            }
+            tiny->push_back(pushOp);
+        }
+        else if(items[0] == "POP"){
+            string  popOp = "pop";
+            if(items.size() == 2){
+                popOp += " " + t2r(items[1]);
+            }
+            tiny->push_back(popOp);
+        }
+        else if(items[0] == "JSR"){
+            tiny->push_back("jsr " + items[1]);
         }
         else if(items[0] == "LT" || items[0] == "LE" ||
                 items[0] == "GT" || items[0] == "GE" ||

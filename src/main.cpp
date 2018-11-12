@@ -26,6 +26,8 @@ int main(int argc, char** argv){
     extern int temp_reg_index;
     temp_reg_index = 0;
     vector<string>& ops = symtable_stack.top()->decl();
+    ops.push_back("jsr FUNC_main");
+    ops.push_back("sys halt");
     for(auto block_node: func_list){
         vector<vector<string>>& ir = split_irs(block_node->translate());
 
@@ -39,7 +41,6 @@ int main(int argc, char** argv){
 
         //printing IR for debugging purpose
 
-        
         for(auto line: ir){
             cout << ";";
             for(auto item:line){
