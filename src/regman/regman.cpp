@@ -1,4 +1,5 @@
 #include "regman.hpp"
+#include <iostream>
 
 using namespace std;
 regManager::regManager(int totalAmount):

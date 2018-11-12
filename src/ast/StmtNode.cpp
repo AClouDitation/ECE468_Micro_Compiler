@@ -86,7 +86,8 @@ BlockNode::~BlockNode(){}
 
 FunctionDeclNode::FunctionDeclNode
     (string name, string type, int argc, Symtable* symtable):
-    BlockNode(symtable),name(name),type(type),argc(argc),regMan(200){}
+    BlockNode(symtable),name(name),type(type),argc(argc),regMan(200){
+}
     // using 200 for now, assume no limit for number of registers
     // will do better later
     // TODO: better register allocation

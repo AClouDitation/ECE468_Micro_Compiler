@@ -80,7 +80,11 @@ string CallExprNode::translate(vector<string>& code_block, regManager& regMan){
     }
 
     // push registers
-    code_block.push_back("PUSHREGS");
+    vector<string> inUseRegs = regMan.inUseList();
+    for(auto reg: inUseRegs){
+        code_block.push_back("PUSH " + reg);
+    }
+
     // push a empty space to store return value of function
     code_block.push_back("PUSH");
     // push arguments on stack
@@ -99,7 +103,10 @@ string CallExprNode::translate(vector<string>& code_block, regManager& regMan){
     string newReg = regMan.takeReg();
     code_block.push_back("POP " + newReg);
     // pop registers
-    code_block.push_back("POPREGS");
+    for(vector<string>::reverse_iterator rit = inUseRegs.rbegin();
+            rit != inUseRegs.rend(); rit++){
+        code_block.push_back("POP " + *rit);
+    }
     return newReg;
 }
 
@@ -117,13 +124,13 @@ string CondExprNode::translate(vector<string>& code_block, regManager& regMan){
     //cmp op1 op2 label
     if(op2[0] != '$'){ // op2 is a regeister
         // Move it to one
-        string res = "$T"+to_string(temp_reg_index);
+        string newReg = regMan.takeReg();
         string new_ir = "STORE";
         if(rnode->type=="INT") new_ir+="I";
         else new_ir+="F";
-        new_ir += " " + op2 + " " + res;
+        new_ir += " " + op2 + " " + newReg;
         code_block.push_back(new_ir);
-        op2 = res;
+        op2 = newReg;
         temp_reg_index++;
     }
 
