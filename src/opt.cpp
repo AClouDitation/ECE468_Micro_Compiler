@@ -40,7 +40,6 @@ bool _is_constant(string lit){
 
 void constant_swap(vector<vector<string>>& irs)
 {
-    extern int temp_reg_index;
     unordered_map<string, string> const_refs;
 
     for(auto ir = irs.begin(); ir != irs.end();)
@@ -120,8 +119,9 @@ void constant_swap(vector<vector<string>>& irs)
                 if((*ir)[0] == "WRITEI")str_ir.push_back("STOREI");
                 else if((*ir)[0] == "WRITEF")str_ir.push_back("STOREF");
                 str_ir.push_back(const_refs[(*ir)[1]]);
-                str_ir.push_back("$T"+to_string(temp_reg_index)); // store to register
-                (*ir)[1] = "$T" + to_string(temp_reg_index++);
+                //TODO: fix this with register manager
+                //str_ir.push_back("$T"+to_string(temp_reg_index)); // store to register
+                //(*ir)[1] = "$T" + to_string(temp_reg_index++);
                 irs.insert(ir,str_ir);
                 ir++;
             }

@@ -2,11 +2,8 @@
 
 using namespace std;
 
-int temp_reg_index;
 AddExprNode::AddExprNode(char sign){
     this->sign = sign;
-    this->lnode = NULL;
-    this->rnode = NULL;
 }
 
 AddExprNode::~AddExprNode(){}
@@ -27,15 +24,12 @@ string AddExprNode::translate(vector<string>& code_block, regManager& regMan){
     new_ir += " " + newReg;
 
     code_block.push_back(new_ir); // only integers for now, will modify later
-    temp_reg_index++;
 
     return newReg;
 }
 
 MulExprNode::MulExprNode(char sign){
     this->sign = sign;
-    this->lnode = NULL;
-    this->rnode = NULL;
 }
 
 MulExprNode::~MulExprNode(){}
@@ -56,7 +50,6 @@ string MulExprNode::translate(vector<string>& code_block, regManager& regMan){
     new_ir += " " + newReg;
 
     code_block.push_back(new_ir); // only integers for now, will modify later
-    temp_reg_index++;
 
     return newReg;
 }
@@ -131,7 +124,6 @@ string CondExprNode::translate(vector<string>& code_block, regManager& regMan){
         new_ir += " " + op2 + " " + newReg;
         code_block.push_back(new_ir);
         op2 = newReg;
-        temp_reg_index++;
     }
 
     string type = "INT";
@@ -146,16 +138,9 @@ string CondExprNode::translate(vector<string>& code_block, regManager& regMan){
 
 
 VarRef::VarRef(string name, string type){
-
     this->name = name;
     this->type = type;
     this->is_var = true;
-
-    // this is a design flaw
-    // VarRef should not have lnode/rnode
-    // however for the sake of polymorphism...
-    this->lnode = NULL;
-    this->rnode = NULL;
 }
 
 VarRef::~VarRef(){}
@@ -164,15 +149,8 @@ string VarRef::translate(vector<string>& code_block, regManager& regMan) {
 }  
 
 LitRef::LitRef(string type, string val){
-
     this->type = type;
     this->value = val;
-
-    // this is a design flaw
-    // VarRef should not have lnode/rnode
-    // however for the sake of polymorphism...
-    this->lnode = NULL;
-    this->rnode = NULL;
 }
 
 LitRef::~LitRef(){}

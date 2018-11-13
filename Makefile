@@ -1,4 +1,4 @@
-CXXFLAGS := -std=c++0x -g -static-libstdc++
+CXXFLAGS := -std=c++11 -g -static-libstdc++
 CXX_ECN := /opt/gcc/7.1.0/bin/g++
 CXX_LOCAL := g++
 CC := gcc

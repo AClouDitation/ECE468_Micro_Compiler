@@ -9,7 +9,7 @@
 
 class ExprNode{
 public:
-    ExprNode():type("INT"),is_var(false){};
+    ExprNode():lnode(NULL),rnode(NULL),type("INT"),is_var(false){};
     virtual ~ExprNode(){};
     virtual std::string translate(std::vector<std::string>&, regManager&)=0;
     ExprNode* lnode;

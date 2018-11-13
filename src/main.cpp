@@ -23,8 +23,6 @@ int main(int argc, char** argv){
     yyin = fp;
     yyparse();
 
-    extern int temp_reg_index;
-    temp_reg_index = 0;
     vector<string>& ops = symtable_stack.top()->decl();
 
     ops.push_back("push");          // push a space for return value of main
