@@ -9,7 +9,6 @@ AssignStmtNode::AssignStmtNode(){
 AssignStmtNode::~AssignStmtNode(){}
 
 void AssignStmtNode::update_AST_type(ExprNode* root){
-    cout << root->type << endl; // TODO: delete this
     if(!root->lnode && !root->rnode) return; // this is a Ref Node
     if(root->lnode) update_AST_type(root->lnode);
     if(root->rnode) update_AST_type(root->rnode);
