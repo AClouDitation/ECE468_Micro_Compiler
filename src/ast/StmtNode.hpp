@@ -1,108 +1,71 @@
-#ifndef STMTNODE_HPP
-#define STMTNODE_HPP
+#ifndef STMTNODE_HPP_
+#define STMTNODE_HPP_
 #include <vector>
 #include <string>
-#include "../symtable/symtable.hpp"
-#include "../ast/ExprNode.hpp"
-#include "../regman/regman.hpp"
 
-using namespace std;
+class Symtable;
+class CondExprNode;
 
 class StmtNode{
 public:
     StmtNode(){};
     virtual ~StmtNode(){};
-    virtual vector<string>& translate(regManager&)=0;
-};
-
-class AssignStmtNode: public StmtNode{
-public:
-    AssignStmtNode();
-    virtual ~AssignStmtNode();
-
-    void update_AST_type(ExprNode*);
-    vector<string>& translate(regManager&);
-    
-    VarRef* to;
-    ExprNode* from;
-};
-
-class WriteStmtNode: public StmtNode{
-public:
-    WriteStmtNode();
-    virtual ~WriteStmtNode();
-    vector<string>& translate(regManager&);
-    vector<VarRef*> id_list;
-};
-
-class ReadStmtNode: public StmtNode{
-public:
-    ReadStmtNode();
-    virtual ~ReadStmtNode();
-    vector<string>& translate(regManager&);
-    vector<VarRef*> id_list;
+    virtual std::vector<std::string>& translate()=0;
 };
 
 class BlockNode: public StmtNode{
 public:
     BlockNode(Symtable*);
     virtual ~BlockNode();
-    virtual vector<string>& translate(regManager&)=0;
+    virtual std::vector<std::string>& translate()=0;
 
-    vector<StmtNode*> stmt_list;
+    std::vector<StmtNode*> stmt_list;
     Symtable* symtable;
 };
 
 class FunctionDeclNode: public BlockNode{
+    int nextAvaTemp;
 public:
-    FunctionDeclNode(string, string, int, Symtable* symtable);
+    FunctionDeclNode(std::string, std::string, int, Symtable* symtable);
     virtual ~FunctionDeclNode();
 
-    virtual vector<string>& translate(regManager&);
-    virtual vector<string>& translate();
-    string name;
-    string type;
+    virtual std::vector<std::string>& translate();
+    std::string name;
+    std::string type;
     int argc;
-    regManager regMan;
+
+    std::string getNextAvaTemp();
 };
+
 
 class ElseStmtNode: public BlockNode{
 public:
     ElseStmtNode(Symtable*);
     virtual ~ElseStmtNode();
-    virtual vector<string>& translate(regManager&);
+    virtual std::vector<std::string>& translate();
 
 };
 
 class IfStmtNode: public BlockNode{
 public:
-    IfStmtNode(CondExprNode*, Symtable*, string);
+    IfStmtNode(CondExprNode*, Symtable*, std::string);
     virtual ~IfStmtNode();
     
-    virtual vector<string>& translate(regManager&); 
+    virtual std::vector<std::string>& translate(); 
 
     CondExprNode* cond;
     ElseStmtNode* elseNode;
-    string index;
+    std::string index;
 };
 
 class WhileStmtNode: public BlockNode{
 public:
-    WhileStmtNode(CondExprNode*, Symtable*, string);
+    WhileStmtNode(CondExprNode*, Symtable*, std::string);
     virtual ~WhileStmtNode();
-    vector<string>& translate(regManager&);
+    std::vector<std::string>& translate();
 
     CondExprNode* cond;
-    string index;
-};
-
-class ReturnStmtNode: public StmtNode{
-    ExprNode* expr;
-    int retLoc;
-public:
-    ReturnStmtNode(ExprNode*, int);
-    virtual ~ReturnStmtNode();
-    virtual vector<string>& translate(regManager&);
+    std::string index;
 };
 
 #endif

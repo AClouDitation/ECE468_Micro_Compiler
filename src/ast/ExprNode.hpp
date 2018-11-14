@@ -5,13 +5,18 @@
 #include <vector>
 #include <stack>
 #include <iostream>
-#include "../regman/regman.hpp"
+
+class FunctionDeclNode;
 
 class ExprNode{
+protected:
+    FunctionDeclNode* farther;
 public:
-    ExprNode():lnode(NULL),rnode(NULL),type("INT"),is_var(false){};
+    ExprNode(FunctionDeclNode* farther):
+        farther(farther),lnode(NULL),rnode(NULL),
+        type("INT"),is_var(false){};
     virtual ~ExprNode(){};
-    virtual std::string translate(std::vector<std::string>&, regManager&)=0;
+    virtual std::string translate(std::vector<std::string>&)=0;
     ExprNode* lnode;
     ExprNode* rnode;
     std::string type;
@@ -21,34 +26,34 @@ public:
 class AddExprNode: public ExprNode{
     char sign;
 public:
-    AddExprNode(char);
+    AddExprNode(FunctionDeclNode*, char);
     virtual ~AddExprNode();
-    virtual std::string translate(std::vector<std::string>&, regManager&);
+    virtual std::string translate(std::vector<std::string>&);
 };
 
 class MulExprNode: public ExprNode{
     char sign;
 public:
-    MulExprNode(char);
+    MulExprNode(FunctionDeclNode*, char);
     virtual ~MulExprNode();
-    virtual std::string translate(std::vector<std::string>&, regManager&);
+    virtual std::string translate(std::vector<std::string>&);
 };
 
 class CallExprNode: public ExprNode{
     std::string name;
 public:
-    CallExprNode(std::string);
+    CallExprNode(FunctionDeclNode*, std::string);
     virtual ~CallExprNode();
-    virtual std::string translate(std::vector<std::string>&, regManager&);
+    virtual std::string translate(std::vector<std::string>&);
 
     std::stack<ExprNode*> exprStack;
 };
 
 class CondExprNode: public ExprNode{
 public:
-    CondExprNode(std::string);
+    CondExprNode(FunctionDeclNode*, std::string);
     virtual ~CondExprNode();    
-    virtual std::string translate(std::vector<std::string>&, regManager&);
+    virtual std::string translate(std::vector<std::string>&);
 
     std::string cmp;
 };
@@ -56,18 +61,18 @@ public:
 // variable references
 class VarRef: public ExprNode{
 public:
-    VarRef(std::string, std::string);
+    VarRef(FunctionDeclNode*, std::string, std::string);
     virtual ~VarRef();
-    virtual std::string translate(std::vector<std::string>&, regManager&);
+    virtual std::string translate(std::vector<std::string>&);
     
     std::string name;
 };
 
 class LitRef: public ExprNode{
 public:
-    LitRef(std::string, std::string);
+    LitRef(FunctionDeclNode*, std::string, std::string);
     virtual ~LitRef();
-    virtual std::string translate(std::vector<std::string>&, regManager&);
+    virtual std::string translate(std::vector<std::string>&);
 
     std::string value;
 };

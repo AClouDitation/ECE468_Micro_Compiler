@@ -1,15 +1,15 @@
 #include "ExprNode.hpp"
+#include "StmtNode.hpp"
 
 using namespace std;
 
-AddExprNode::AddExprNode(char sign){
-    this->sign = sign;
-}
+AddExprNode::AddExprNode(FunctionDeclNode* farther, char sign):
+    ExprNode(farther), sign(sign){}
 
 AddExprNode::~AddExprNode(){}
-string AddExprNode::translate(vector<string>& code_block, regManager& regMan){
-    string op1 = lnode->translate(code_block, regMan);
-    string op2 = rnode->translate(code_block, regMan);
+string AddExprNode::translate(vector<string>& code_block){
+    string op1 = lnode->translate(code_block);
+    string op2 = rnode->translate(code_block);
 
     string new_ir = "";
     if(sign == '+') new_ir += "ADD";
@@ -19,23 +19,21 @@ string AddExprNode::translate(vector<string>& code_block, regManager& regMan){
     else new_ir += "I ";
 
     new_ir += op1+" "+op2;
-    //string res = "$T"+to_string(temp_reg_index);
-    string newReg = regMan.takeReg();
-    new_ir += " " + newReg;
+    string newTemp = farther->getNextAvaTemp();
+    new_ir += " " + newTemp;
 
     code_block.push_back(new_ir); // only integers for now, will modify later
 
-    return newReg;
+    return newTemp;
 }
 
-MulExprNode::MulExprNode(char sign){
-    this->sign = sign;
-}
+MulExprNode::MulExprNode(FunctionDeclNode* farther, char sign):
+    ExprNode(farther), sign(sign){}
 
 MulExprNode::~MulExprNode(){}
-string MulExprNode::translate(vector<string>& code_block, regManager& regMan){
-    string op1 = lnode->translate(code_block, regMan);
-    string op2 = rnode->translate(code_block, regMan);
+string MulExprNode::translate(vector<string>& code_block){
+    string op1 = lnode->translate(code_block);
+    string op2 = rnode->translate(code_block);
 
     string new_ir = "";
     if(sign == '*') new_ir += "MUL";
@@ -45,38 +43,34 @@ string MulExprNode::translate(vector<string>& code_block, regManager& regMan){
     else new_ir += "I ";
     
     new_ir += op1+" "+op2;
-    //string res = "$T"+to_string(temp_reg_index);
-    string newReg = regMan.takeReg();
-    new_ir += " " + newReg;
+
+    string newTemp = farther->getNextAvaTemp();
+    new_ir += " " + newTemp;
 
     code_block.push_back(new_ir); // only integers for now, will modify later
 
-    return newReg;
+    return newTemp;
 }
 
 // for now
-CallExprNode::CallExprNode(string fname):
-    name(fname){}
+CallExprNode::CallExprNode(FunctionDeclNode* farther, string fname):
+    ExprNode(farther),name(fname){}
 
 CallExprNode::~CallExprNode(){}
 
-string CallExprNode::translate(vector<string>& code_block, regManager& regMan){
+string CallExprNode::translate(vector<string>& code_block){
 
     vector<string> args;
     int argc = 0;
     // prepare arguments
     while(!exprStack.empty()){
         argc++;
-        string ret = exprStack.top()->translate(code_block, regMan);
+        string ret = exprStack.top()->translate(code_block);
         args.push_back(ret);
         exprStack.pop();
     }
 
-    // push registers
-    vector<string> inUseRegs = regMan.inUseList();
-    for(auto reg: inUseRegs){
-        code_block.push_back("PUSH " + reg);
-    }
+    code_block.push_back("PUSHREGS");
 
     // push a empty space to store return value of function
     code_block.push_back("PUSH");
@@ -93,37 +87,35 @@ string CallExprNode::translate(vector<string>& code_block, regManager& regMan){
         code_block.push_back("POP");
     }
     // pop return value
-    string newReg = regMan.takeReg();
-    code_block.push_back("POP " + newReg);
+    string newTemp = farther->getNextAvaTemp();
+    code_block.push_back("POP " + newTemp);
     // pop registers
-    for(vector<string>::reverse_iterator rit = inUseRegs.rbegin();
-            rit != inUseRegs.rend(); rit++){
-        code_block.push_back("POP " + *rit);
-    }
-    return newReg;
+    code_block.push_back("POPREGS");
+
+    return newTemp;
 }
 
-CondExprNode::CondExprNode(string cmp):
-    cmp(cmp)
+CondExprNode::CondExprNode(FunctionDeclNode* farther, string cmp):
+    ExprNode(farther),cmp(cmp)
 {}
 
 CondExprNode::~CondExprNode(){}
 
-string CondExprNode::translate(vector<string>& code_block, regManager& regMan){
+string CondExprNode::translate(vector<string>& code_block){
 
-    string op1 = lnode->translate(code_block, regMan);
-    string op2 = rnode->translate(code_block, regMan);
+    string op1 = lnode->translate(code_block);
+    string op2 = rnode->translate(code_block);
 
     //cmp op1 op2 label
     if(!(op2[0] == '$' && op2[1] == 'T')){ // op2 is not a regeister
         // Move it to one
-        string newReg = regMan.takeReg();
+        string newTemp = farther->getNextAvaTemp();
         string new_ir = "STORE";
         if(rnode->type=="INT") new_ir+="I";
         else new_ir+="F";
-        new_ir += " " + op2 + " " + newReg;
+        new_ir += " " + op2 + " " + newTemp;
         code_block.push_back(new_ir);
-        op2 = newReg;
+        op2 = newTemp;
     }
 
     string type = "INT";
@@ -137,21 +129,20 @@ string CondExprNode::translate(vector<string>& code_block, regManager& regMan){
 }
 
 
-VarRef::VarRef(string name, string type){
-    this->name = name;
+VarRef::VarRef(FunctionDeclNode* farther, string name, string type):
+    ExprNode(farther),name(name){
     this->type = type;
     this->is_var = true;
 }
 
 VarRef::~VarRef(){}
-string VarRef::translate(vector<string>& code_block, regManager& regMan) {
-    return name;
-}  
 
-LitRef::LitRef(string type, string val){
-    this->type = type;
-    this->value = val;
-}
+string VarRef::translate(vector<string>& code_block) {return name;}  
+
+
+LitRef::LitRef(FunctionDeclNode* farther, string type, string val):
+    ExprNode(farther),value(val){this->type = type;}
 
 LitRef::~LitRef(){}
-string LitRef::translate(vector<string>& code_block, regManager& regMan){return value;}
+
+string LitRef::translate(vector<string>& code_block){return value;}

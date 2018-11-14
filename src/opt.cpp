@@ -1,5 +1,6 @@
 #include "../src/opt.hpp"
 
+using namespace std;
 // Utils
 vector<string> SplitString(const string& s, const string& c){
 

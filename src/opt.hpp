@@ -5,10 +5,9 @@
 #include <string>
 #include <unordered_map>
 
-using namespace std;
 
-vector<string> SplitString(const string&, const string&);
-vector<vector<string>>& split_irs(vector<string>& irs);
+std::vector<std::string> Splitstring(const std::string&, const std::string&);
+std::vector<std::vector<std::string>>& split_irs(std::vector<std::string>& irs);
 
-void OOOptmize(vector<vector<string>>&);
+void OOOptmize(std::vector<std::vector<std::string>>&);
 #endif

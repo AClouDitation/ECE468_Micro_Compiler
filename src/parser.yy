@@ -8,6 +8,7 @@
     #include "../src/symtable/symtable.hpp"
     #include "../src/ast/ExprNode.hpp"
     #include "../src/ast/StmtNode.hpp"
+    #include "../src/ast/BaseStmtNode.hpp"
 
     extern int yylex();
     extern int yylineno;
@@ -44,16 +45,16 @@
         
         if(!entry){
             //error handling
-            cout << id;
+            std::cerr << id;
             yyerror(" does not exist in scope!\n");
         }
         
         VarRef* new_ref;
-        if(now_stack.empty()){
-            new_ref = new VarRef(id, entry->type);
+        if(now_stack.empty()){  // reaching the last Symbol table, var is global
+            new_ref = new VarRef(func_list.back(), id, entry->type);
         }
-        else{
-            new_ref = new VarRef("$"+std::to_string(entry->index), entry->type);
+        else{                   // var is local other wise, referencing by adding offset on framepointer
+            new_ref = new VarRef(func_list.back(), "$"+std::to_string(entry->index), entry->type);
         }
         return new_ref;
     }
@@ -258,7 +259,7 @@ assign_stmt         :assign_expr SEMICOLON{
                     };
 
 assign_expr         :id ASSIGN expr{
-                        AssignStmtNode* new_assign = new AssignStmtNode(); 
+                        AssignStmtNode* new_assign = new AssignStmtNode(func_list.back()); 
 
                         // search the current symbol stack to find the table;
                         VarRef* to = find_id(*$1);
@@ -273,7 +274,7 @@ read_stmt           :{
                         while(!id_stack.empty())id_stack.pop();
                     }
                     READ OPAREN id_list CPAREN SEMICOLON{
-                        ReadStmtNode* new_read = new ReadStmtNode();
+                        ReadStmtNode* new_read = new ReadStmtNode(func_list.back());
                         while(!id_stack.empty()){
                             new_read->id_list.push_back(find_id(id_stack.top()));
                             id_stack.pop();
@@ -283,7 +284,7 @@ read_stmt           :{
 write_stmt          :{
                         while(!id_stack.empty())id_stack.pop();
                     }WRITE OPAREN id_list CPAREN SEMICOLON{
-                        WriteStmtNode* new_write = new WriteStmtNode();
+                        WriteStmtNode* new_write = new WriteStmtNode(func_list.back());
                         while(!id_stack.empty()){
                             new_write->id_list.push_back(find_id(id_stack.top()));
                             id_stack.pop();
@@ -300,7 +301,7 @@ return_stmt         :RETURN expr SEMICOLON{
                         assert(lastFuncDecl);
                         int retLoc = lastFuncDecl->argc+ 2;
                         
-                        block_list.back()->stmt_list.push_back(new ReturnStmtNode($2, retLoc)); 
+                        block_list.back()->stmt_list.push_back(new ReturnStmtNode(lastFuncDecl, $2, retLoc)); 
                     };
 
 /* Expressions */
@@ -312,7 +313,7 @@ expr                :expr_prefix factor {
                         else $$ = $2;
                     };
 expr_prefix         :expr_prefix factor addop {
-                        $$ = new AddExprNode($3);
+                        $$ = new AddExprNode(func_list.back(),$3);
                         if($1){
                             $1 -> rnode = $2;
                             $$ -> lnode = $1;
@@ -327,7 +328,7 @@ factor              :factor_prefix postfix_expr {
                         else $$ = $2;
                     };
 factor_prefix       :factor_prefix postfix_expr mulop {
-                        $$ = new MulExprNode($3);
+                        $$ = new MulExprNode(func_list.back(),$3);
                         if($1){
                             $$ -> lnode = $1;
                             $1 -> rnode = $2;
@@ -351,7 +352,7 @@ call_expr           :id{
                         expr_stack_ptr = new std::stack<ExprNode*>();
                     }OPAREN expr_list CPAREN {
                         
-                        CallExprNode* new_call = new CallExprNode(*$1);
+                        CallExprNode* new_call = new CallExprNode(func_list.back(), *$1);
                         new_call->exprStack = *expr_stack_ptr;  // copy expr list in to call expr node
 
                         // free and pop
@@ -377,12 +378,10 @@ primary             :OPAREN expr CPAREN {
                         delete $1;
                         $$ = new_var;
                     } | INTLITERAL {
-                        LitRef* new_lit = new LitRef("INT",
-                            std::to_string(static_cast<long long int>($1)));
+                        LitRef* new_lit = new LitRef(func_list.back(),"INT",std::to_string($1));
                         $$ = new_lit;
                     } | FLOATLITERAL {
-                        LitRef* new_lit = new LitRef("FLOAT",
-                            std::to_string(static_cast<long double>($1)));
+                        LitRef* new_lit = new LitRef(func_list.back(),"FLOAT",std::to_string($1));
                         $$ = new_lit;
                     };
 addop               :PLUS{$$='+';} | MINUS{$$='-';};
@@ -392,15 +391,12 @@ mulop               :MUL{$$='*';} | DIV{$$='/';};
 if_stmt             :IF OPAREN cond CPAREN decl{
                         // allocate a new block
                         block_index++;
-                        Symtable* current = new Symtable(
-                            "BLOCK "+
-                            std::to_string(static_cast<long long int>(block_index)));
+                        Symtable* current = new Symtable("BLOCK "+std::to_string(block_index));
                         symtable_stack.push(current);
-                        //symtable_list.push_back(current);
 
                         // allocate a new if node
                         IfStmtNode* new_if = new IfStmtNode(dynamic_cast<CondExprNode*>($3),current,
-                            std::to_string(static_cast<long long int>(block_index)));
+                            std::to_string(block_index));
                         block_list.back()->stmt_list.push_back(new_if); 
                         block_list.push_back(new_if);
                     }
@@ -414,7 +410,7 @@ else_part           :ELSE{
                         block_index++;
                         Symtable* current = new Symtable(
                             "BLOCK "+
-                            std::to_string(static_cast<long long int>(block_index)));
+                            std::to_string(block_index));
                         symtable_stack.push(current);
                         //symtable_list.push_back(current);
 
@@ -429,23 +425,23 @@ else_part           :ELSE{
                     } 
                     | /* empty */;
 cond                :expr compop expr{
-                        CondExprNode* new_cond = new CondExprNode((string)$2);
+                        CondExprNode* new_cond = new CondExprNode(func_list.back(), (std::string)$2);
                         new_cond->lnode = $1;
                         new_cond->rnode = $3;
                         $$ = new_cond;
                     }
                     | TRUE {
-                        CondExprNode* new_lit = new CondExprNode("TRUE");
+                        CondExprNode* new_lit = new CondExprNode(func_list.back(), "TRUE");
                     }
                     | FALSE{
-                        CondExprNode* new_lit = new CondExprNode("FALSE");
+                        CondExprNode* new_lit = new CondExprNode(func_list.back(), "FALSE");
                     };
 compop              :LT| GT| EQ| NEQ| LEQ| GEQ; /* reutrn $1 by default */
 while_stmt          :WHILE OPAREN cond CPAREN {
                         block_index++;
                         Symtable* current = new Symtable(
                             "BLOCK "+
-                            std::to_string(static_cast<long long int>(block_index)));
+                            std::to_string(block_index));
                         symtable_stack.push(current);
 
                         // allocate a new while node
