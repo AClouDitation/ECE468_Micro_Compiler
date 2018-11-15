@@ -81,16 +81,6 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
 
             tiny->push_back(moveOp + op1 + " " + op2);
         }
-        else if(items[0] == "JSR"){
-            tiny->push_back("jsr " + items[1]);
-        }
-        else if(items[0] == "MOVE"){
-            string moveOp = "move ";
-            string op1 = t2r(items[1]);
-            string op2 = t2r(items[2]);
-
-            tiny->push_back(moveOp + op1 + " " + op2);
-        }
         else if(items[0] == "LTI" || items[0] == "LEI" ||
                 items[0] == "GTI" || items[0] == "GEI" ||
                 items[0] == "EQI" || items[0] == "NEI" ||
