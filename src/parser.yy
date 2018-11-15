@@ -18,6 +18,7 @@
 
 %code{
     int block_index = 0;
+    int if_else_label_index = 0;
     Symtable* globalSymtable;
     std::stack<Symtable*> symtable_stack;
     std::stack<std::string> id_stack;
@@ -396,7 +397,7 @@ if_stmt             :IF OPAREN cond CPAREN decl{
 
                         // allocate a new if node
                         IfStmtNode* new_if = new IfStmtNode(dynamic_cast<CondExprNode*>($3),current,
-                            std::to_string(block_index));
+                            std::to_string(if_else_label_index++));
                         block_list.back()->stmt_list.push_back(new_if); 
                         block_list.push_back(new_if);
                     }

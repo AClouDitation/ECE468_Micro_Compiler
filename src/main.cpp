@@ -31,22 +31,17 @@ int main(int argc, char** argv){
 
     for(auto block_node: func_list){
         vector<vector<string>>& ir = split_irs(block_node->translate());
-
-        //OOOptmize(ir);
-        //TODO: get those by frame pointer and offsets
-        //vector<string>& op_decl = block_node->symtable->decl();
+        
+        //if (argc == 2 && strcmp(argv[1],"-o")) OOOptmize(ir);
         
         vector<string>& op_block = ir2tiny(ir);
-        //ops.insert(ops.end(),op_decl.begin(),op_decl.end());
         ops.insert(ops.end(),op_block.begin(),op_block.end());
 
         //printing IR for debugging purpose
 
         for(auto line: ir){
             cout << ";";
-            for(auto item:line){
-                cout << item << " ";
-            }
+            for(auto item:line) cout << item << " ";
             cout << endl;
         }
         cout << endl;

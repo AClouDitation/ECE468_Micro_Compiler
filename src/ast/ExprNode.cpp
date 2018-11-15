@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "ExprNode.hpp"
 #include "StmtNode.hpp"
 
@@ -96,18 +97,33 @@ string CallExprNode::translate(vector<string>& code_block){
 }
 
 CondExprNode::CondExprNode(FunctionDeclNode* farther, string cmp):
-    ExprNode(farther),cmp(cmp)
+    ExprNode(farther),out_label("NULL"),cmp(cmp)
 {}
 
 CondExprNode::~CondExprNode(){}
 
-string CondExprNode::translate(vector<string>& code_block){
+string negateCond(string cond) {
+    if(cond == "EQ") return "NE";
+    if(cond == "NE") return "EQ";
+    if(cond == "LT") return "GE";
+    if(cond == "LE") return "GT";
+    if(cond == "GT") return "LE";
+    if(cond == "GE") return "LT";
+    cerr << "ERR: unknown condition " << cond << endl;
+    exit(1);
+    return "ERR!!!"; // let g++ shut up
+}
 
+void CondExprNode::setOutLabel(string out_label) {this -> out_label = out_label;}
+
+string CondExprNode::translate(vector<string>& code_block) {
+
+    assert(out_label != "NULL");
     string op1 = lnode->translate(code_block);
     string op2 = rnode->translate(code_block);
 
     //cmp op1 op2 label
-    if(!(op2[0] == '$' && op2[1] == 'T')){ // op2 is not a regeister
+    if(!(op2[0] == '!' && op2[1] == 'T')){ // op2 is not a temporary
         // Move it to one
         string newTemp = farther->getNextAvaTemp();
         string new_ir = "STORE";
@@ -118,12 +134,11 @@ string CondExprNode::translate(vector<string>& code_block){
         op2 = newTemp;
     }
 
-    string type = "INT";
-    if(lnode->type == "FLOAT" || rnode->type == "FLOAT"){
-        type = "FLOAT";        
-    }
+    string type = "I";
+    if(lnode->type == "FLOAT" || rnode->type == "FLOAT") type = "F";        
 
-    string new_ir = cmp + " " + type + " " + op1 + " " + op2 + " SUCCESS_";
+    // index will be added in the translate function
+    string new_ir = negateCond(cmp) + type + " " + op1 + " " + op2 + " " + out_label;
     code_block.push_back(new_ir);
     return cmp;
 }

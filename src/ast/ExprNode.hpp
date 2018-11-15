@@ -50,9 +50,11 @@ public:
 };
 
 class CondExprNode: public ExprNode{
+    std::string out_label;
 public:
     CondExprNode(FunctionDeclNode*, std::string);
     virtual ~CondExprNode();    
+    void setOutLabel(std::string);
     virtual std::string translate(std::vector<std::string>&);
 
     std::string cmp;

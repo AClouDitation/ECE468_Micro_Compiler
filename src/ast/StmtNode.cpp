@@ -5,8 +5,6 @@
 
 using namespace std;
 
-
-
 BlockNode::BlockNode(Symtable* symtable):
     symtable(symtable){}
 
@@ -49,25 +47,22 @@ IfStmtNode::~IfStmtNode(){}
 
 vector<string>& IfStmtNode::translate(){
     vector<string>* ir = new vector<string>;
-
+    cond->setOutLabel("ELSE_"+index);
     cond->translate(*ir);
-    ir->back() += index;
 
-    if(elseNode){
-        vector<string> code_block = elseNode->translate();
-        ir->insert(ir->end(),code_block.begin(),code_block.end());
-    }
-
-
-    ir->push_back("JUMP OUT_"+index);
-    ir->push_back("LABEL SUCCESS_"+index);
-    for(auto stmt: stmt_list){
+    for(auto stmt: stmt_list){  // translate if block
         vector<string> code_block = stmt->translate();
         ir->insert(ir->end(),code_block.begin(),code_block.end());
     }
-
+    ir->push_back("JUMP END_IF_ELSE_"+index);
+    ir->push_back("LABEL ELSE_"+index);
+    if(elseNode){               // translate else block
+        vector<string> code_block = elseNode->translate();
+        ir->insert(ir->end(),code_block.begin(),code_block.end());
+    }
+    else {} // TODO: if there is no else node, set the condition jump to out directly
     
-    ir->push_back("LABEL OUT_"+index);
+    ir->push_back("LABEL END_IF_ELSE_"+index);
     return *ir;
 }
 
@@ -98,19 +93,16 @@ vector<string>& WhileStmtNode::translate(){
     vector<string>* ir = new vector<string>;
 
     ir->push_back("LABEL WHILE_START_"+index);
+    cond->setOutLabel("END_WHILE_"+index);
     cond->translate(*ir);
-    ir->back() += index;
 
-    ir->push_back("JUMP OUT_"+index);
-    ir->push_back("LABEL SUCCESS_"+index);
     for(auto stmt: stmt_list){
         vector<string> code_block = stmt->translate();
         ir->insert(ir->end(),code_block.begin(),code_block.end());
     }
-
-    ir->push_back("JUMP WHILE_START_"+index);
     
-    ir->push_back("LABEL OUT_"+index);
+    ir->push_back("JUMP WHILE_START_"+index);
+    ir->push_back("LABEL END_WHILE_"+index);
     return *ir;
 
 }

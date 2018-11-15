@@ -9,10 +9,8 @@
 #include <stack>
 #include <vector>
 
-using namespace std;
-
-string t2r(string& t);
-
-vector<string>& ir2tiny(vector<vector<string>>& irs);
+std::vector<std::string> SplitString(const std::string&, const std::string&);
+std::string t2r(std::string& t);
+std::vector<std::string>& ir2tiny(std::vector<std::vector<std::string>>& irs);
 
 #endif

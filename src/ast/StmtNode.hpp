@@ -55,7 +55,7 @@ public:
 
     CondExprNode* cond;
     ElseStmtNode* elseNode;
-    std::string index;
+    std::string index; // label index
 };
 
 class WhileStmtNode: public BlockNode{

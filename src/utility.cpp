@@ -1,14 +1,36 @@
 #include "../src/utility.hpp"
 
+using namespace std;
 
-// translate $T** to r**,
-// probably remove in the future 
-// and re-implement translate()
+// split string 
+// @s: string to split
+// @c: delimiter
+vector<string> SplitString(const string& s, const string& c){
+
+    vector<string> v;
+    string::size_type pos1, pos2;
+    pos2 = s.find(c);
+    pos1 = 0;
+    while(string::npos != pos2){
+        v.push_back(s.substr(pos1, pos2-pos1));
+
+        pos1 = pos2 + c.size();
+        pos2 = s.find(c, pos1);
+    }
+    if(pos1 != s.length()) v.push_back(s.substr(pos1));
+
+    return v;
+}
+
+// translate !T** to r**,
+// @t: temporary to translate
 string t2r(string& t){
     if(t[0] == '!' && t[1] == 'T') return "r" + t.substr(2);    // if t is a temporary, return a register
     return t;                                                   // otherwise skip
 }
 
+// translate IR to tiny assembly
+// @irs: vector<vector<string>> containing ir
 vector<string>& ir2tiny(vector<vector<string>>& irs){
 
     vector<string>* tiny = new vector<string>;
@@ -59,19 +81,33 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
 
             tiny->push_back(moveOp + op1 + " " + op2);
         }
-        else if(items[0] == "LT" || items[0] == "LE" ||
-                items[0] == "GT" || items[0] == "GE" ||
-                items[0] == "EQ" || items[0] == "NE")
-        {
-            string op1 = t2r(items[2]);
-            string op2 = t2r(items[3]);
+        else if(items[0] == "JSR"){
+            tiny->push_back("jsr " + items[1]);
+        }
+        else if(items[0] == "MOVE"){
+            string moveOp = "move ";
+            string op1 = t2r(items[1]);
+            string op2 = t2r(items[2]);
 
-            string type = items[1]=="INT"?"i":"r";
+            tiny->push_back(moveOp + op1 + " " + op2);
+        }
+        else if(items[0] == "LTI" || items[0] == "LEI" ||
+                items[0] == "GTI" || items[0] == "GEI" ||
+                items[0] == "EQI" || items[0] == "NEI" ||
+                items[0] == "LTF" || items[0] == "LEF" ||
+                items[0] == "GTF" || items[0] == "GEF" ||
+                items[0] == "EQF" || items[0] == "NEF")
+
+        {
+            string op1 = t2r(items[1]);
+            string op2 = t2r(items[2]);
+
+            string type = items[0][2] == 'I'?"i":"r";
             tiny->push_back("cmp" + type + " " + op1  + " " + op2);
             string cmp = "";
             cmp += items[0][0] + 'a' - 'A';
             cmp += items[0][1] + 'a' - 'A';
-            tiny->push_back("j" + cmp + " " + items[4]);
+            tiny->push_back("j" + cmp + " " + items[3]);
         }
         else if(items[0] == "ADDI"){
             string target_reg = t2r(items[3]); 

@@ -1,23 +1,7 @@
+#include "../src/utility.hpp"
 #include "../src/opt.hpp"
 
 using namespace std;
-// Utils
-vector<string> SplitString(const string& s, const string& c){
-
-    vector<string> v;
-    string::size_type pos1, pos2;
-    pos2 = s.find(c);
-    pos1 = 0;
-    while(string::npos != pos2){
-        v.push_back(s.substr(pos1, pos2-pos1));
-
-        pos1 = pos2 + c.size();
-        pos2 = s.find(c, pos1);
-    }
-    if(pos1 != s.length()) v.push_back(s.substr(pos1));
-
-    return v;
-}
 
 vector<vector<string>>& split_irs(vector<string>& irs){
     vector<vector<string>>* sp_irs = 
@@ -138,9 +122,7 @@ void constant_swap(vector<vector<string>>& irs)
 }
 
 // cross_out dead exprs
-void _cross_out(unordered_map<string,string>& reg_content,
-        string& target)
-{
+void _cross_out(unordered_map<string,string>& reg_content, string& target) {
     //cerr << "Looking for " << target << endl;
     for(auto it = reg_content.begin();it != reg_content.end();){
         vector<string>items = SplitString(it->first," ");
@@ -153,12 +135,13 @@ void _cross_out(unordered_map<string,string>& reg_content,
     }
 }
 
-void live_ana(vector<vector<string>>& irs){    
+// perform backward liveness analysis
+void live_ana(vector<vector<string>>& irs) {    
 
     unordered_map<string,string> reg_content;
     //                  ^expr       ^reg
 
-    for(auto ir = irs.begin(); ir != irs.end();){
+    for(auto ir = irs.begin(); ir != irs.end();) {
 
         if((*ir)[0] == "READI" || (*ir)[0] == "READF")
         {
@@ -195,8 +178,6 @@ void live_ana(vector<vector<string>>& irs){
     }
 }
 
-void rm_useless_move(vector<vector<string>>& irs){
-}
 
 void dead_store_eli(vector<vector<string>>& irs){
 
