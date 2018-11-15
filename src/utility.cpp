@@ -5,8 +5,8 @@
 // probably remove in the future 
 // and re-implement translate()
 string t2r(string& t){
-    if(t[1] == 'T') return "r" + t.substr(2);
-    return t;
+    if(t[0] == '!' && t[1] == 'T') return "r" + t.substr(2);    // if t is a temporary, return a register
+    return t;                                                   // otherwise skip
 }
 
 vector<string>& ir2tiny(vector<vector<string>>& irs){
@@ -36,6 +36,9 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
             }
             tiny->push_back(pushOp);
         }
+        else if(items[0] == "PUSHREGS") {
+            // TODO: push all inuse registers on to the stack
+        }
         else if(items[0] == "POP"){
             string popOp = "pop";
             if(items.size() == 2){
@@ -43,33 +46,25 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
             }
             tiny->push_back(popOp);
         }
+        else if(items[0] == "POPREGS") {
+            // TODO: pop all used registers off the stack
+        }
         else if(items[0] == "JSR"){
             tiny->push_back("jsr " + items[1]);
         }
         else if(items[0] == "MOVE"){
             string moveOp = "move ";
-            string op1;
-            string op2;
+            string op1 = t2r(items[1]);
+            string op2 = t2r(items[2]);
 
-            if(items[1][0] == '$') op1 = t2r(items[1]);
-            else op1 = items[1];
-
-            if(items[2][0] == '$') op2 = t2r(items[2]);
-            else op2 = items[2];
             tiny->push_back(moveOp + op1 + " " + op2);
         }
         else if(items[0] == "LT" || items[0] == "LE" ||
                 items[0] == "GT" || items[0] == "GE" ||
                 items[0] == "EQ" || items[0] == "NE")
         {
-            string op1;
-            string op2;
-
-            if(items[2][0] == '$') op1 = t2r(items[2]);
-            else op1 = items[2];
-
-            if(items[3][0] == '$') op2 = t2r(items[3]);
-            else op2 = items[3];
+            string op1 = t2r(items[2]);
+            string op2 = t2r(items[3]);
 
             string type = items[1]=="INT"?"i":"r";
             tiny->push_back("cmp" + type + " " + op1  + " " + op2);
@@ -80,14 +75,8 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
         }
         else if(items[0] == "ADDI"){
             string target_reg = t2r(items[3]); 
-            string op1;
-            string op2;
-
-            if(items[1][0] == '$') op1 = t2r(items[1]);
-            else op1 = items[1];
-
-            if(items[2][0] == '$') op2 = t2r(items[2]);
-            else op2 = items[2];
+            string op1 = t2r(items[1]);
+            string op2 = t2r(items[2]);
 
             string new_tiny_op = "move " + op1 + " " + target_reg;
             tiny->push_back(new_tiny_op);
@@ -96,14 +85,8 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
         }
         else if(items[0] == "SUBI"){
             string target_reg = t2r(items[3]); 
-            string op1;
-            string op2;
-
-            if(items[1][0] == '$') op1 = t2r(items[1]);
-            else op1 = items[1];
-
-            if(items[2][0] == '$') op2 = t2r(items[2]);
-            else op2 = items[2];
+            string op1 = t2r(items[1]);
+            string op2 = t2r(items[2]);
 
             string new_tiny_op = "move " + op1 + " " + target_reg;
             tiny->push_back(new_tiny_op);
@@ -112,14 +95,8 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
         }
         else if(items[0] == "MULI"){
             string target_reg = t2r(items[3]); 
-            string op1;
-            string op2;
-
-            if(items[1][0] == '$') op1 = t2r(items[1]);
-            else op1 = items[1];
-
-            if(items[2][0] == '$') op2 = t2r(items[2]);
-            else op2 = items[2];
+            string op1 = t2r(items[1]);
+            string op2 = t2r(items[2]);
 
             string new_tiny_op;
             if(op1 == "1"){
@@ -138,14 +115,8 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
         }
         else if(items[0] == "DIVI"){
             string target_reg = t2r(items[3]); 
-            string op1;
-            string op2;
-
-            if(items[1][0] == '$') op1 = t2r(items[1]);
-            else op1 = items[1];
-
-            if(items[2][0] == '$') op2 = t2r(items[2]);
-            else op2 = items[2];
+            string op1 = t2r(items[1]);
+            string op2 = t2r(items[2]);
 
             string new_tiny_op = "move " + op1 + " " + target_reg;
             tiny->push_back(new_tiny_op);
@@ -154,14 +125,8 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
         }
         else if(items[0] == "ADDF"){
             string target_reg = t2r(items[3]); 
-            string op1;
-            string op2;
-
-            if(items[1][0] == '$') op1 = t2r(items[1]);
-            else op1 = items[1];
-
-            if(items[2][0] == '$') op2 = t2r(items[2]);
-            else op2 = items[2];
+            string op1 = t2r(items[1]);
+            string op2 = t2r(items[2]);
 
             string new_tiny_op = "move " + op1 + " " + target_reg;
             tiny->push_back(new_tiny_op);
@@ -170,14 +135,8 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
         }
         else if(items[0] == "SUBF"){
             string target_reg = t2r(items[3]); 
-            string op1;
-            string op2;
-
-            if(items[1][0] == '$') op1 = t2r(items[1]);
-            else op1 = items[1];
-
-            if(items[2][0] == '$') op2 = t2r(items[2]);
-            else op2 = items[2];
+            string op1 = t2r(items[1]);
+            string op2 = t2r(items[2]);
 
             string new_tiny_op = "move " + op1 + " " + target_reg;
             tiny->push_back(new_tiny_op);
@@ -186,14 +145,8 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
         }
         else if(items[0] == "MULF"){
             string target_reg = t2r(items[3]); 
-            string op1;
-            string op2;
-
-            if(items[1][0] == '$') op1 = t2r(items[1]);
-            else op1 = items[1];
-
-            if(items[2][0] == '$') op2 = t2r(items[2]);
-            else op2 = items[2];
+            string op1 = t2r(items[1]);
+            string op2 = t2r(items[2]);
 
             string new_tiny_op = "move " + op1 + " " + target_reg;
             tiny->push_back(new_tiny_op);
@@ -202,14 +155,8 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
         }
         else if(items[0] == "DIVF"){
             string target_reg = t2r(items[3]); 
-            string op1;
-            string op2;
-
-            if(items[1][0] == '$') op1 = t2r(items[1]);
-            else op1 = items[1];
-
-            if(items[2][0] == '$') op2 = t2r(items[2]);
-            else op2 = items[2];
+            string op1 = t2r(items[1]);
+            string op2 = t2r(items[2]);
 
             string new_tiny_op = "move " + op1 + " " + target_reg;
             tiny->push_back(new_tiny_op);
@@ -217,26 +164,14 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
             tiny->push_back(new_tiny_op);
         }
         else if(items[0] == "STOREI"){
-            string target_reg; 
-            string op1;
-
-            if(items[2][0] == '$') target_reg = t2r(items[2]);
-            else target_reg = items[2];
-
-            if(items[1][0] == '$') op1 = t2r(items[1]);
-            else op1 = items[1];
+            string target_reg = t2r(items[2]); 
+            string op1 = t2r(items[1]);
 
             tiny->push_back("move " + op1 + " " + target_reg);
         }
         else if(items[0] == "STOREF"){
-            string target_reg; 
-            string op1;
-
-            if(items[2][0] == '$') target_reg = t2r(items[2]);
-            else target_reg = items[2];
-
-            if(items[1][0] == '$') op1 = t2r(items[1]);
-            else op1 = items[1];
+            string target_reg = t2r(items[2]); 
+            string op1 = t2r(items[1]);
 
             tiny->push_back("move " + op1 + " " + target_reg);
         }
@@ -252,20 +187,14 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
         }
         else if(items[0] == "WRITEI"){
             string new_tiny_op = "sys writei ";
-            string op1;
-
-            if(items[1][0] == '$') op1 = t2r(items[1]);
-            else op1 = items[1];
+            string op1 = t2r(items[1]);
 
             new_tiny_op += op1;
             tiny->push_back(new_tiny_op);
         }
         else if(items[0] == "WRITEF"){
             string new_tiny_op = "sys writer ";
-            string op1;
-
-            if(items[1][0] == '$') op1 = t2r(items[1]);
-            else op1 = items[1];
+            string op1 = t2r(items[1]);
 
             new_tiny_op += op1;
             tiny->push_back(new_tiny_op);
