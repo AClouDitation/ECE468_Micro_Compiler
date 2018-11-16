@@ -21,8 +21,8 @@ compiler_local: main
 main: ./src/*
 	mkdir -p generated
 	mkdir -p build
-	flex -o generated/scanner.cpp src/scanner.ll
-	bison -d -o generated/parser.cpp src/parser.yy
+	flex -o generated/scanner.cpp src/frontend/scanner.ll
+	bison -d -o generated/parser.cpp src/frontend/parser.yy
 	$(CXX) $(CXXFLAGS) -c generated/scanner.cpp -o build/scanner.o -ll
 	$(CXX) $(CXXFLAGS) -c generated/parser.cpp -o build/parser.o 
 	$(CXX) $(CXXFLAGS) -c src/main.cpp -o build/comp.o

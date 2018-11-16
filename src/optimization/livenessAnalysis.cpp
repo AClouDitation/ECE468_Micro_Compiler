@@ -11,6 +11,7 @@ vector<set<string>> liveAna(vector<vector<string>>& irs) {
         vector<string> use;
         vector<string> items = *it;
         if(items[0] == "LABEL"){
+
         }
         else if(items[0] == "LINK"){
         }
