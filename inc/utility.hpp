@@ -10,6 +10,7 @@
 #include <vector>
 
 std::vector<std::string> SplitString(const std::string&, const std::string&);
+std::vector<std::vector<std::string>>& split_irs(std::vector<std::string>& irs);
 std::string t2r(std::string& t);
 std::vector<std::string>& ir2tiny(std::vector<std::vector<std::string>>& irs);
 

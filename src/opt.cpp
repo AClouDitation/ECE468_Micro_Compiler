@@ -3,16 +3,6 @@
 
 using namespace std;
 
-vector<vector<string>>& split_irs(vector<string>& irs){
-    vector<vector<string>>* sp_irs = 
-        new vector<vector<string>>;
-
-    for(auto ir:irs){
-        sp_irs->push_back(SplitString(ir," "));  
-    }
-
-    return *sp_irs;
-}
 
 bool _is_constant(string lit){
     char have_dot = false;

@@ -22,6 +22,19 @@ vector<string> SplitString(const string& s, const string& c){
     return v;
 }
 
+// split ir string by space
+// @irs: ir codes
+vector<vector<string>>& split_irs(vector<string>& irs){
+    vector<vector<string>>* sp_irs =
+        new vector<vector<string>>;
+
+    for(auto ir:irs){
+        sp_irs->push_back(SplitString(ir," "));
+    }
+
+    return *sp_irs;
+}
+
 // translate !T** to r**,
 // @t: temporary to translate
 string t2r(string& t){

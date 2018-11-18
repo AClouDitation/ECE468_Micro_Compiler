@@ -7,7 +7,6 @@
 
 
 std::vector<std::string> Splitstring(const std::string&, const std::string&);
-std::vector<std::vector<std::string>>& split_irs(std::vector<std::string>& irs);
 
 void OOOptmize(std::vector<std::vector<std::string>>&);
 #endif
