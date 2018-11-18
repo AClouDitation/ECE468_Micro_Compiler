@@ -1,4 +1,4 @@
-#include "regman.hpp"
+#include "../../inc/regman.hpp"
 #include <iostream>
 
 using namespace std;

@@ -1,4 +1,4 @@
-#include "../src/utility.hpp"
+#include "../inc/utility.hpp"
 
 using namespace std;
 

@@ -1,5 +1,5 @@
-#include "ExprNode.hpp"
-#include "BaseStmtNode.hpp"
+#include "../../inc/ExprNode.hpp"
+#include "../../inc/BaseStmtNode.hpp"
 
 using namespace::std;
 

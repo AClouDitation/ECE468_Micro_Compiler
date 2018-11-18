@@ -1,4 +1,4 @@
-#include "livenessAnalysis.hpp"
+#include "../../inc/livenessAnalysis.hpp"
 
 using namespace std;
 

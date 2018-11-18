@@ -1,6 +1,6 @@
-#include "StmtNode.hpp"
-#include "ExprNode.hpp"
-#include "../symtable/symtable.hpp"
+#include "../../inc/StmtNode.hpp"
+#include "../../inc/ExprNode.hpp"
+#include "../../inc/symtable.hpp"
 #include <assert.h>
 
 using namespace std;

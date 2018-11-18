@@ -1,5 +1,5 @@
-#include "../src/utility.hpp"
-#include "../src/opt.hpp"
+#include "../inc/utility.hpp"
+#include "../inc/opt.hpp"
 
 using namespace std;
 

@@ -4,12 +4,12 @@
 #include <fstream>
 #include <iostream>
 #include <stack>
-#include "../src/symtable/symtable.hpp"
-#include "../src/ast/ExprNode.hpp"
-#include "../src/ast/StmtNode.hpp"
-#include "../src/opt.hpp"
+#include "../inc/symtable.hpp"
+#include "../inc/ExprNode.hpp"
+#include "../inc/StmtNode.hpp"
+#include "../inc/opt.hpp"
+#include "../inc/utility.hpp"///////new add utility.cpp
 #include "../generated/parser.hpp"
-#include "../src/utility.hpp"///////new add utility.cpp
 
 using namespace std;
 

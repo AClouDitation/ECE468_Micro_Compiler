@@ -1,6 +1,6 @@
 #include <assert.h>
-#include "ExprNode.hpp"
-#include "StmtNode.hpp"
+#include "../../inc/ExprNode.hpp"
+#include "../../inc/StmtNode.hpp"
 
 using namespace std;
 

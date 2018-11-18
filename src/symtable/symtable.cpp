@@ -1,4 +1,4 @@
-#include "symtable.hpp"
+#include "../../inc/symtable.hpp"
 #include <iostream>
 #include <cstdlib>
 

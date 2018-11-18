@@ -1,13 +1,14 @@
 %{
-    #include "../src/symtable/symtable.hpp"
-    #include "../src/ast/ExprNode.hpp"
-    #include "../src/ast/StmtNode.hpp"
+    #include "../inc/symtable.hpp"
+    #include "../inc/ExprNode.hpp"
+    #include "../inc/StmtNode.hpp"
     #include "../generated/parser.hpp"
-    extern char* yytext;
     #include <stdio.h>
     #include <stdlib.h>
     #include <string>
     #define YY_DECL int yylex()
+
+    extern char* yytext;
 %}
 
 %option noyywrap nounput batch noinput
