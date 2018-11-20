@@ -1,6 +1,8 @@
 #include <assert.h>
 #include "../../inc/ExprNode.hpp"
 #include "../../inc/StmtNode.hpp"
+#include "../../inc/irNode.hpp"
+#include "../../inc/utility.hpp"
 
 using namespace std;
 
@@ -8,49 +10,36 @@ AddExprNode::AddExprNode(FunctionDeclNode* farther, char sign):
     ExprNode(farther), sign(sign){}
 
 AddExprNode::~AddExprNode(){}
-string AddExprNode::translate(vector<string>& code_block){
+string AddExprNode::translate(vector<IrNode*>& code_block){
     string op1 = lnode->translate(code_block);
     string op2 = rnode->translate(code_block);
 
-    string new_ir = "";
-    if(sign == '+') new_ir += "ADD";
-    else new_ir += "SUB";
+    string cmd = sign == '+'?"ADD":"SUB";
+    string type = this->type == "FLOAT"? "F":"I";
+    string res = farther->getNextAvaTemp();
 
-    if(type == "FLOAT") new_ir += "F ";
-    else new_ir += "I ";
+    IrNode* newIr = new ArithmeticIrNode(cmd, type, op1, op2, res);
+    irBlockInsert(code_block, newIr);
 
-    new_ir += op1+" "+op2;
-    string newTemp = farther->getNextAvaTemp();
-    new_ir += " " + newTemp;
-
-    code_block.push_back(new_ir); // only integers for now, will modify later
-
-    return newTemp;
+    return res;
 }
 
 MulExprNode::MulExprNode(FunctionDeclNode* farther, char sign):
     ExprNode(farther), sign(sign){}
 
 MulExprNode::~MulExprNode(){}
-string MulExprNode::translate(vector<string>& code_block){
+string MulExprNode::translate(vector<IrNode*>& code_block){
     string op1 = lnode->translate(code_block);
     string op2 = rnode->translate(code_block);
 
-    string new_ir = "";
-    if(sign == '*') new_ir += "MUL";
-    else new_ir += "DIV";
+    string cmd = sign == '*'?"MUL":"DIV";
+    string type = this->type == "FLOAT"? "F":"I";
+    string res = farther->getNextAvaTemp();
 
-    if(type == "FLOAT") new_ir += "F ";
-    else new_ir += "I ";
-    
-    new_ir += op1+" "+op2;
+    IrNode* newIr = new ArithmeticIrNode(cmd, type, op1, op2, res);
+    irBlockInsert(code_block, newIr);
 
-    string newTemp = farther->getNextAvaTemp();
-    new_ir += " " + newTemp;
-
-    code_block.push_back(new_ir); // only integers for now, will modify later
-
-    return newTemp;
+    return res;
 }
 
 // for now
@@ -59,7 +48,7 @@ CallExprNode::CallExprNode(FunctionDeclNode* farther, string fname):
 
 CallExprNode::~CallExprNode(){}
 
-string CallExprNode::translate(vector<string>& code_block){
+string CallExprNode::translate(vector<IrNode*>& code_block){
 
     vector<string> args;
     int argc = 0;
@@ -71,29 +60,23 @@ string CallExprNode::translate(vector<string>& code_block){
         exprStack.pop();
     }
 
-    code_block.push_back("PUSHREGS");
-
-    // push a empty space to store return value of function
-    code_block.push_back("PUSH");
-    // push arguments on stack
-    for(auto argToPush: args){
-        code_block.push_back("PUSH " + argToPush);
+    irBlockInsert(code_block, new PushIrNode("!REGS")); // push all register inuse
+    irBlockInsert(code_block, new PushIrNode());        // push a empty space to store return value of function
+    for(auto argToPush: args){                          // push arguments on stack
+        irBlockInsert(code_block, new PushIrNode(argToPush));
     }
         
-    // call function
-    code_block.push_back("JSR FUNC_" + name);
+    irBlockInsert(code_block, new CallIrNode(name));    // call function
 
-    // pop arguments
-    for(int i = 0;i < argc;i++){
-        code_block.push_back("POP");
+    for(int i = 0;i < argc;i++){                        // pop arguments
+        irBlockInsert(code_block, new PopIrNode());
     }
-    // pop return value
-    string newTemp = farther->getNextAvaTemp();
-    code_block.push_back("POP " + newTemp);
-    // pop registers
-    code_block.push_back("POPREGS");
 
-    return newTemp;
+    string res = farther->getNextAvaTemp();
+    irBlockInsert(code_block, new PopIrNode(res));      // pop return value
+    irBlockInsert(code_block, new PopIrNode("!REGS"));  // pop registers
+
+    return res;
 }
 
 CondExprNode::CondExprNode(FunctionDeclNode* farther, string cmp):
@@ -116,7 +99,7 @@ string negateCond(string cond) {
 
 void CondExprNode::setOutLabel(string out_label) {this -> out_label = out_label;}
 
-string CondExprNode::translate(vector<string>& code_block) {
+string CondExprNode::translate(vector<IrNode*>& code_block) {
 
     assert(out_label != "NULL");
     string op1 = lnode->translate(code_block);
@@ -125,22 +108,18 @@ string CondExprNode::translate(vector<string>& code_block) {
     //cmp op1 op2 label
     if(!(op2[0] == '!' && op2[1] == 'T')){ // op2 is not a temporary
         // Move it to one
-        string newTemp = farther->getNextAvaTemp();
-        string new_ir = "STORE";
-        if(rnode->type=="INT") new_ir+="I";
-        else new_ir+="F";
-        new_ir += " " + op2 + " " + newTemp;
-        code_block.push_back(new_ir);
-        op2 = newTemp;
+        string res = farther->getNextAvaTemp();
+        string type = rnode->type == "INT"? "I":"F";                    //TODO: standardlize all type to 1 letter string
+        irBlockInsert(code_block, new StoreIrNode(type, op2, res));
+        op2 = res;
     }
 
     string type = "I";
-    if(lnode->type == "FLOAT" || rnode->type == "FLOAT") type = "F";        
+    if(lnode->type == "FLOAT" || rnode->type == "FLOAT") type = "F";    // promote type to float if applicable    
 
-    // index will be added in the translate function
-    string new_ir = negateCond(cmp) + type + " " + op1 + " " + op2 + " " + out_label;
-    code_block.push_back(new_ir);
-    return cmp;
+    // out_label should be set by the caller this function
+    irBlockInsert(code_block, new CondIrNode(negateCond(cmp), type, op1, op2, out_label));
+    return out_label;   // this will not actually be used, just for polymorphism
 }
 
 
@@ -152,7 +131,7 @@ VarRef::VarRef(FunctionDeclNode* farther, string name, string type):
 
 VarRef::~VarRef(){}
 
-string VarRef::translate(vector<string>& code_block) {return name;}  
+string VarRef::translate(vector<IrNode*>& code_block) {return name;}  
 
 
 LitRef::LitRef(FunctionDeclNode* farther, string type, string val):
@@ -160,4 +139,4 @@ LitRef::LitRef(FunctionDeclNode* farther, string type, string val):
 
 LitRef::~LitRef(){}
 
-string LitRef::translate(vector<string>& code_block){return value;}
+string LitRef::translate(vector<IrNode*>& code_block){return value;}

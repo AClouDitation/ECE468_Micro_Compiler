@@ -5,18 +5,21 @@
 #include <vector>
 #include <stack>
 #include <iostream>
+#include <set>
 
 class FunctionDeclNode;
+class IrNode;
 
 class ExprNode{
 protected:
     FunctionDeclNode* farther;
+    std::set<std::string> sym;
 public:
     ExprNode(FunctionDeclNode* farther):
         farther(farther),lnode(NULL),rnode(NULL),
         type("INT"),is_var(false){};
     virtual ~ExprNode(){};
-    virtual std::string translate(std::vector<std::string>&)=0;
+    virtual std::string translate(std::vector<IrNode*>&)=0;
     ExprNode* lnode;
     ExprNode* rnode;
     std::string type;
@@ -28,7 +31,7 @@ class AddExprNode: public ExprNode{
 public:
     AddExprNode(FunctionDeclNode*, char);
     virtual ~AddExprNode();
-    virtual std::string translate(std::vector<std::string>&);
+    virtual std::string translate(std::vector<IrNode*>&);
 };
 
 class MulExprNode: public ExprNode{
@@ -36,7 +39,7 @@ class MulExprNode: public ExprNode{
 public:
     MulExprNode(FunctionDeclNode*, char);
     virtual ~MulExprNode();
-    virtual std::string translate(std::vector<std::string>&);
+    virtual std::string translate(std::vector<IrNode*>&);
 };
 
 class CallExprNode: public ExprNode{
@@ -44,7 +47,7 @@ class CallExprNode: public ExprNode{
 public:
     CallExprNode(FunctionDeclNode*, std::string);
     virtual ~CallExprNode();
-    virtual std::string translate(std::vector<std::string>&);
+    virtual std::string translate(std::vector<IrNode*>&);
 
     std::stack<ExprNode*> exprStack;
 };
@@ -55,7 +58,7 @@ public:
     CondExprNode(FunctionDeclNode*, std::string);
     virtual ~CondExprNode();    
     void setOutLabel(std::string);
-    virtual std::string translate(std::vector<std::string>&);
+    virtual std::string translate(std::vector<IrNode*>&);
 
     std::string cmp;
 };
@@ -65,7 +68,7 @@ class VarRef: public ExprNode{
 public:
     VarRef(FunctionDeclNode*, std::string, std::string);
     virtual ~VarRef();
-    virtual std::string translate(std::vector<std::string>&);
+    virtual std::string translate(std::vector<IrNode*>&);
     
     std::string name;
 };
@@ -74,7 +77,7 @@ class LitRef: public ExprNode{
 public:
     LitRef(FunctionDeclNode*, std::string, std::string);
     virtual ~LitRef();
-    virtual std::string translate(std::vector<std::string>&);
+    virtual std::string translate(std::vector<IrNode*>&);
 
     std::string value;
 };

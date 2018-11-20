@@ -1,4 +1,5 @@
 #include "../inc/utility.hpp"
+#include "../inc/irNode.hpp"
 
 using namespace std;
 
@@ -246,4 +247,19 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
     }
 
     return *tiny;
+}
+
+void irBlockInsert(vector<IrNode*>& block, IrNode* newIr) {
+    IrNode* lastIr = block.empty()?NULL:block.back();
+    block.push_back(newIr);
+    newIr->setPre(lastIr);
+    if (lastIr) lastIr->setSuc(newIr); 
+}
+
+void irBlockCascade(vector<IrNode*>& block, vector<IrNode*>& newBlock) {
+    IrNode* lastIr = block.empty()?NULL:block.back();
+    IrNode* firstNewIr = newBlock.empty()?NULL:newBlock.front();
+    if(lastIr) lastIr->setSuc(firstNewIr);
+    if(firstNewIr) firstNewIr->setPre(lastIr);
+    block.insert(block.end(),newBlock.begin(),newBlock.end());
 }

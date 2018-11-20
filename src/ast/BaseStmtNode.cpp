@@ -1,5 +1,7 @@
 #include "../../inc/ExprNode.hpp"
 #include "../../inc/BaseStmtNode.hpp"
+#include "../../inc/irNode.hpp"
+#include "../../inc/utility.hpp"
 
 using namespace::std;
 
@@ -25,26 +27,23 @@ void AssignStmtNode::update_AST_type(ExprNode* root){
     }
 }
 
-vector<string>& AssignStmtNode::translate(){
+vector<IrNode*>& AssignStmtNode::translate(){
     
     update_AST_type(from); // for now
-    vector<string>* code_block = new vector<string>;
+    vector<IrNode*>* code_block = new vector<IrNode*>;
     string res = from->translate(*code_block);
-    string new_IR = "";
-    if(to -> type == "INT") new_IR += "STOREI ";
-    else if(to -> type == "FLOAT") new_IR += "STOREF ";
+    string type = to->type == "INT" ? "I" : "F";
 
     // this is because of the error in the tiny simulator
     // causing that in a move instruction, you cannot make
     // both operand memory refs
     if(from->is_var){
         string newReg = farther->getNextAvaTemp();
-        code_block->push_back(new_IR + res + newReg);
+        irBlockInsert(*code_block, new StoreIrNode(type, res, newReg));
         res = newReg;
     }
 
-    new_IR += res + " " + to->name;
-    code_block->push_back(new_IR);
+    irBlockInsert(*code_block, new StoreIrNode(type, res, to->name));
     
     return *code_block;
 }
@@ -55,15 +54,12 @@ ReadStmtNode::ReadStmtNode(FunctionDeclNode* farther):
 
 ReadStmtNode::~ReadStmtNode(){}
 
-vector<string>& ReadStmtNode::translate(){
-    vector<string>* code_block = new vector<string>;
+vector<IrNode*>& ReadStmtNode::translate(){
+    vector<IrNode*>* code_block = new vector<IrNode*>;
     
     for(auto id:id_list){
-        string new_IR = "";
-        if(id -> type == "INT") new_IR += "READI ";
-        else if(id -> type == "FLOAT") new_IR += "READF ";
-        new_IR += id->name;
-        code_block->push_back(new_IR);
+        string type = id->type == "INT"? "I":"F";
+        irBlockInsert(*code_block, new ReadIrNode(type, id->name));
     }
     
     return *code_block;
@@ -73,18 +69,17 @@ vector<string>& ReadStmtNode::translate(){
 WriteStmtNode::WriteStmtNode(FunctionDeclNode* farther):
     BaseStmtNode(farther){}
 
-WriteStmtNode::~WriteStmtNode(){}
+WriteStmtNode::~WriteStmtNode(){} 
 
-vector<string>& WriteStmtNode::translate(){
-    vector<string>* code_block = new vector<string>;
+vector<IrNode*>& WriteStmtNode::translate(){
+    vector<IrNode*>* code_block = new vector<IrNode*>;
     
     for(auto id:id_list){
-        string new_IR = "";
-        if(id -> type == "INT") new_IR += "WRITEI ";
-        else if(id -> type == "FLOAT") new_IR += "WRITEF ";
-        else if(id -> type == "STRING") new_IR += "WRITES ";
-        new_IR += id->name;
-        code_block->push_back(new_IR);
+        string type;
+        if(id -> type == "INT")         type = "I";
+        else if(id -> type == "FLOAT")  type = "F";
+        else if(id -> type == "STRING") type = "S";
+        irBlockInsert(*code_block, new WriteIrNode(type, id->name));
     }
     
     return *code_block;
@@ -95,14 +90,15 @@ ReturnStmtNode::ReturnStmtNode(FunctionDeclNode* farther, ExprNode* expr, int re
 
 ReturnStmtNode::~ReturnStmtNode(){}
 
-vector<string>& ReturnStmtNode::translate(){
-    vector<string>* ir = new vector<string>;
+vector<IrNode*>& ReturnStmtNode::translate(){
+    vector<IrNode*>* ir = new vector<IrNode*>;
     string ret = expr->translate(*ir);
+    string type = expr->type.substr(0,1);
     string newReg = farther->getNextAvaTemp();
 
-    ir->push_back("MOVE " + ret + " " + newReg);
-    ir->push_back("MOVE " + newReg + " " + "$"+to_string(retLoc));
-    ir->push_back("UNLINK");
-    ir->push_back("RET");
+    irBlockInsert(*ir, new StoreIrNode(type, ret, newReg));
+    irBlockInsert(*ir, new StoreIrNode(type, newReg,"$"+to_string(retLoc)));
+    irBlockInsert(*ir, new IrNode("UNLINK"));
+    irBlockInsert(*ir, new IrNode("RET"));
     return *ir;
 }

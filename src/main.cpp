@@ -7,6 +7,7 @@
 #include "../inc/symtable.hpp"
 #include "../inc/ExprNode.hpp"
 #include "../inc/StmtNode.hpp"
+#include "../inc/irNode.hpp"
 #include "../inc/opt.hpp"
 #include "../inc/utility.hpp"///////new add utility.cpp
 #include "../generated/parser.hpp"
@@ -30,27 +31,28 @@ int main(int argc, char** argv){
     ops.push_back("sys halt");      // end
 
     for(auto block_node: func_list){
-        vector<vector<string>>& ir = split_irs(block_node->translate());
-        
+        //vector<vector<string>>& ir = split_irs(block_node->translate());
         //if (argc == 2 && strcmp(argv[1],"-o")) OOOptmize(ir);
+        vector<IrNode*> irs = block_node->translate();
         
-        vector<string>& op_block = ir2tiny(ir);
-        ops.insert(ops.end(),op_block.begin(),op_block.end());
+        //vector<string>& op_block = ir2tiny(ir);
+        //ops.insert(ops.end(),op_block.begin(),op_block.end());
 
         //printing IR for debugging purpose
 
-        for(auto line: ir){
+        for(auto ir: irs){
             cout << ";";
-            for(auto item:line) cout << item << " ";
-            cout << endl;
+            ir->print();
         }
         cout << endl;
 
     }
 
+    /*
     for(auto op:ops){
         cout << op << endl;
     }
+    */
 
     fclose(fp);
 

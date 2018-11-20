@@ -14,7 +14,7 @@ protected:
 public:
     BaseStmtNode(FunctionDeclNode*);
     virtual ~BaseStmtNode();
-    std::vector<std::string>& translate()=0;
+    std::vector<IrNode*>& translate()=0;
 };
 
 class AssignStmtNode: public BaseStmtNode{
@@ -23,7 +23,7 @@ public:
     virtual ~AssignStmtNode();
 
     void update_AST_type(ExprNode*);
-    std::vector<std::string>& translate();
+    std::vector<IrNode*>& translate();
     
     VarRef* to;
     ExprNode* from;
@@ -33,7 +33,7 @@ class WriteStmtNode: public BaseStmtNode{
 public:
     WriteStmtNode(FunctionDeclNode*);
     virtual ~WriteStmtNode();
-    std::vector<std::string>& translate();
+    std::vector<IrNode*>& translate();
     std::vector<VarRef*> id_list;
 };
 
@@ -41,7 +41,7 @@ class ReadStmtNode: public BaseStmtNode{
 public:
     ReadStmtNode(FunctionDeclNode*);
     virtual ~ReadStmtNode();
-    std::vector<std::string>& translate();
+    std::vector<IrNode*>& translate();
     std::vector<VarRef*> id_list;
 };
 
@@ -54,7 +54,7 @@ class ReturnStmtNode: public BaseStmtNode{
 public:
     ReturnStmtNode(FunctionDeclNode*, ExprNode*, int);
     virtual ~ReturnStmtNode();
-    virtual std::vector<std::string>& translate();
+    virtual std::vector<IrNode*>& translate();
 };
 
 
