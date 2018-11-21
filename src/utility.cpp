@@ -253,15 +253,19 @@ vector<string>& ir2tiny(vector<vector<string>>& irs){
 void irBlockInsert(vector<IrNode*>& block, IrNode* newIr) {
     IrNode* lastIr = block.empty()?NULL:block.back();
     block.push_back(newIr);
-    newIr->setPre(lastIr);
-    if (lastIr) lastIr->setSuc(newIr); 
+    if(lastIr && lastIr->cmd != "RET") {
+        lastIr->setSuc(newIr); 
+        newIr->setPre(lastIr);
+    }
 }
 
 void irBlockCascade(vector<IrNode*>& block, vector<IrNode*>& newBlock) {
     IrNode* lastIr = block.empty()?NULL:block.back();
     IrNode* firstNewIr = newBlock.empty()?NULL:newBlock.front();
-    if(lastIr) lastIr->setSuc(firstNewIr);
-    if(firstNewIr) firstNewIr->setPre(lastIr);
+    if(lastIr && lastIr->cmd != "RET") {
+        lastIr->setSuc(firstNewIr);
+        if(firstNewIr) firstNewIr->setPre(lastIr);
+    }
     block.insert(block.end(),newBlock.begin(),newBlock.end());
 }
 
@@ -270,6 +274,7 @@ bool isLiteral(string op) {
     extern Symtable* globalSymtable;
     for (auto kv :globalSymtable->id_map) {
         if(kv.second->isFunc) continue;
+        if(kv.second->type == "STRING") return true;
         if(kv.first == op) return false;
     }
 

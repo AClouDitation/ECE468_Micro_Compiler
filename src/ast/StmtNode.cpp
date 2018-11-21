@@ -28,14 +28,21 @@ vector<IrNode*>& FunctionDeclNode::translate(){
 
     for(auto stmt: stmt_list){
         vector<IrNode*> code_block = stmt->translate();                 // translate one statment
-        code_block.front()->setPre(ir->back());                         // link the statment code block to the end of ir block
-        ir->insert(ir->end(),code_block.begin(),code_block.end());      // insert the new  block into ir block
+        irBlockCascade(*ir, code_block);
     }
 
     // return if reach the end of function
     irBlockInsert(*ir, new IrNode("UNLINK"));
     irBlockInsert(*ir, new IrNode("RET"));
 
+    // TODO: make a class for return node
+    // and puth the following part into it
+    // mark all global var as live here
+    extern Symtable* globalSymtable;
+    for(auto kv: globalSymtable->id_map) {
+        if(kv.second->isFunc) continue;
+        ir->back()->insertOutSet(kv.first);
+    }
     return *ir;
 }
 

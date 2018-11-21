@@ -60,7 +60,7 @@ string CallExprNode::translate(vector<IrNode*>& code_block){
         exprStack.pop();
     }
 
-    irBlockInsert(code_block, new PushIrNode("!REGS")); // push all register inuse
+    irBlockInsert(code_block, new IrNode("PUSHREGS")); // push all register inuse
     irBlockInsert(code_block, new PushIrNode());        // push a empty space to store return value of function
     for(auto argToPush: args){                          // push arguments on stack
         irBlockInsert(code_block, new PushIrNode(argToPush));
@@ -74,7 +74,7 @@ string CallExprNode::translate(vector<IrNode*>& code_block){
 
     string res = farther->getNextAvaTemp();
     irBlockInsert(code_block, new PopIrNode(res));      // pop return value
-    irBlockInsert(code_block, new PopIrNode("!REGS"));  // pop registers
+    irBlockInsert(code_block, new IrNode("POPREGS"));  // pop registers
 
     return res;
 }

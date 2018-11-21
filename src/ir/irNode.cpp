@@ -65,7 +65,6 @@ stringstream IrNode::printOut() {
 bool IrNode::livenessCalc() {
     if(successor) outSet = successor->inSet;    // initialize outSet
     set<string> inSetbk = inSet;                // backup inSet
-
     inSet = outSet;                             // initialize inSet                    
 
     /* calculate new inSet */
@@ -73,6 +72,13 @@ bool IrNode::livenessCalc() {
     for(auto id: genSet)  inSet.insert(id);
 
     return inSet != inSetbk;
+}
+
+void IrNode::updateWorklist() {
+    if(!predecessor) return;
+    for(auto irNode: worklist) if(irNode == predecessor) return;
+    worklist.push_back(predecessor);
+    predecessor->updateWorklist();
 }
 
 /* ----- Arithmetic IR nodes ----- */
@@ -131,7 +137,7 @@ WriteIrNode::~WriteIrNode() {}
 
 stringstream WriteIrNode::print() {
     stringstream ss = IrNode::print();
-    ss << cmd << type << " " << op1;
+    ss << type << " " << op1;
     return ss;
 }
 
@@ -160,8 +166,7 @@ PushIrNode::~PushIrNode() {}
 
 stringstream PushIrNode::print() {
     stringstream ss = IrNode::print();
-    if(op1 == "!REGS") ss << cmd << "REGS";
-    else ss << cmd << " " << op1;
+    ss << " " << op1;
     return ss;
 }
 
@@ -178,8 +183,7 @@ PopIrNode::~PopIrNode() {}
 
 stringstream PopIrNode::print() {
     stringstream ss = IrNode::print();
-    if(op1 == "!REGS") ss << cmd << "REGS";
-    else ss << cmd << " " << op1;
+    ss << " " << op1;
     return ss;
 }
 
@@ -209,11 +213,11 @@ stringstream LinkIrNode::print() {
 
 
 void IrNode::livenessAna() {
-    // calculate in/out set
     reverse(worklist.begin(),worklist.end());   // reverse the worklist
     while(!worklist.empty()){ 
         IrNode* lastNode = worklist.front();
         worklist.pop_front();                    
-        lastNode->livenessCalc(); 
+        // push all predecessor of this node into worklist
+        if(lastNode->livenessCalc()) lastNode->updateWorklist();            
     }
 }

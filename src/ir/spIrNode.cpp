@@ -50,3 +50,12 @@ stringstream LabelIrNode::print() {
 }
 
 void LabelIrNode::setPre2(IrNode* predecessor2) {this->predecessor2 = predecessor2;}
+
+void LabelIrNode::updateWorklist() {
+
+    IrNode::updateWorklist();
+    if(!predecessor2) return;
+    for(auto irNode: worklist) if(irNode == predecessor2) return;
+    worklist.push_back(predecessor2);
+    predecessor2->updateWorklist();
+}

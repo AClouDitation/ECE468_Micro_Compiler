@@ -67,6 +67,7 @@ public:
     virtual int size();
     virtual void offsetFuncParam();
     friend std::vector<IrNode*>& ReturnStmtNode::translate();
+    friend std::vector<IrNode*>& FunctionDeclNode::translate();
     friend bool isLiteral(std::string op);
 };
 

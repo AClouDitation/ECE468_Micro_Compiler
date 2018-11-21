@@ -4,6 +4,7 @@
 #include <string>
 #include <list>
 #include <set>
+#include <vector>
 #include <sstream>
 
 class IrNode {
@@ -31,8 +32,11 @@ public:
     virtual std::stringstream printIn();
     virtual std::stringstream printOut();
     virtual bool livenessCalc();    // return true if inSet got updated
+    virtual void updateWorklist();  // put predecessor into worklist
     static void livenessAna();
     friend class CondIrNode;       // don't know why...
+    friend void irBlockCascade(std::vector<IrNode*>& block, std::vector<IrNode*>& newBlock);    // TODO: make this a member function
+    friend void irBlockInsert(std::vector<IrNode*>& block, IrNode* newIr);                           // and this
 };
 
 class ArithmeticIrNode: public IrNode {
@@ -142,5 +146,6 @@ public:
     virtual ~LabelIrNode();
     virtual std::stringstream print();
     virtual void setPre2(IrNode*);
+    virtual void updateWorklist();
 };
 #endif //IRNODE_HPP_
