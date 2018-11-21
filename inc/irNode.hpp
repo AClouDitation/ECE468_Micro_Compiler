@@ -2,34 +2,37 @@
 #define IRNODE_HPP_
 
 #include <string>
-#include <queue>
-#include <unordered_set>
+#include <list>
+#include <set>
+#include <sstream>
 
 class IrNode {
 protected:
     std::string cmd;
     IrNode* predecessor;
     IrNode* successor;
-    std::unordered_set<std::string> genSet;
-    std::unordered_set<std::string> killSet;
-    std::unordered_set<std::string> inSet;
-    std::unordered_set<std::string> outSet;
+    std::set<std::string> genSet;
+    std::set<std::string> killSet;
+    std::set<std::string> inSet;
+    std::set<std::string> outSet;
 
-    static std::queue<IrNode*> worklist;
+    static std::list<IrNode*> worklist;
 
 public:
     IrNode(std::string);
     virtual ~IrNode();
-    virtual void print();
+    virtual std::stringstream print();
+    virtual void reformatPrint();
     virtual void setPre(IrNode*);
     virtual void setSuc(IrNode*);
     virtual void insertOutSet(std::string);
     virtual void insertInSet(std::string);
 
-    virtual void printGen();
-    virtual void printKill();
-    virtual void livenessCalc();
-    friend class splitIrNode;   // don't know why...
+    virtual std::stringstream printIn();
+    virtual std::stringstream printOut();
+    virtual bool livenessCalc();    // return true if inSet got updated
+    static void livenessAna();
+    friend class CondIrNode;       // don't know why...
 };
 
 class ArithmeticIrNode: public IrNode {
@@ -41,7 +44,7 @@ public:
     ArithmeticIrNode(std::string, std::string, 
             std::string, std::string, std::string);
     virtual ~ArithmeticIrNode();
-    virtual void print();
+    virtual std::stringstream print();
 };
 
 class StoreIrNode: public IrNode {
@@ -51,7 +54,7 @@ class StoreIrNode: public IrNode {
 public:
     StoreIrNode(std::string, std::string, std::string);
     virtual ~StoreIrNode();
-    virtual void print();
+    virtual std::stringstream print();
 };
 
 class ReadIrNode: public IrNode {
@@ -60,7 +63,7 @@ class ReadIrNode: public IrNode {
 public:
     ReadIrNode(std::string, std::string);
     virtual ~ReadIrNode();
-    virtual void print();
+    virtual std::stringstream print();
 };
 
 class WriteIrNode: public IrNode {
@@ -69,7 +72,7 @@ class WriteIrNode: public IrNode {
 public:
     WriteIrNode(std::string, std::string);
     virtual ~WriteIrNode();
-    virtual void print();
+    virtual std::stringstream print();
 };
 
 
@@ -78,7 +81,7 @@ class CallIrNode: public IrNode {
 public:
     CallIrNode(std::string);
     virtual ~CallIrNode();
-    virtual void print();
+    virtual std::stringstream print();
 };
 
 class PushIrNode: public IrNode {
@@ -87,7 +90,7 @@ public:
     PushIrNode();
     PushIrNode(std::string);
     virtual ~PushIrNode();
-    virtual void print();
+    virtual std::stringstream print();
 };
 
 class PopIrNode: public IrNode {
@@ -96,7 +99,7 @@ public:
     PopIrNode();
     PopIrNode(std::string);
     virtual ~PopIrNode();
-    virtual void print();
+    virtual std::stringstream print();
 };
 
 class JumpIrNode: public IrNode {
@@ -104,7 +107,7 @@ class JumpIrNode: public IrNode {
 public:
     JumpIrNode(std::string);
     virtual ~JumpIrNode();
-    virtual void print();
+    virtual std::stringstream print();
 };
 
 class LinkIrNode: public IrNode {
@@ -112,30 +115,11 @@ class LinkIrNode: public IrNode {
 public:
     LinkIrNode(int);
     virtual ~LinkIrNode();
-    virtual void print();
+    virtual std::stringstream print();
 };
 
-class splitIrNode: public IrNode {
+class CondIrNode: public IrNode {
     IrNode* successor2; 
-public:
-    splitIrNode(std::string);
-    virtual ~splitIrNode();
-    virtual void print();
-    virtual void setSuc2(IrNode*);
-    virtual void livenessCalc();
-};
-
-class mergeIrNode: public IrNode {
-    IrNode* predecessor2;
-public:
-    mergeIrNode(std::string);
-    virtual ~mergeIrNode();
-    virtual void print();
-    virtual void setPre2(IrNode*);
-};  // could be multiple merge,
-    // only support two-branch merging for now
-
-class CondIrNode: public splitIrNode {
     std::string cond;
     std::string type;
     std::string op1;
@@ -145,14 +129,18 @@ public:
     CondIrNode(std::string, std::string, std::string, 
             std::string, std::string);
     virtual ~CondIrNode();
-    virtual void print();
+    virtual std::stringstream print();
+    virtual void setSuc2(IrNode*);
+    virtual bool livenessCalc();
 };
 
-class LabelIrNode: public mergeIrNode {
+class LabelIrNode: public IrNode {
+    IrNode* predecessor2;
     std::string label;
 public:
     LabelIrNode(std::string);
     virtual ~LabelIrNode();
-    virtual void print();
+    virtual std::stringstream print();
+    virtual void setPre2(IrNode*);
 };
 #endif //IRNODE_HPP_

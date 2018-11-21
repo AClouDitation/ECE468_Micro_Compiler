@@ -34,6 +34,7 @@ int main(int argc, char** argv){
         //vector<vector<string>>& ir = split_irs(block_node->translate());
         //if (argc == 2 && strcmp(argv[1],"-o")) OOOptmize(ir);
         vector<IrNode*> irs = block_node->translate();
+        IrNode::livenessAna();
         
         //vector<string>& op_block = ir2tiny(ir);
         //ops.insert(ops.end(),op_block.begin(),op_block.end());
@@ -41,17 +42,13 @@ int main(int argc, char** argv){
         //printing IR for debugging purpose
 
         for(auto ir: irs){
-            cout << ";";
-            ir->print();
-            cout << " ";
-            ir->printGen();
-            cout << "\t\t";
-            ir->printKill();
+            cout << ";" ;
+            ir->reformatPrint();
             cout << endl;
         }
-        cout << endl;
-
     }
+
+
 
     /*
     for(auto op:ops){

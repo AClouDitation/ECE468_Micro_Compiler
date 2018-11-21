@@ -269,14 +269,9 @@ bool isLiteral(string op) {
     if(op[0] == '!' || op[0] == '$') return false;
     extern Symtable* globalSymtable;
     for (auto kv :globalSymtable->id_map) {
-        //if(!kv.second->isFunc && kv.first == op) return false;
         if(kv.second->isFunc) continue;
-        if(kv.first == op) {
-            cout << "in global symtable " << op << endl;
-            return false;
-        }
+        if(kv.first == op) return false;
     }
 
-    cout << op << " is literal" << endl;
     return true;
 }

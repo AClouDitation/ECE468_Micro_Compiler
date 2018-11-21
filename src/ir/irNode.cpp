@@ -1,22 +1,31 @@
 #include "../../inc/irNode.hpp"
 #include "../../inc/utility.hpp"
-#include <iostream>
-#include <queue>
+#include <algorithm>
+#include <iomanip>
 
 using namespace std;
 
-queue<IrNode*> IrNode::worklist;
+list<IrNode*> IrNode::worklist;
 
 /* ----- generic IR nodes ----- */
 IrNode::IrNode(string cmd):
     cmd(cmd), predecessor(NULL), successor(NULL){
-        IrNode::worklist.push(this); 
+        IrNode::worklist.push_back(this); 
 }
 
 IrNode::~IrNode() {}
 
-void IrNode::print() {
-    cout << cmd;
+stringstream IrNode::print() {
+    stringstream ss;
+    ss << cmd;
+    return ss;
+}
+
+void IrNode::reformatPrint() {
+    stringstream ss;
+    cout << left << setfill(' ') << setw(40) << print().str();
+    cout << left << setfill(' ') << setw(40) << printIn().str();
+    cout << left << setfill(' ') << setw(40) << printOut().str();
 }
 
 void IrNode::setPre(IrNode* predecessor) {
@@ -35,25 +44,35 @@ void IrNode::insertInSet(string id) {
     if(!isLiteral(id)) inSet.insert(id);
 }
 
-void IrNode::printGen() {
-    cout << "GEN SET: ";
-    for(auto id: genSet){
-        cout << id << " ";
+stringstream IrNode::printIn() {
+    stringstream ss;
+    ss << "In SET: ";
+    for(auto id: inSet){
+        ss << id << " ";
     }
+    return ss;
 }
 
-void IrNode::printKill() {
-    cout << "KILL SET: ";
-    for(auto id: killSet){
-        cout << id << " ";
+stringstream IrNode::printOut() {
+    stringstream ss;
+    ss << "Out SET: ";
+    for(auto id: outSet){
+        ss << id << " ";
     }
+    return ss;
 }
 
-void IrNode::livenessCalc() {
-    if(successor) outSet = successor->inSet;
-    inSet = outSet;
-    for(auto id: killSet) inSet.erase(id);
+bool IrNode::livenessCalc() {
+    if(successor) outSet = successor->inSet;    // initialize outSet
+    set<string> inSetbk = inSet;                // backup inSet
+
+    inSet = outSet;                             // initialize inSet                    
+
+    /* calculate new inSet */
+    for(auto id: killSet) inSet.erase(id);      
     for(auto id: genSet)  inSet.insert(id);
+
+    return inSet != inSetbk;
 }
 
 /* ----- Arithmetic IR nodes ----- */
@@ -67,9 +86,10 @@ ArithmeticIrNode::ArithmeticIrNode(string cmd, string type, string op1,
 
 ArithmeticIrNode::~ArithmeticIrNode() {}
 
-void ArithmeticIrNode::print() {
-    cout << cmd << type << " ";
-    cout << op1 << " " << op2 << " " << res;
+stringstream ArithmeticIrNode::print() {
+    stringstream ss = IrNode::print();
+    ss << type << " " << op1 << " " << op2 << " " << res;
+    return ss;
 }
 
 /* ----- Store IR nodes ----- */
@@ -81,9 +101,10 @@ StoreIrNode::StoreIrNode(string type, string op1, string res):
 
 StoreIrNode::~StoreIrNode() {}
 
-void StoreIrNode::print() {
-    cout << cmd << type << " ";
-    cout << op1 << " " << res;
+stringstream StoreIrNode::print() {
+    stringstream ss = IrNode::print();
+    ss << type << " " << op1 << " " << res;
+    return ss;
 }
 
 /* ----- Read IR nodes ----- */
@@ -94,9 +115,10 @@ ReadIrNode::ReadIrNode(string type, string res):
 
 ReadIrNode::~ReadIrNode() {}
 
-void ReadIrNode::print() {
-    cout << cmd << type << " ";
-    cout << res;
+stringstream ReadIrNode::print() {
+    stringstream ss = IrNode::print();
+    ss << type << " " << res;
+    return ss;
 }
 
 /* ----- Write IR nodes ----- */
@@ -107,9 +129,10 @@ WriteIrNode::WriteIrNode(string type, string op1):
 
 WriteIrNode::~WriteIrNode() {}
 
-void WriteIrNode::print() {
-    cout << cmd << type << " ";
-    cout << op1;
+stringstream WriteIrNode::print() {
+    stringstream ss = IrNode::print();
+    ss << cmd << type << " " << op1;
+    return ss;
 }
 
 /* ----- Call IR nodes ----- */
@@ -118,8 +141,10 @@ CallIrNode::CallIrNode(string name):
 
 CallIrNode::~CallIrNode() {}
 
-void CallIrNode::print() {
-    cout << cmd << " " << "FUNC_" << name;
+stringstream CallIrNode::print() {
+    stringstream ss = IrNode::print();
+    ss << " " << "FUNC_" << name;
+    return ss;
 }
 
 /* ----- Push IR nodes ----- */
@@ -133,9 +158,11 @@ PushIrNode::PushIrNode(string op1):
 
 PushIrNode::~PushIrNode() {}
 
-void PushIrNode::print() {
-    if(op1 == "!REGS") cout << cmd << "REGS";
-    else cout << cmd << " " << op1;
+stringstream PushIrNode::print() {
+    stringstream ss = IrNode::print();
+    if(op1 == "!REGS") ss << cmd << "REGS";
+    else ss << cmd << " " << op1;
+    return ss;
 }
 
 /* ----- Pop IR nodes ----- */
@@ -149,9 +176,11 @@ PopIrNode::PopIrNode(string op1):
 
 PopIrNode::~PopIrNode() {}
 
-void PopIrNode::print() {
-    if(op1 == "!REGS") cout << cmd << "REGS";
-    else cout << cmd << " " << op1;
+stringstream PopIrNode::print() {
+    stringstream ss = IrNode::print();
+    if(op1 == "!REGS") ss << cmd << "REGS";
+    else ss << cmd << " " << op1;
+    return ss;
 }
 
 /* ----- Jump IR nodes ----- */
@@ -160,8 +189,10 @@ JumpIrNode::JumpIrNode(string label):
 
 JumpIrNode::~JumpIrNode() {}
 
-void JumpIrNode::print() {
-    cout << cmd << " " << label;
+stringstream JumpIrNode::print() {
+    stringstream ss = IrNode::print();
+    ss << " " << label;
+    return ss;
 }
 
 /* ----- Link IR nodes ----- */
@@ -170,7 +201,19 @@ LinkIrNode::LinkIrNode(int size):
 
 LinkIrNode::~LinkIrNode() {}
 
-void LinkIrNode::print() {
-    cout << cmd << " " << size;
+stringstream LinkIrNode::print() {
+    stringstream ss = IrNode::print();
+    ss << " " << size;
+    return ss;
 }
 
+
+void IrNode::livenessAna() {
+    // calculate in/out set
+    reverse(worklist.begin(),worklist.end());   // reverse the worklist
+    while(!worklist.empty()){ 
+        IrNode* lastNode = worklist.front();
+        worklist.pop_front();                    
+        lastNode->livenessCalc(); 
+    }
+}
