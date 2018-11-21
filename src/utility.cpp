@@ -1,5 +1,6 @@
 #include "../inc/utility.hpp"
 #include "../inc/irNode.hpp"
+#include "../inc/symtable.hpp"
 
 using namespace std;
 
@@ -262,4 +263,20 @@ void irBlockCascade(vector<IrNode*>& block, vector<IrNode*>& newBlock) {
     if(lastIr) lastIr->setSuc(firstNewIr);
     if(firstNewIr) firstNewIr->setPre(lastIr);
     block.insert(block.end(),newBlock.begin(),newBlock.end());
+}
+
+bool isLiteral(string op) {
+    if(op[0] == '!' || op[0] == '$') return false;
+    extern Symtable* globalSymtable;
+    for (auto kv :globalSymtable->id_map) {
+        //if(!kv.second->isFunc && kv.first == op) return false;
+        if(kv.second->isFunc) continue;
+        if(kv.first == op) {
+            cout << "in global symtable " << op << endl;
+            return false;
+        }
+    }
+
+    cout << op << " is literal" << endl;
+    return true;
 }

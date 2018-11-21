@@ -1,5 +1,6 @@
 #include "../../inc/ExprNode.hpp"
 #include "../../inc/BaseStmtNode.hpp"
+#include "../../inc/symtable.hpp"
 #include "../../inc/irNode.hpp"
 #include "../../inc/utility.hpp"
 
@@ -100,5 +101,13 @@ vector<IrNode*>& ReturnStmtNode::translate(){
     irBlockInsert(*ir, new StoreIrNode(type, newReg,"$"+to_string(retLoc)));
     irBlockInsert(*ir, new IrNode("UNLINK"));
     irBlockInsert(*ir, new IrNode("RET"));
+    
+    // mark all global var as live here
+    extern Symtable* globalSymtable;
+    for(auto kv: globalSymtable->id_map) {
+        if(kv.second->isFunc) continue;
+        ir->back()->insertOutSet(kv.first);
+    }
+
     return *ir;
 }

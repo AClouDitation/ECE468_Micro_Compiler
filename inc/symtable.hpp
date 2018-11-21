@@ -5,10 +5,15 @@
 #include <unordered_map>
 #include <string>
 #include <iostream>
+#include "BaseStmtNode.hpp"
+
+class IrNode;
+
 
 class SymEntry{
 public:
     int index;
+    bool isFunc;
     std::string name;
     std::string type;
     SymEntry(std::string, std::string);
@@ -61,6 +66,8 @@ public:
     virtual SymEntry* have(std::string);
     virtual int size();
     virtual void offsetFuncParam();
+    friend std::vector<IrNode*>& ReturnStmtNode::translate();
+    friend bool isLiteral(std::string op);
 };
 
 #endif

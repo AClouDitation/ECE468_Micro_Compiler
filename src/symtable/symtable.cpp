@@ -4,10 +4,8 @@
 
 using namespace std;
 
-SymEntry::SymEntry(string name, string type){
-    this->name = name;
-    this->type = type;
-}
+SymEntry::SymEntry(string name, string type):
+    isFunc(false), name(name), type(type){}
 
 SymEntry::~SymEntry(){}
 
@@ -30,7 +28,7 @@ IntEntry::IntEntry(string name):SymEntry(name,"INT"){}
 FltEntry::FltEntry(string name):SymEntry(name,"FLOAT"){}
 
 FuncEntry::FuncEntry(string name, string type):
-    SymEntry(name, type),argc(0){}
+    SymEntry(name, type),argc(0){isFunc=true;}
 
 void FuncEntry::print(){
     cout<<"Function name "<<name<<" type "<< type << endl;
@@ -41,7 +39,6 @@ int FuncEntry::getArgCnt(){return argc;}
 
 // the symtable table
 // start from 2 since $1 is the frame pointer 
-// NOT SURE!!! TODO: make sure this...
 Symtable::Symtable(string name):name(name),nextIndex(-2){}
 Symtable::~Symtable(){
     for(auto id:id_map) delete id.second;
@@ -61,7 +58,7 @@ void Symtable::add(SymEntry* entry){
 
 void Symtable::print(){
     cout << "Symbol table " << name << endl;
-    for(auto id:id_map)    id.second->print();
+    for(auto id:id_map) id.second->print();
 }
 
 vector<string>& Symtable::decl(){

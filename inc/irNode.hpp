@@ -2,18 +2,34 @@
 #define IRNODE_HPP_
 
 #include <string>
+#include <queue>
+#include <unordered_set>
 
 class IrNode {
 protected:
     std::string cmd;
     IrNode* predecessor;
     IrNode* successor;
+    std::unordered_set<std::string> genSet;
+    std::unordered_set<std::string> killSet;
+    std::unordered_set<std::string> inSet;
+    std::unordered_set<std::string> outSet;
+
+    static std::queue<IrNode*> worklist;
+
 public:
     IrNode(std::string);
     virtual ~IrNode();
     virtual void print();
     virtual void setPre(IrNode*);
     virtual void setSuc(IrNode*);
+    virtual void insertOutSet(std::string);
+    virtual void insertInSet(std::string);
+
+    virtual void printGen();
+    virtual void printKill();
+    virtual void livenessCalc();
+    friend class splitIrNode;   // don't know why...
 };
 
 class ArithmeticIrNode: public IrNode {
@@ -22,7 +38,8 @@ class ArithmeticIrNode: public IrNode {
     std::string op2;
     std::string res;
 public:
-    ArithmeticIrNode(std::string, std::string, std::string, std::string, std::string);
+    ArithmeticIrNode(std::string, std::string, 
+            std::string, std::string, std::string);
     virtual ~ArithmeticIrNode();
     virtual void print();
 };
@@ -105,6 +122,7 @@ public:
     virtual ~splitIrNode();
     virtual void print();
     virtual void setSuc2(IrNode*);
+    virtual void livenessCalc();
 };
 
 class mergeIrNode: public IrNode {

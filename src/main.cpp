@@ -43,6 +43,11 @@ int main(int argc, char** argv){
         for(auto ir: irs){
             cout << ";";
             ir->print();
+            cout << " ";
+            ir->printGen();
+            cout << "\t\t";
+            ir->printKill();
+            cout << endl;
         }
         cout << endl;
 

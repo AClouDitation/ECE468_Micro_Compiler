@@ -17,5 +17,6 @@ std::vector<std::string>& ir2tiny(std::vector<std::vector<std::string>>& irs);
 class IrNode;
 void irBlockInsert(std::vector<IrNode*>&, IrNode*);
 void irBlockCascade(std::vector<IrNode*>&, std::vector<IrNode*>&);
+bool isLiteral(std::string);
 
 #endif
