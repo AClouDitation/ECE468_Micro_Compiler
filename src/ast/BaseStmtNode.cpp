@@ -38,11 +38,13 @@ vector<IrNode*>& AssignStmtNode::translate(){
     // this is because of the error in the tiny simulator
     // causing that in a move instruction, you cannot make
     // both operand memory refs
+    /*
     if(from->is_var){
         string newReg = farther->getNextAvaTemp();
         irBlockInsert(*code_block, new StoreIrNode(type, res, newReg, *(farther->regMan)));
         res = newReg;
     }
+    */
 
     irBlockInsert(*code_block, new StoreIrNode(type, res, to->name, *(farther->regMan)));
     

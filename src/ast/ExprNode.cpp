@@ -117,7 +117,7 @@ string CondExprNode::translate(vector<IrNode*>& code_block) {
     string type = "I";
     if(lnode->type == "FLOAT" || rnode->type == "FLOAT") type = "F";    // promote type to float if applicable    
 
-    // out_label should be set by the caller this function
+    // out_label should be set by the caller of this function
     irBlockInsert(code_block, new CondIrNode(negateCond(cmp), type, op1, op2, 
                 out_label, *(farther->regMan)));
     return out_label;   // this will not actually be used, just for polymorphism

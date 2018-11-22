@@ -125,9 +125,8 @@ vector<string> ArithmeticIrNode::translate() {
     int regZ = regMan.regAllocate(res, opCodeBlock, outSet);
     regMan.markDirty(regZ);
     
-    // FIXME: translate the ir
-    //
-    
+    if(regX != regZ) opCodeBlock.push_back("move r" + to_string(regX) + " r" + to_string(regZ));
+    opCodeBlock.push_back(toLower(cmd) + " r" +  to_string(regZ) + " r" + to_string(regY));
     return opCodeBlock;
 }
 
