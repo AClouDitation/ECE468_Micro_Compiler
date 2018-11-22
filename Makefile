@@ -32,7 +32,7 @@ main: ./src/* ./inc/*
 	$(CXX) $(CXXFLAGS) -c src/ir/irNode.cpp -o build/irNode.o 
 	$(CXX) $(CXXFLAGS) -c src/ir/spIrNode.cpp -o build/spIrNode.o 
 	$(CXX) $(CXXFLAGS) -c src/regman/regman.cpp -o build/regman.o 
-	$(CXX) $(CXXFLAGS) -c src/opt.cpp -o build/opt.o 
+#	$(CXX) $(CXXFLAGS) -c src/opt.cpp -o build/opt.o 
 	$(CXX) $(CXXFLAGS) -c src/symtable/symtable.cpp -o build/symtable.o 
 	$(CXX) $(CXXFLAGS) -c src/main.cpp -o build/comp.o
 	$(CXX) $(CXXFLAGS) -o compiler build/*.o

@@ -300,7 +300,7 @@ return_stmt         :RETURN expr SEMICOLON{
                         
                         FunctionDeclNode* lastFuncDecl = func_list.back();
                         assert(lastFuncDecl);
-                        int retLoc = lastFuncDecl->argc+ 2;
+                        int retLoc = lastFuncDecl->argc + 2 + 4;    // only have 4 registers
                         
                         block_list.back()->stmt_list.push_back(new ReturnStmtNode(lastFuncDecl, $2, retLoc)); 
                     };
@@ -397,7 +397,7 @@ if_stmt             :IF OPAREN cond CPAREN decl{
 
                         // allocate a new if node
                         IfStmtNode* new_if = new IfStmtNode(dynamic_cast<CondExprNode*>($3),current,
-                            std::to_string(if_else_label_index++));
+                            std::to_string(if_else_label_index++), func_list.back());
                         block_list.back()->stmt_list.push_back(new_if); 
                         block_list.push_back(new_if);
                     }
@@ -416,7 +416,7 @@ else_part           :ELSE{
                         //symtable_list.push_back(current);
 
                         // allocate a new else node
-                        ElseStmtNode* new_else = new ElseStmtNode(current);
+                        ElseStmtNode* new_else = new ElseStmtNode(current, func_list.back());
                         dynamic_cast<IfStmtNode*>(block_list.back())->elseNode = new_else;
                         block_list.push_back(new_else);
                     }
@@ -447,7 +447,7 @@ while_stmt          :WHILE OPAREN cond CPAREN {
 
                         // allocate a new while node
                         WhileStmtNode* new_while = new WhileStmtNode(dynamic_cast<CondExprNode*>($3),current,
-                            std::to_string(static_cast<long long int>(block_index)));
+                            std::to_string(static_cast<long long int>(block_index)), func_list.back());
                         block_list.back()->stmt_list.push_back(new_while); 
                         block_list.push_back(new_while);
                     } 

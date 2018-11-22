@@ -7,7 +7,7 @@
 using namespace::std;
 
 BaseStmtNode::BaseStmtNode(FunctionDeclNode* farther):
-    farther(farther)
+    StmtNode(farther)
 {}
 
 BaseStmtNode::~BaseStmtNode(){}
@@ -40,11 +40,11 @@ vector<IrNode*>& AssignStmtNode::translate(){
     // both operand memory refs
     if(from->is_var){
         string newReg = farther->getNextAvaTemp();
-        irBlockInsert(*code_block, new StoreIrNode(type, res, newReg));
+        irBlockInsert(*code_block, new StoreIrNode(type, res, newReg, *(farther->regMan)));
         res = newReg;
     }
 
-    irBlockInsert(*code_block, new StoreIrNode(type, res, to->name));
+    irBlockInsert(*code_block, new StoreIrNode(type, res, to->name, *(farther->regMan)));
     
     return *code_block;
 }
@@ -60,7 +60,7 @@ vector<IrNode*>& ReadStmtNode::translate(){
     
     for(auto id:id_list){
         string type = id->type == "INT"? "I":"F";
-        irBlockInsert(*code_block, new ReadIrNode(type, id->name));
+        irBlockInsert(*code_block, new ReadIrNode(type, id->name, *(farther->regMan)));
     }
     
     return *code_block;
@@ -80,7 +80,7 @@ vector<IrNode*>& WriteStmtNode::translate(){
         if(id -> type == "INT")         type = "I";
         else if(id -> type == "FLOAT")  type = "F";
         else if(id -> type == "STRING") type = "S";
-        irBlockInsert(*code_block, new WriteIrNode(type, id->name));
+        irBlockInsert(*code_block, new WriteIrNode(type, id->name, *(farther->regMan)));
     }
     
     return *code_block;
@@ -97,10 +97,10 @@ vector<IrNode*>& ReturnStmtNode::translate(){
     string type = expr->type.substr(0,1);
     string newReg = farther->getNextAvaTemp();
 
-    irBlockInsert(*ir, new StoreIrNode(type, ret, newReg));
-    irBlockInsert(*ir, new StoreIrNode(type, newReg,"$"+to_string(retLoc)));
-    irBlockInsert(*ir, new IrNode("UNLINK"));
-    irBlockInsert(*ir, new IrNode("RET"));
+    irBlockInsert(*ir, new StoreIrNode(type, ret, newReg, *(farther->regMan)));
+    irBlockInsert(*ir, new StoreIrNode(type, newReg,"$"+to_string(retLoc), *(farther->regMan)));
+    irBlockInsert(*ir, new IrNode("UNLINK", *(farther->regMan)));
+    irBlockInsert(*ir, new IrNode("RET", *(farther->regMan)));
     
     // mark all global var as live here
     extern Symtable* globalSymtable;

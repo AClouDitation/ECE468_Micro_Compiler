@@ -7,19 +7,23 @@
 class Symtable;
 class CondExprNode;
 class IrNode;
+class regManager;
+class FunctionDeclNode;
 
 class StmtNode{
+protected:
+    FunctionDeclNode* farther;
 public:
     std::set<std::string> symGen;
     std::set<std::string> symKill;
-    StmtNode(){};
-    virtual ~StmtNode(){};
+    StmtNode(FunctionDeclNode*);
+    virtual ~StmtNode();
     virtual std::vector<IrNode*>& translate()=0;
 };
 
 class BlockNode: public StmtNode{
 public:
-    BlockNode(Symtable*);
+    BlockNode(Symtable*, FunctionDeclNode*);
     virtual ~BlockNode();
     virtual std::vector<IrNode*>& translate()=0;
 
@@ -30,13 +34,14 @@ public:
 class FunctionDeclNode: public BlockNode{
     int nextAvaTemp;
 public:
+    std::string name;
+    std::string type;
+    int argc;
+    regManager* regMan;
     FunctionDeclNode(std::string, std::string, int, Symtable* symtable);
     virtual ~FunctionDeclNode();
 
     virtual std::vector<IrNode*>& translate();
-    std::string name;
-    std::string type;
-    int argc;
 
     std::string getNextAvaTemp();
 };
@@ -44,7 +49,7 @@ public:
 
 class ElseStmtNode: public BlockNode{
 public:
-    ElseStmtNode(Symtable*);
+    ElseStmtNode(Symtable*, FunctionDeclNode*);
     virtual ~ElseStmtNode();
     virtual std::vector<IrNode*>& translate();
 
@@ -52,7 +57,7 @@ public:
 
 class IfStmtNode: public BlockNode{
 public:
-    IfStmtNode(CondExprNode*, Symtable*, std::string);
+    IfStmtNode(CondExprNode*, Symtable*, std::string, FunctionDeclNode*);
     virtual ~IfStmtNode();
     
     virtual std::vector<IrNode*>& translate(); 
@@ -64,7 +69,7 @@ public:
 
 class WhileStmtNode: public BlockNode{
 public:
-    WhileStmtNode(CondExprNode*, Symtable*, std::string);
+    WhileStmtNode(CondExprNode*, Symtable*, std::string, FunctionDeclNode*);
     virtual ~WhileStmtNode();
     std::vector<IrNode*>& translate();
 

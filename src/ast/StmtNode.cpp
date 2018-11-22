@@ -2,28 +2,36 @@
 #include "../../inc/ExprNode.hpp"
 #include "../../inc/symtable.hpp"
 #include "../../inc/irNode.hpp"
+#include "../../inc/regman.hpp"
 #include "../../inc/utility.hpp"
 #include <assert.h>
 
 using namespace std;
 
-BlockNode::BlockNode(Symtable* symtable):
-    symtable(symtable){}
+StmtNode::StmtNode(FunctionDeclNode* farther): farther(farther) {}
+StmtNode::~StmtNode() {}
+
+BlockNode::BlockNode(Symtable* symtable, FunctionDeclNode* farther):
+    StmtNode(farther), symtable(symtable){}
 
 BlockNode::~BlockNode(){}
 
 FunctionDeclNode::FunctionDeclNode
     (string name, string type, int argc, Symtable* symtable):
-    BlockNode(symtable),name(name),type(type),argc(argc){}
+    BlockNode(symtable, NULL),name(name),type(type),argc(argc), 
+    regMan(new regManager(4)){}
 
-FunctionDeclNode::~FunctionDeclNode(){}
+FunctionDeclNode::~FunctionDeclNode(){
+    delete regMan;
+}
 
 vector<IrNode*>& FunctionDeclNode::translate(){
     
     vector<IrNode*>* ir = new vector<IrNode*>;
 
-    irBlockInsert(*ir, new LabelIrNode("FUNC_"+name));
-    irBlockInsert(*ir,new LinkIrNode(symtable->size() - argc));         // temporary, size of link should be adjust after 
+    irBlockInsert(*ir, new LabelIrNode("FUNC_"+name, *regMan));
+    // FIXME: change link to acutal size
+    irBlockInsert(*ir,new LinkIrNode(symtable->size() - argc, *regMan));         // temporary, size of link should be adjust after 
                                                                         // register allocation
 
     for(auto stmt: stmt_list){
@@ -32,8 +40,8 @@ vector<IrNode*>& FunctionDeclNode::translate(){
     }
 
     // return if reach the end of function
-    irBlockInsert(*ir, new IrNode("UNLINK"));
-    irBlockInsert(*ir, new IrNode("RET"));
+    irBlockInsert(*ir, new IrNode("UNLINK", *regMan));
+    irBlockInsert(*ir, new IrNode("RET", *regMan));
 
     // TODO: make a class for return node
     // and puth the following part into it
@@ -50,8 +58,10 @@ string FunctionDeclNode::getNextAvaTemp() {
     return "!T" + to_string(nextAvaTemp++);                             // get a new temporary
 }
 
-IfStmtNode::IfStmtNode(CondExprNode* cond, Symtable* symtable, string index):
-    BlockNode(symtable),
+
+IfStmtNode::IfStmtNode(CondExprNode* cond, Symtable* symtable, string index,
+        FunctionDeclNode* farther):
+    BlockNode(symtable, farther),
     cond(cond),elseNode(NULL),index(index){}
 
 IfStmtNode::~IfStmtNode(){}
@@ -67,10 +77,10 @@ vector<IrNode*>& IfStmtNode::translate(){
         irBlockCascade(*ir, code_block);
     }
 
-    JumpIrNode* jmp = new JumpIrNode("END_IF_ELSE_"+index);
+    JumpIrNode* jmp = new JumpIrNode("END_IF_ELSE_"+index, *(farther->regMan));
     irBlockInsert(*ir, jmp);
 
-    LabelIrNode* elseLabelNode = new LabelIrNode("ELSE_"+index);
+    LabelIrNode* elseLabelNode = new LabelIrNode("ELSE_"+index, *(farther->regMan));
     irBlockInsert(*ir, elseLabelNode); 
     elseLabelNode->setPre(condNode);    // manually reset predecessor
     condNode->setSuc2(elseLabelNode);
@@ -80,7 +90,7 @@ vector<IrNode*>& IfStmtNode::translate(){
         irBlockCascade(*ir, code_block);
     }
     
-    LabelIrNode* endLabelNode = new LabelIrNode("END_IF_ELSE_"+index);
+    LabelIrNode* endLabelNode = new LabelIrNode("END_IF_ELSE_"+index, *(farther->regMan));
     irBlockInsert(*ir, endLabelNode);
     endLabelNode->setPre2(jmp);
     jmp->setSuc(endLabelNode);
@@ -88,8 +98,8 @@ vector<IrNode*>& IfStmtNode::translate(){
     return *ir;
 }
 
-ElseStmtNode::ElseStmtNode(Symtable* symtable):
-    BlockNode(symtable)
+ElseStmtNode::ElseStmtNode(Symtable* symtable, FunctionDeclNode* farther):
+    BlockNode(symtable, farther)
 {}
 
 ElseStmtNode::~ElseStmtNode(){}
@@ -105,8 +115,9 @@ vector<IrNode*>& ElseStmtNode::translate(){
     return *ir;
 }
 
-WhileStmtNode::WhileStmtNode(CondExprNode* cond, Symtable* symtable, string index):
-    BlockNode(symtable),
+WhileStmtNode::WhileStmtNode(CondExprNode* cond, Symtable* symtable, string index,
+        FunctionDeclNode* farther):
+    BlockNode(symtable, farther),
     cond(cond),index(index){}
 
 WhileStmtNode::~WhileStmtNode(){}
@@ -114,7 +125,7 @@ WhileStmtNode::~WhileStmtNode(){}
 vector<IrNode*>& WhileStmtNode::translate(){
     vector<IrNode*>* ir = new vector<IrNode*>;
 
-    LabelIrNode* begin = new  LabelIrNode("WHILE_START_"+index);     // save the begin node of the loop
+    LabelIrNode* begin = new  LabelIrNode("WHILE_START_"+index, *(farther->regMan));     // save the begin node of the loop
     irBlockInsert(*ir, begin);
     cond->setOutLabel("END_WHILE_"+index);
     cond->translate(*ir);
@@ -125,12 +136,12 @@ vector<IrNode*>& WhileStmtNode::translate(){
         irBlockCascade(*ir, code_block);
     }
     
-    JumpIrNode* jmp = new JumpIrNode("WHILE_START_"+index); 
+    JumpIrNode* jmp = new JumpIrNode("WHILE_START_"+index, *(farther->regMan)); 
     irBlockInsert(*ir, jmp);
     begin->setPre2(jmp);    // link the begin label node with jump node 
                             // jmp label ----> label
 
-    LabelIrNode* endLabelNode = new LabelIrNode("END_WHILE_"+index);
+    LabelIrNode* endLabelNode = new LabelIrNode("END_WHILE_"+index, *(farther->regMan));
     irBlockInsert(*ir, endLabelNode);
     endLabelNode->setPre2(condNode);
     condNode->setSuc2(endLabelNode);

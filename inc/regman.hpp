@@ -6,15 +6,21 @@
 #include <vector>
 #include <string>
 
+class IrNode;
 class regManager {
     int totalAmount;
-    std::priority_queue<int,std::vector<int>, std::greater<int>> ava;
-    std::unordered_map<int, std::string> inUse;     
+    bool* isDirty;
+    std::priority_queue<int, std::vector<int>, std::greater<int>> ava;
+    std::unordered_map<int, std::string> inUseOR;     
+    std::unordered_map<std::string, int> inUseRO;     
 public:
     regManager(int);
     virtual ~regManager();
-    std::string takeReg(std::string var);
-    std::vector<std::string> inUseList();
+
+    int regEnsure(std::string);
+    void regFree(int);
+    int regAllocate(std::string);
+    void markDirty(int);
 };
 
 #endif

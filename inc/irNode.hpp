@@ -6,6 +6,7 @@
 #include <set>
 #include <vector>
 #include <sstream>
+#include "regman.hpp"
 
 class IrNode {
 protected:
@@ -16,11 +17,12 @@ protected:
     std::set<std::string> killSet;
     std::set<std::string> inSet;
     std::set<std::string> outSet;
+    regManager& regMan;
 
     static std::list<IrNode*> worklist;
 
 public:
-    IrNode(std::string);
+    IrNode(std::string, regManager&);
     virtual ~IrNode();
     virtual std::stringstream print();
     virtual void reformatPrint();
@@ -33,6 +35,8 @@ public:
     virtual std::stringstream printOut();
     virtual bool livenessCalc();    // return true if inSet got updated
     virtual void updateWorklist();  // put predecessor into worklist
+    virtual void regAlloc();        // do nothing since base class IrNode does not have any oprand
+    
     static void livenessAna();
     friend class CondIrNode;       // don't know why...
     friend void irBlockCascade(std::vector<IrNode*>& block, std::vector<IrNode*>& newBlock);    // TODO: make this a member function
@@ -46,9 +50,10 @@ class ArithmeticIrNode: public IrNode {
     std::string res;
 public:
     ArithmeticIrNode(std::string, std::string, 
-            std::string, std::string, std::string);
+            std::string, std::string, std::string, regManager&);
     virtual ~ArithmeticIrNode();
     virtual std::stringstream print();
+    virtual void regAlloc();
 };
 
 class StoreIrNode: public IrNode {
@@ -56,34 +61,37 @@ class StoreIrNode: public IrNode {
     std::string op1;
     std::string res;
 public:
-    StoreIrNode(std::string, std::string, std::string);
+    StoreIrNode(std::string, std::string, std::string, regManager&);
     virtual ~StoreIrNode();
     virtual std::stringstream print();
+    virtual void regAlloc();
 };
 
 class ReadIrNode: public IrNode {
     std::string type;
     std::string res;
 public:
-    ReadIrNode(std::string, std::string);
+    ReadIrNode(std::string, std::string, regManager&);
     virtual ~ReadIrNode();
     virtual std::stringstream print();
+    virtual void regAlloc();
 };
 
 class WriteIrNode: public IrNode {
     std::string type;
     std::string op1;
 public:
-    WriteIrNode(std::string, std::string);
+    WriteIrNode(std::string, std::string, regManager&);
     virtual ~WriteIrNode();
     virtual std::stringstream print();
+    virtual void regAlloc();
 };
 
 
 class CallIrNode: public IrNode {
     std::string name;
 public:
-    CallIrNode(std::string);
+    CallIrNode(std::string, regManager&);
     virtual ~CallIrNode();
     virtual std::stringstream print();
 };
@@ -91,25 +99,27 @@ public:
 class PushIrNode: public IrNode {
     std::string op1;
 public:
-    PushIrNode();
-    PushIrNode(std::string);
+    PushIrNode(regManager&);
+    PushIrNode(std::string, regManager&);
     virtual ~PushIrNode();
     virtual std::stringstream print();
+    virtual void regAlloc();
 };
 
 class PopIrNode: public IrNode {
     std::string op1;
 public:
-    PopIrNode();
-    PopIrNode(std::string);
+    PopIrNode(regManager&);
+    PopIrNode(std::string, regManager&);
     virtual ~PopIrNode();
     virtual std::stringstream print();
+    virtual void regAlloc();
 };
 
 class JumpIrNode: public IrNode {
     std::string label;
 public:
-    JumpIrNode(std::string);
+    JumpIrNode(std::string, regManager&);
     virtual ~JumpIrNode();
     virtual std::stringstream print();
 };
@@ -117,7 +127,7 @@ public:
 class LinkIrNode: public IrNode {
     int size;
 public:
-    LinkIrNode(int);
+    LinkIrNode(int, regManager&);
     virtual ~LinkIrNode();
     virtual std::stringstream print();
 };
@@ -131,18 +141,19 @@ class CondIrNode: public IrNode {
     std::string jumpTo;
 public:
     CondIrNode(std::string, std::string, std::string, 
-            std::string, std::string);
+            std::string, std::string, regManager&);
     virtual ~CondIrNode();
     virtual std::stringstream print();
     virtual void setSuc2(IrNode*);
     virtual bool livenessCalc();
+    virtual void regAlloc();
 };
 
 class LabelIrNode: public IrNode {
     IrNode* predecessor2;
     std::string label;
 public:
-    LabelIrNode(std::string);
+    LabelIrNode(std::string, regManager&);
     virtual ~LabelIrNode();
     virtual std::stringstream print();
     virtual void setPre2(IrNode*);

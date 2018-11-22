@@ -5,8 +5,8 @@ using namespace std;
 
 /* ----- conditional IR nodes ----- */
 CondIrNode::CondIrNode(string cond, string type,
-    string op1, string op2, string jumpTo):
-    IrNode(cond), successor2(NULL), cond(cond), type(type), 
+    string op1, string op2, string jumpTo, regManager& regMan):
+    IrNode(cond, regMan), successor2(NULL), cond(cond), type(type), 
     op1(op1), op2(op2), jumpTo(jumpTo) {
     
     if(!isLiteral(op1)) genSet.insert(op1);
@@ -37,9 +37,16 @@ bool CondIrNode::livenessCalc() {
     return inSet != inSetbk;
 }
 
+void CondIrNode::regAlloc() {
+    int regX = regMan.regEnsure(op1);
+    int regY = regMan.regEnsure(op2);
+    if(outSet.find(op1) == outSet.end()) regMan.regFree(regX);
+    if(outSet.find(op2) == outSet.end()) regMan.regFree(regY);
+}
+
 /* ----- label IR nodes ----- */
-LabelIrNode::LabelIrNode(string label):
-    IrNode("LABEL"), predecessor2(NULL), label(label) {}
+LabelIrNode::LabelIrNode(string label, regManager& regMan):
+    IrNode("LABEL", regMan), predecessor2(NULL), label(label) {}
 
 LabelIrNode::~LabelIrNode() {}
 

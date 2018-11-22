@@ -18,7 +18,7 @@ string AddExprNode::translate(vector<IrNode*>& code_block){
     string type = this->type == "FLOAT"? "F":"I";
     string res = farther->getNextAvaTemp();
 
-    IrNode* newIr = new ArithmeticIrNode(cmd, type, op1, op2, res);
+    IrNode* newIr = new ArithmeticIrNode(cmd, type, op1, op2, res, *(farther->regMan));
     irBlockInsert(code_block, newIr);
 
     return res;
@@ -36,7 +36,7 @@ string MulExprNode::translate(vector<IrNode*>& code_block){
     string type = this->type == "FLOAT"? "F":"I";
     string res = farther->getNextAvaTemp();
 
-    IrNode* newIr = new ArithmeticIrNode(cmd, type, op1, op2, res);
+    IrNode* newIr = new ArithmeticIrNode(cmd, type, op1, op2, res, *(farther->regMan));
     irBlockInsert(code_block, newIr);
 
     return res;
@@ -60,21 +60,21 @@ string CallExprNode::translate(vector<IrNode*>& code_block){
         exprStack.pop();
     }
 
-    irBlockInsert(code_block, new IrNode("PUSHREGS")); // push all register inuse
-    irBlockInsert(code_block, new PushIrNode());        // push a empty space to store return value of function
+    irBlockInsert(code_block, new PushIrNode(*(farther->regMan)));        // push a empty space to store return value of function
+    irBlockInsert(code_block, new IrNode("PUSHREGS", *(farther->regMan))); // push all register inuse
     for(auto argToPush: args){                          // push arguments on stack
-        irBlockInsert(code_block, new PushIrNode(argToPush));
+        irBlockInsert(code_block, new PushIrNode(argToPush, *(farther->regMan)));
     }
         
-    irBlockInsert(code_block, new CallIrNode(name));    // call function
+    irBlockInsert(code_block, new CallIrNode(name, *(farther->regMan)));    // call function
 
     for(int i = 0;i < argc;i++){                        // pop arguments
-        irBlockInsert(code_block, new PopIrNode());
+        irBlockInsert(code_block, new PopIrNode(*(farther->regMan)));
     }
 
     string res = farther->getNextAvaTemp();
-    irBlockInsert(code_block, new PopIrNode(res));      // pop return value
-    irBlockInsert(code_block, new IrNode("POPREGS"));  // pop registers
+    irBlockInsert(code_block, new IrNode("POPREGS", *(farther->regMan)));  // pop registers
+    irBlockInsert(code_block, new PopIrNode(res, *(farther->regMan)));      // pop return value
 
     return res;
 }
@@ -110,7 +110,7 @@ string CondExprNode::translate(vector<IrNode*>& code_block) {
         // Move it to one
         string res = farther->getNextAvaTemp();
         string type = rnode->type == "INT"? "I":"F";                    //TODO: standardlize all type to 1 letter string
-        irBlockInsert(code_block, new StoreIrNode(type, op2, res));
+        irBlockInsert(code_block, new StoreIrNode(type, op2, res, *(farther->regMan)));
         op2 = res;
     }
 
@@ -118,7 +118,8 @@ string CondExprNode::translate(vector<IrNode*>& code_block) {
     if(lnode->type == "FLOAT" || rnode->type == "FLOAT") type = "F";    // promote type to float if applicable    
 
     // out_label should be set by the caller this function
-    irBlockInsert(code_block, new CondIrNode(negateCond(cmp), type, op1, op2, out_label));
+    irBlockInsert(code_block, new CondIrNode(negateCond(cmp), type, op1, op2, 
+                out_label, *(farther->regMan)));
     return out_label;   // this will not actually be used, just for polymorphism
 }
 

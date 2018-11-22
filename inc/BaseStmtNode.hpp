@@ -9,8 +9,6 @@ class ExprNode;
 class VarRef;
 
 class BaseStmtNode: public StmtNode {
-protected:
-    FunctionDeclNode* farther;
 public:
     BaseStmtNode(FunctionDeclNode*);
     virtual ~BaseStmtNode();
