@@ -1,6 +1,7 @@
 #include "../inc/utility.hpp"
 #include "../inc/irNode.hpp"
 #include "../inc/symtable.hpp"
+#include<bits/stdc++.h>
 
 using namespace std;
 
@@ -279,4 +280,9 @@ bool isLiteral(string op) {
     }
 
     return true;
+}
+
+string toLower(string s){
+    transform(s.begin(), s.end(), s.begin(), ::tolower);
+    return s;
 }

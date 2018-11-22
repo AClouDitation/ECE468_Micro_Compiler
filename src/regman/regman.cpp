@@ -20,42 +20,59 @@ regManager::~regManager() {
     delete[] isDirty;
 }
 
-int regManager::regEnsure(string op) {
+int regManager::regEnsure(string op, vector<string>& opcode, set<string>& liveOut) {
     if(inUseRO.find(op) != inUseRO.end()) return inUseRO[op];
-    int reg = regAllocate(op);
-    // FIXME: generate load from op to reg
+    int reg = regAllocate(op, opcode, liveOut);
+    // generate load from op to reg
+    opcode.push_back("move " + op + " r" + to_string(reg) + " debug: ldr from reg to op");
     return reg;
 }
 
-void regManager::regFree(int r) {
-    if(isDirty[r]){
-    // FIXME: generate store
-    }
+void regManager::regFree(int r, vector<string>& opcode, set<string>& liveOut) {
+    // if not used, return directly
+    if(inUseOR.find(r) == inUseOR.end()) return;
+
+    //if r dirty and var in r still live, generate store to spill the register
+    if(isDirty[r] && liveOut.find(inUseOR[r]) != liveOut.end())
+        opcode.push_back("move r" + to_string(r) + " " + inUseOR[r] + " debug: spill");
+
+    // mark r as free
+    inUseRO.erase(inUseRO.find(inUseOR[r]));
+    inUseOR.erase(inUseOR.find(r));
+
     ava.push(r);
 }
 
-int regManager::regAllocate(string op) {
+int regManager::regAllocate(string op, vector<string>& opcode, set<string>& liveOut) {
     
-    // if there is a free register, return it
+    int reg = -1;
+
+    // if there is a free register, choose it
     if(!ava.empty()){
-        int reg = ava.top();
+        reg = ava.top();
         ava.pop();
-        return reg;
     }
     
-    // otherwise if there is a clean register, return it
-    for(auto kv: inUseOR) {
-        if(!isDirty[kv.first]) {
-            regFree(kv.first);  // seems like dont actually need this
-                                // since the register going to be used 
-                                // after allocation anyway...
-            return kv.first;
+    // otherwise if there is a clean register, choose it
+    if(reg == -1) {
+        for(auto kv: inUseOR) {
+            if(isDirty[kv.first]) continue;
+            regFree(kv.first, opcode, liveOut);      
+            reg = kv.first;
+            break;
         }
     }
 
-    // otherwise free r0
-    regFree(0); 
-    return 0;
+    // otherwise choose r0
+    if(reg == -1) {
+        reg = 0;
+        regFree(0, opcode, liveOut); 
+    }
+
+    // mark r associated with op
+    inUseOR[reg] = op;
+    inUseRO[op] = reg;
+    return reg;
 }
 
 void regManager::markDirty(int r){

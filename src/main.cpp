@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <stack>
+#include <iomanip>
 #include "../inc/symtable.hpp"
 #include "../inc/ExprNode.hpp"
 #include "../inc/StmtNode.hpp"
@@ -20,9 +21,12 @@ extern stack<Symtable*> symtable_stack; // should be size 1, with only the
 extern vector<FunctionDeclNode*> func_list;
 
 int main(int argc, char** argv){
+
     FILE* fp = fopen(argv[1],"r");
     yyin = fp;
     yyparse();
+
+    fclose(fp);
 
     vector<string>& ops = symtable_stack.top()->decl();
 
@@ -32,7 +36,6 @@ int main(int argc, char** argv){
 
     for(auto block_node: func_list){
         //vector<vector<string>>& ir = split_irs(block_node->translate());
-        //if (argc == 2 && strcmp(argv[1],"-o")) OOOptmize(ir);
         vector<IrNode*> irs = block_node->translate();
         IrNode::livenessAna();
         
@@ -44,7 +47,14 @@ int main(int argc, char** argv){
         for(auto ir: irs){
             cout << ";" ;
             ir->reformatPrint();
-            cout << endl;
+            vector<string> codeBlock = ir->translate();
+            if(!codeBlock.empty()) cout << codeBlock[0] << endl;
+            else cout << endl;
+            for(int i = 1; i < codeBlock.size(); i++) {
+                cout << left << setfill(' ') << setw(121) << ' ';
+                cout << codeBlock[i] << endl;
+            }
+            ops.insert(ops.end(), codeBlock.begin(), codeBlock.end());
         }
     }
 
@@ -56,7 +66,6 @@ int main(int argc, char** argv){
     }
     */
 
-    fclose(fp);
 
     return 0;
 }

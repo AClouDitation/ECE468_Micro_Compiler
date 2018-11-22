@@ -81,7 +81,21 @@ void IrNode::updateWorklist() {
     predecessor->updateWorklist();
 }
 
-void IrNode::regAlloc() {}
+vector<string> IrNode::translate() {
+    vector<string> opCodeBlock;
+    opCodeBlock.push_back(toLower(cmd));
+    return opCodeBlock;
+}
+
+void IrNode::livenessAna() {
+    reverse(worklist.begin(),worklist.end());   // reverse the worklist
+    while(!worklist.empty()){ 
+        IrNode* lastNode = worklist.front();
+        worklist.pop_front();                    
+        // push all predecessor of this node into worklist
+        if(lastNode->livenessCalc()) lastNode->updateWorklist();            
+    }
+}
 
 /* ----- Arithmetic IR nodes ----- */
 ArithmeticIrNode::ArithmeticIrNode(string cmd, string type, string op1, 
@@ -100,13 +114,21 @@ stringstream ArithmeticIrNode::print() {
     return ss;
 }
 
-void ArithmeticIrNode::regAlloc() {
-    int regX = regMan.regEnsure(op1);
-    int regY = regMan.regEnsure(op2);
-    if(outSet.find(op1) == outSet.end()) regMan.regFree(regX);
-    if(outSet.find(op2) == outSet.end()) regMan.regFree(regY);
-    int regZ = regMan.regAllocate(res);
+vector<string> ArithmeticIrNode::translate() {
+
+    vector<string> opCodeBlock;
+    /* register allocation */
+    int regX = regMan.regEnsure(op1, opCodeBlock, outSet);
+    int regY = regMan.regEnsure(op2, opCodeBlock, outSet);
+    if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
+    if(outSet.find(op2) == outSet.end()) regMan.regFree(regY, opCodeBlock, outSet);
+    int regZ = regMan.regAllocate(res, opCodeBlock, outSet);
     regMan.markDirty(regZ);
+    
+    // FIXME: translate the ir
+    //
+    
+    return opCodeBlock;
 }
 
 /* ----- Store IR nodes ----- */
@@ -125,11 +147,17 @@ stringstream StoreIrNode::print() {
     return ss;
 }
 
-void StoreIrNode::regAlloc() {
-    int regX = regMan.regEnsure(op1);
-    if(outSet.find(op1) == outSet.end()) regMan.regFree(regX);
-    int regZ = regMan.regAllocate(res);
+vector<string> StoreIrNode::translate() {
+    vector<string> opCodeBlock;
+    int regX = regMan.regEnsure(op1, opCodeBlock, outSet);
+    if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
+    int regZ = regMan.regAllocate(res, opCodeBlock, outSet);
     regMan.markDirty(regZ);
+
+    if(regX != regZ)
+        opCodeBlock.push_back("move r" + to_string(regX) + " r" + to_string(regZ));   // TODO: this seems redundant...
+                                                // optimize it
+    return opCodeBlock;
 }
 
 /* ----- Read IR nodes ----- */
@@ -146,10 +174,15 @@ stringstream ReadIrNode::print() {
     return ss;
 }
 
-void ReadIrNode::regAlloc() {
-    int regZ = regMan.regAllocate(res);
+vector<string> ReadIrNode::translate() {
+    vector<string> opCodeBlock;
+    int regZ = regMan.regAllocate(res, opCodeBlock, outSet);
     regMan.markDirty(regZ);
+
+    opCodeBlock.push_back("sys " + toLower(cmd) + " r" + to_string(regZ));
+    return opCodeBlock;
 }
+
 /* ----- Write IR nodes ----- */
 WriteIrNode::WriteIrNode(string type, string op1, regManager& regMan):
     IrNode("WRITE", regMan), type(type), op1(op1) {
@@ -164,9 +197,13 @@ stringstream WriteIrNode::print() {
     return ss;
 }
 
-void WriteIrNode::regAlloc() {
-    int regX = regMan.regEnsure(op1);
-    if(outSet.find(op1) == outSet.end()) regMan.regFree(regX);
+vector<string> WriteIrNode::translate() {
+    vector<string> opCodeBlock;
+    int regX = regMan.regEnsure(op1, opCodeBlock, outSet);
+    if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
+
+    opCodeBlock.push_back("sys " + toLower(cmd) + " r" + to_string(regX));
+    return opCodeBlock;
 }
 
 /* ----- Call IR nodes ----- */
@@ -179,6 +216,12 @@ stringstream CallIrNode::print() {
     stringstream ss = IrNode::print();
     ss << " " << "FUNC_" << name;
     return ss;
+}
+
+vector<string> CallIrNode::translate() {
+    vector<string> opCodeBlock;
+    opCodeBlock.push_back("jsr FUNC_" + name);
+    return opCodeBlock;
 }
 
 /* ----- Push IR nodes ----- */
@@ -198,10 +241,17 @@ stringstream PushIrNode::print() {
     return ss;
 }
 
-void PushIrNode::regAlloc() {
-    if(op1 == "") return;
-    int regX = regMan.regEnsure(op1);
-    if(outSet.find(op1) == outSet.end()) regMan.regFree(regX);
+vector<string> PushIrNode::translate() {
+    vector<string> opCodeBlock;
+    if(op1 == "") {
+        opCodeBlock.push_back("push");
+        return opCodeBlock;
+    }
+
+    int regX = regMan.regEnsure(op1, opCodeBlock, outSet);
+    if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
+    opCodeBlock.push_back("push r" + to_string(regX));
+    return opCodeBlock;
 }
 
 /* ----- Pop IR nodes ----- */
@@ -221,9 +271,16 @@ stringstream PopIrNode::print() {
     return ss;
 }
 
-void PopIrNode::regAlloc() {
-    int regZ = regMan.regAllocate(op1);
+vector<string> PopIrNode::translate() {
+    vector<string> opCodeBlock;
+    if(op1 == "") {
+        opCodeBlock.push_back("push");
+        return opCodeBlock;
+    }
+    int regZ = regMan.regAllocate(op1, opCodeBlock, outSet);
     regMan.markDirty(regZ);
+    opCodeBlock.push_back("pop r" + to_string(regZ));
+    return opCodeBlock;
 }
 
 /* ----- Jump IR nodes ----- */
@@ -238,6 +295,12 @@ stringstream JumpIrNode::print() {
     return ss;
 }
 
+vector<string> JumpIrNode::translate() {
+    vector<string> opCodeBlock;
+    opCodeBlock.push_back("jmp " + label);
+    return opCodeBlock;
+}
+
 /* ----- Link IR nodes ----- */
 LinkIrNode::LinkIrNode(int size, regManager& regMan):
     IrNode("LINK", regMan), size(size) {}
@@ -250,12 +313,10 @@ stringstream LinkIrNode::print() {
     return ss;
 }
 
-void IrNode::livenessAna() {
-    reverse(worklist.begin(),worklist.end());   // reverse the worklist
-    while(!worklist.empty()){ 
-        IrNode* lastNode = worklist.front();
-        worklist.pop_front();                    
-        // push all predecessor of this node into worklist
-        if(lastNode->livenessCalc()) lastNode->updateWorklist();            
-    }
+vector<string> LinkIrNode::translate() {
+    vector<string> opCodeBlock;
+    opCodeBlock.push_back("link " + to_string(size));
+    return opCodeBlock;
 }
+
+

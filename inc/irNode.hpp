@@ -35,7 +35,8 @@ public:
     virtual std::stringstream printOut();
     virtual bool livenessCalc();    // return true if inSet got updated
     virtual void updateWorklist();  // put predecessor into worklist
-    virtual void regAlloc();        // do nothing since base class IrNode does not have any oprand
+
+    virtual std::vector<std::string> translate();       // translate into opcode
     
     static void livenessAna();
     friend class CondIrNode;       // don't know why...
@@ -53,7 +54,8 @@ public:
             std::string, std::string, std::string, regManager&);
     virtual ~ArithmeticIrNode();
     virtual std::stringstream print();
-    virtual void regAlloc();
+    
+    virtual std::vector<std::string> translate();       // translate into opcode
 };
 
 class StoreIrNode: public IrNode {
@@ -64,7 +66,8 @@ public:
     StoreIrNode(std::string, std::string, std::string, regManager&);
     virtual ~StoreIrNode();
     virtual std::stringstream print();
-    virtual void regAlloc();
+    
+    virtual std::vector<std::string> translate();       // translate into opcode
 };
 
 class ReadIrNode: public IrNode {
@@ -74,7 +77,8 @@ public:
     ReadIrNode(std::string, std::string, regManager&);
     virtual ~ReadIrNode();
     virtual std::stringstream print();
-    virtual void regAlloc();
+    
+    virtual std::vector<std::string> translate();       // translate into opcode
 };
 
 class WriteIrNode: public IrNode {
@@ -84,7 +88,8 @@ public:
     WriteIrNode(std::string, std::string, regManager&);
     virtual ~WriteIrNode();
     virtual std::stringstream print();
-    virtual void regAlloc();
+    
+    virtual std::vector<std::string> translate();       // translate into opcode
 };
 
 
@@ -94,6 +99,7 @@ public:
     CallIrNode(std::string, regManager&);
     virtual ~CallIrNode();
     virtual std::stringstream print();
+    virtual std::vector<std::string> translate();       // translate into opcode
 };
 
 class PushIrNode: public IrNode {
@@ -103,7 +109,8 @@ public:
     PushIrNode(std::string, regManager&);
     virtual ~PushIrNode();
     virtual std::stringstream print();
-    virtual void regAlloc();
+    
+    virtual std::vector<std::string> translate();       // translate into opcode
 };
 
 class PopIrNode: public IrNode {
@@ -113,7 +120,8 @@ public:
     PopIrNode(std::string, regManager&);
     virtual ~PopIrNode();
     virtual std::stringstream print();
-    virtual void regAlloc();
+    
+    virtual std::vector<std::string> translate();       // translate into opcode
 };
 
 class JumpIrNode: public IrNode {
@@ -122,6 +130,7 @@ public:
     JumpIrNode(std::string, regManager&);
     virtual ~JumpIrNode();
     virtual std::stringstream print();
+    virtual std::vector<std::string> translate();       // translate into opcode
 };
 
 class LinkIrNode: public IrNode {
@@ -130,6 +139,7 @@ public:
     LinkIrNode(int, regManager&);
     virtual ~LinkIrNode();
     virtual std::stringstream print();
+    virtual std::vector<std::string> translate();       // translate into opcode
 };
 
 class CondIrNode: public IrNode {
@@ -146,7 +156,8 @@ public:
     virtual std::stringstream print();
     virtual void setSuc2(IrNode*);
     virtual bool livenessCalc();
-    virtual void regAlloc();
+    
+    virtual std::vector<std::string> translate();       // translate into opcode
 };
 
 class LabelIrNode: public IrNode {
@@ -158,5 +169,7 @@ public:
     virtual std::stringstream print();
     virtual void setPre2(IrNode*);
     virtual void updateWorklist();
+
+    virtual std::vector<std::string> translate();       // translate into opcode
 };
 #endif //IRNODE_HPP_

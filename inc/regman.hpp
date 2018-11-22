@@ -4,6 +4,7 @@
 #include <queue>
 #include <unordered_map>
 #include <vector>
+#include <set>
 #include <string>
 
 class IrNode;
@@ -17,9 +18,9 @@ public:
     regManager(int);
     virtual ~regManager();
 
-    int regEnsure(std::string);
-    void regFree(int);
-    int regAllocate(std::string);
+    int regEnsure(std::string, std::vector<std::string>&, std::set<std::string>&);
+    void regFree(int, std::vector<std::string>&, std::set<std::string>&);
+    int regAllocate(std::string, std::vector<std::string>&, std::set<std::string>&);
     void markDirty(int);
 };
 

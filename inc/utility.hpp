@@ -18,5 +18,6 @@ class IrNode;
 void irBlockInsert(std::vector<IrNode*>&, IrNode*);
 void irBlockCascade(std::vector<IrNode*>&, std::vector<IrNode*>&);
 bool isLiteral(std::string);
+std::string toLower(std::string);
 
 #endif

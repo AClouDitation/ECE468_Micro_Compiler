@@ -37,11 +37,19 @@ bool CondIrNode::livenessCalc() {
     return inSet != inSetbk;
 }
 
-void CondIrNode::regAlloc() {
-    int regX = regMan.regEnsure(op1);
-    int regY = regMan.regEnsure(op2);
-    if(outSet.find(op1) == outSet.end()) regMan.regFree(regX);
-    if(outSet.find(op2) == outSet.end()) regMan.regFree(regY);
+vector<string> CondIrNode::translate() {
+    vector<string> opCodeBlock;
+    int regX = regMan.regEnsure(op1, opCodeBlock, outSet);
+    int regY = regMan.regEnsure(op2, opCodeBlock, outSet);
+    if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
+    if(outSet.find(op2) == outSet.end()) regMan.regFree(regY, opCodeBlock, outSet);
+
+    // FIXME; 
+    opCodeBlock.push_back("cmp" + type + " r" + to_string(regX)  + " r" + to_string(regY));
+    opCodeBlock.push_back("j" + toLower(cmd) + " " + jumpTo);
+
+
+    return opCodeBlock;
 }
 
 /* ----- label IR nodes ----- */
@@ -65,4 +73,10 @@ void LabelIrNode::updateWorklist() {
     for(auto irNode: worklist) if(irNode == predecessor2) return;
     worklist.push_back(predecessor2);
     predecessor2->updateWorklist();
+}
+
+vector<string> LabelIrNode::translate() {
+    vector<string> opCodeBlock;
+    opCodeBlock.push_back("label " + label); 
+    return opCodeBlock;
 }
