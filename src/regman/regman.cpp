@@ -9,12 +9,8 @@ regManager::regManager(int totalAmount):
     totalAmount(totalAmount) {
 
     isDirty = new bool[totalAmount];
-    // push all avaliable register indexes into the priority queue
     // mark all register clean
-    for(int i = 0; i < totalAmount;i++){
-        ava.push(i);
-        isDirty[i] = false;
-    }
+    for(int i = 0; i < totalAmount;i++) isDirty[i] = false;
 }
 
 regManager::~regManager() {
@@ -25,7 +21,7 @@ int regManager::regEnsure(string op, vector<string>& opcode, set<string>& liveOu
     if(inUseRO.find(op) != inUseRO.end()) return inUseRO[op];
     int reg = regAllocate(op, opcode, liveOut);
     // generate load from op to reg
-    opcode.push_back("move " + op + " r" + to_string(reg) + " debug:ldr");
+    opcode.push_back("move " + op + " r" + to_string(reg));
     return reg;
 }
 
@@ -35,13 +31,11 @@ void regManager::regFree(int r, vector<string>& opcode, set<string>& liveOut) {
 
     //if r dirty and var in r still live, generate store to spill the register
     if(isDirty[r] && liveOut.find(inUseOR[r]) != liveOut.end())
-        opcode.push_back("move r" + to_string(r) + " " + inUseOR[r] + " debug:spill");
+        opcode.push_back("spilling:move r" + to_string(r) + " " + inUseOR[r]);
 
     // mark r as free
     inUseRO.erase(inUseRO.find(inUseOR[r]));
     inUseOR.erase(inUseOR.find(r));
-
-    ava.push(r);
 }
 
 int regManager::regAllocate(string op, vector<string>& opcode, set<string>& liveOut) {
@@ -49,9 +43,11 @@ int regManager::regAllocate(string op, vector<string>& opcode, set<string>& live
     int reg = -1;
 
     // if there is a free register, choose it
-    if(!ava.empty()){
-        reg = ava.top();
-        ava.pop();
+    for(int i = 0;i < totalAmount;i++) {
+        if(inUseOR.find(i) == inUseOR.end()) {
+            reg = i;
+            break;
+        }
     }
     
     // otherwise if there is a clean register, choose it
@@ -71,6 +67,8 @@ int regManager::regAllocate(string op, vector<string>& opcode, set<string>& live
     }
 
     // mark r associated with op
+    if(inUseOR.find(reg) != inUseOR.end() && inUseRO.find(inUseOR[reg]) != inUseRO.end())
+        inUseRO.erase(inUseRO.find(inUseOR[reg]));
     inUseOR[reg] = op;
     inUseRO[op] = reg;
     return reg;
@@ -89,6 +87,10 @@ stringstream regManager::print() {
        ss << left << setfill(' ') << setw(10);
        if(inUseOR.find(i) != inUseOR.end()) ss << inUseOR[i];
        else ss << ' ';
+   }
+
+   for(auto kv: inUseRO) {
+       ss << kv.first << ":" << kv.second;
    }
 
    return ss;

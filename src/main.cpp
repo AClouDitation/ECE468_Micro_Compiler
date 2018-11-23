@@ -38,12 +38,8 @@ int main(int argc, char** argv){
         //vector<vector<string>>& ir = split_irs(block_node->translate());
         vector<IrNode*> irs = block_node->translate();
         IrNode::livenessAna();
-        
-        //vector<string>& op_block = ir2tiny(ir);
-        //ops.insert(ops.end(),op_block.begin(),op_block.end());
 
-        //printing IR for debugging purpose
-
+        //printing debugging infos
         for(auto ir: irs){
             cout << ";" ;
             ir->reformatPrint();
@@ -53,21 +49,18 @@ int main(int argc, char** argv){
             else cout << " ";
             cout << ir->regMan.print().str() << endl;
 
-            for(int i = 1; i < codeBlock.size(); i++) {
-                cout << setfill(' ') << setw(91) << ' ';
+            for(unsigned int i = 1; i < codeBlock.size(); i++) {
+                cout << ';';
+                cout << setfill(' ') << setw(90) << ' ';
                 cout << codeBlock[i] << endl;
             }
             ops.insert(ops.end(), codeBlock.begin(), codeBlock.end());
         }
     }
 
-
-
-    /*
     for(auto op:ops){
         cout << op << endl;
     }
-    */
 
 
     return 0;

@@ -40,7 +40,7 @@ vector<IrNode*>& FunctionDeclNode::translate(){
     }
 
     // return if reach the end of function
-    irBlockInsert(*ir, new IrNode("UNLINK", *regMan));
+    irBlockInsert(*ir, new IrNode("UNLNK", *regMan));
     irBlockInsert(*ir, new IrNode("RET", *regMan));
 
     // TODO: make a class for return node

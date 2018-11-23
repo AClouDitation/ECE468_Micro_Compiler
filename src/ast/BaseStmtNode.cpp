@@ -101,7 +101,7 @@ vector<IrNode*>& ReturnStmtNode::translate(){
 
     irBlockInsert(*ir, new StoreIrNode(type, ret, newReg, *(farther->regMan)));
     irBlockInsert(*ir, new StoreIrNode(type, newReg,"$"+to_string(retLoc), *(farther->regMan)));
-    irBlockInsert(*ir, new IrNode("UNLINK", *(farther->regMan)));
+    irBlockInsert(*ir, new IrNode("UNLNK", *(farther->regMan)));
     irBlockInsert(*ir, new IrNode("RET", *(farther->regMan)));
     
     // mark all global var as live here
