@@ -15,7 +15,7 @@ string AddExprNode::translate(vector<IrNode*>& code_block){
     string op2 = rnode->translate(code_block);
 
     string cmd = sign == '+'?"ADD":"SUB";
-    string type = this->type == "FLOAT"? "F":"I";
+    string type = this->type;
     string res = farther->getNextAvaTemp();
 
     IrNode* newIr = new ArithmeticIrNode(cmd, type, op1, op2, res, *(farther->regMan));
@@ -33,7 +33,7 @@ string MulExprNode::translate(vector<IrNode*>& code_block){
     string op2 = rnode->translate(code_block);
 
     string cmd = sign == '*'?"MUL":"DIV";
-    string type = this->type == "FLOAT"? "F":"I";
+    string type = this->type;
     string res = farther->getNextAvaTemp();
 
     IrNode* newIr = new ArithmeticIrNode(cmd, type, op1, op2, res, *(farther->regMan));
@@ -109,13 +109,13 @@ string CondExprNode::translate(vector<IrNode*>& code_block) {
     if(!(op2[0] == '!' && op2[1] == 'T')){ // op2 is not a temporary
         // Move it to one
         string res = farther->getNextAvaTemp();
-        string type = rnode->type == "INT"? "I":"F";                    //TODO: standardlize all type to 1 letter string
+        string type = rnode->type;                    //TODO: standardlize all type to 1 letter string
         irBlockInsert(code_block, new StoreIrNode(type, op2, res, *(farther->regMan)));
         op2 = res;
     }
 
     string type = "I";
-    if(lnode->type == "FLOAT" || rnode->type == "FLOAT") type = "F";    // promote type to float if applicable    
+    if(lnode->type == "R" || rnode->type == "R") type = "R";    // promote type to float if applicable    
 
     // out_label should be set by the caller of this function
     irBlockInsert(code_block, new CondIrNode(negateCond(cmp), type, op1, op2, 

@@ -51,7 +51,7 @@ int main(int argc, char** argv){
 
             for(unsigned int i = 1; i < codeBlock.size(); i++) {
                 cout << ';';
-                cout << setfill(' ') << setw(90) << ' ';
+                cout << setfill(' ') << setw(80) << ' ';
                 cout << codeBlock[i] << endl;
             }
             ops.insert(ops.end(), codeBlock.begin(), codeBlock.end());

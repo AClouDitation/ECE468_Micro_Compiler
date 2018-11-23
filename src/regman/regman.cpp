@@ -31,7 +31,7 @@ void regManager::regFree(int r, vector<string>& opcode, set<string>& liveOut) {
 
     //if r dirty and var in r still live, generate store to spill the register
     if(isDirty[r] && liveOut.find(inUseOR[r]) != liveOut.end())
-        opcode.push_back("spilling:move r" + to_string(r) + " " + inUseOR[r]);
+        opcode.push_back("move r" + to_string(r) + " " + inUseOR[r]);
 
     // mark r as free
     inUseRO.erase(inUseRO.find(inUseOR[r]));
@@ -87,10 +87,6 @@ stringstream regManager::print() {
        ss << left << setfill(' ') << setw(10);
        if(inUseOR.find(i) != inUseOR.end()) ss << inUseOR[i];
        else ss << ' ';
-   }
-
-   for(auto kv: inUseRO) {
-       ss << kv.first << ":" << kv.second;
    }
 
    return ss;

@@ -17,7 +17,7 @@ protected:
 public:
     ExprNode(FunctionDeclNode* farther):
         farther(farther),lnode(NULL),rnode(NULL),
-        type("INT"),is_var(false){};
+        type("I"),is_var(false){};
     virtual ~ExprNode(){};
     virtual std::string translate(std::vector<IrNode*>&)=0;
     ExprNode* lnode;

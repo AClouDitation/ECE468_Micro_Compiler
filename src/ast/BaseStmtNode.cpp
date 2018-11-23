@@ -23,8 +23,8 @@ void AssignStmtNode::update_AST_type(ExprNode* root){
     if(root->lnode) update_AST_type(root->lnode);
     if(root->rnode) update_AST_type(root->rnode);
 
-    if(root->lnode->type == "FLOAT" || root->rnode->type == "FLOAT"){
-        root->type = "FLOAT"; 
+    if(root->lnode->type == "R" || root->rnode->type == "R"){
+        root->type = "R"; 
     }
 }
 
@@ -33,18 +33,7 @@ vector<IrNode*>& AssignStmtNode::translate(){
     update_AST_type(from); // for now
     vector<IrNode*>* code_block = new vector<IrNode*>;
     string res = from->translate(*code_block);
-    string type = to->type == "INT" ? "I" : "F";
-
-    // this is because of the error in the tiny simulator
-    // causing that in a move instruction, you cannot make
-    // both operand memory refs
-    /*
-    if(from->is_var){
-        string newReg = farther->getNextAvaTemp();
-        irBlockInsert(*code_block, new StoreIrNode(type, res, newReg, *(farther->regMan)));
-        res = newReg;
-    }
-    */
+    string type = to->type;
 
     irBlockInsert(*code_block, new StoreIrNode(type, res, to->name, *(farther->regMan)));
     
@@ -61,7 +50,7 @@ vector<IrNode*>& ReadStmtNode::translate(){
     vector<IrNode*>* code_block = new vector<IrNode*>;
     
     for(auto id:id_list){
-        string type = id->type == "INT"? "I":"F";
+        string type = id->type;
         irBlockInsert(*code_block, new ReadIrNode(type, id->name, *(farther->regMan)));
     }
     
@@ -78,10 +67,7 @@ vector<IrNode*>& WriteStmtNode::translate(){
     vector<IrNode*>* code_block = new vector<IrNode*>;
     
     for(auto id:id_list){
-        string type;
-        if(id -> type == "INT")         type = "I";
-        else if(id -> type == "FLOAT")  type = "F";
-        else if(id -> type == "STRING") type = "S";
+        string type = id -> type;
         irBlockInsert(*code_block, new WriteIrNode(type, id->name, *(farther->regMan)));
     }
     

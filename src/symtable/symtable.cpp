@@ -23,9 +23,9 @@ void StrEntry::print(){
     cout<<"name "<<name<<" type STRING"<<" value "<<literal<<endl;
 }
 
-IntEntry::IntEntry(string name):SymEntry(name,"INT"){}
+IntEntry::IntEntry(string name):SymEntry(name,"I"){}
 
-FltEntry::FltEntry(string name):SymEntry(name,"FLOAT"){}
+FltEntry::FltEntry(string name):SymEntry(name,"R"){}
 
 FuncEntry::FuncEntry(string name, string type):
     SymEntry(name, type),argc(0){isFunc=true;}
@@ -66,7 +66,8 @@ vector<string>& Symtable::decl(){
     vector<string>* decl_ops = new vector<string>;
     for(auto kv:id_map){
         string new_decl = "";
-        if(kv.second->type == "STRING"){
+        if(kv.second->isFunc) continue;
+        if(kv.second->type == "S"){
             new_decl += "str " + kv.first + " "
                 + dynamic_cast<StrEntry*>(kv.second)->literal;
         }

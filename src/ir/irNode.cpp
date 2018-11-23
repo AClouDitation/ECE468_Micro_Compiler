@@ -23,7 +23,7 @@ stringstream IrNode::print() {
 
 void IrNode::reformatPrint() {
     stringstream ss;
-    cout << left << setfill(' ') << setw(30) << print().str();
+    cout << left << setfill(' ') << setw(20) << print().str();
     cout << left << setfill(' ') << setw(30) << printIn().str();
     cout << left << setfill(' ') << setw(30) << printOut().str();
 }

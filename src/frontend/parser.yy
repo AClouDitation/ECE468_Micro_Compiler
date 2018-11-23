@@ -158,7 +158,7 @@ var_decl            :{
                     var_type id_list SEMICOLON {
                         Symtable* current = symtable_stack.top();
                         while(!id_stack.empty()){
-                            if(*$2 == "INT"){
+                            if(*$2 == "I"){
                                 IntEntry* new_entry = new IntEntry(id_stack.top());
                                 current->add(new_entry);
                             }
@@ -171,16 +171,16 @@ var_decl            :{
                         delete $2;
                     };
 var_type            :FLOAT{
-                        $$ = new std::string("FLOAT");  
+                        $$ = new std::string("R");  
                     }
                     |INT {
-                        $$ = new std::string("INT");  
+                        $$ = new std::string("I");  
                     };
 any_type            :var_type{
                         $$ = $1;
                     }    
                     |VOID{
-                        $$ = new std::string("VOID");
+                        $$ = new std::string("V");
                     }; 
 
 id_list             :id id_tail {
@@ -201,7 +201,7 @@ param_decl_list     :param_decl param_decl_tail{$$ = $2 + 1;}
 
 param_decl          :var_type id{
                         Symtable* current = symtable_stack.top(); 
-                        if(*$1 == "INT"){
+                        if(*$1 == "I"){
                             IntEntry* new_entry = new IntEntry(*$2);
                             current->add(new_entry);
                         }
@@ -379,10 +379,10 @@ primary             :OPAREN expr CPAREN {
                         delete $1;
                         $$ = new_var;
                     } | INTLITERAL {
-                        LitRef* new_lit = new LitRef(func_list.back(),"INT",std::to_string($1));
+                        LitRef* new_lit = new LitRef(func_list.back(),"I",std::to_string($1));
                         $$ = new_lit;
                     } | FLOATLITERAL {
-                        LitRef* new_lit = new LitRef(func_list.back(),"FLOAT",std::to_string($1));
+                        LitRef* new_lit = new LitRef(func_list.back(),"R",std::to_string($1));
                         $$ = new_lit;
                     };
 addop               :PLUS{$$='+';} | MINUS{$$='-';};
