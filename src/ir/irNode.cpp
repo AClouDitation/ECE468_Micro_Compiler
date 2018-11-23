@@ -134,23 +134,21 @@ vector<string> ArithmeticIrNode::translate() {
     vector<string> opCodeBlock;
     /* register allocation */
 
-    //cout << regMan.print().str() << endl;
-    int regX = regMan.regEnsure(op1, opCodeBlock, outSet);
+    int regX = regMan.regEnsure(op1, -1, opCodeBlock, outSet);
     if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
-    //cout << regMan.print().str() << endl;
-    int regZ = regMan.regAllocate(res, opCodeBlock, outSet);
+    int regZ = regMan.regAllocate(res, -1, opCodeBlock, outSet);
     if(regX != regZ) opCodeBlock.push_back("move r" + to_string(regX) + " r" + to_string(regZ));
-    //cout << regMan.print().str() << endl;
 
     if(op2 == op1) {    // since op1 has been freed, it might cause some trouble
         opCodeBlock.push_back(toLower(cmd+type) + " r" +  to_string(regZ) + " r" + to_string(regZ));
     }
     else {
-        int regY = regMan.regEnsure(op2, opCodeBlock, outSet);
+        int regY = regMan.regEnsure(op2, regZ, opCodeBlock, outSet);
         if(outSet.find(op2) == outSet.end()) regMan.regFree(regY, opCodeBlock, outSet);
         //cout << regMan.print().str() << endl;
         opCodeBlock.push_back(toLower(cmd+type) + " r" +  to_string(regY) + " r" + to_string(regZ));
     }
+
     regMan.markDirty(regZ);
     
     return opCodeBlock;
@@ -174,9 +172,9 @@ stringstream StoreIrNode::print() {
 
 vector<string> StoreIrNode::translate() {
     vector<string> opCodeBlock;
-    int regX = regMan.regEnsure(op1, opCodeBlock, outSet);
+    int regX = regMan.regEnsure(op1, -1, opCodeBlock, outSet);
     if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
-    int regZ = regMan.regAllocate(res, opCodeBlock, outSet);
+    int regZ = regMan.regAllocate(res, -1, opCodeBlock, outSet);
     regMan.markDirty(regZ);
 
     if(regX != regZ)
@@ -201,7 +199,7 @@ stringstream ReadIrNode::print() {
 
 vector<string> ReadIrNode::translate() {
     vector<string> opCodeBlock;
-    int regZ = regMan.regAllocate(res, opCodeBlock, outSet);
+    int regZ = regMan.regAllocate(res, -1, opCodeBlock, outSet);
     regMan.markDirty(regZ);
 
     opCodeBlock.push_back("sys " + toLower(cmd+type) + " r" + to_string(regZ));
@@ -228,7 +226,7 @@ vector<string> WriteIrNode::translate() {
         opCodeBlock.push_back("sys " + toLower(cmd+type)+ " " + op1);
     }
     else {
-        int regX = regMan.regEnsure(op1, opCodeBlock, outSet);
+        int regX = regMan.regEnsure(op1, -1, opCodeBlock, outSet);
         if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
 
         opCodeBlock.push_back("sys " + toLower(cmd+type) + " r" + to_string(regX));
@@ -278,7 +276,7 @@ vector<string> PushIrNode::translate() {
         return opCodeBlock;
     }
 
-    int regX = regMan.regEnsure(op1, opCodeBlock, outSet);
+    int regX = regMan.regEnsure(op1, -1, opCodeBlock, outSet);
     if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
     opCodeBlock.push_back("push r" + to_string(regX));
     return opCodeBlock;
@@ -307,7 +305,7 @@ vector<string> PopIrNode::translate() {
         opCodeBlock.push_back("push");
         return opCodeBlock;
     }
-    int regZ = regMan.regAllocate(op1, opCodeBlock, outSet);
+    int regZ = regMan.regAllocate(op1, -1, opCodeBlock, outSet);
     regMan.markDirty(regZ);
     opCodeBlock.push_back("pop r" + to_string(regZ));
     return opCodeBlock;

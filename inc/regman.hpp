@@ -21,9 +21,9 @@ public:
     regManager(int, FunctionDeclNode*);
     virtual ~regManager();
 
-    int regEnsure(std::string, std::vector<std::string>&, std::set<std::string>&);
+    int regEnsure(std::string, int, std::vector<std::string>&, std::set<std::string>&);
     void regFree(int, std::vector<std::string>&, std::set<std::string>&);
-    int regAllocate(std::string, std::vector<std::string>&, std::set<std::string>&);
+    int regAllocate(std::string, int, std::vector<std::string>&, std::set<std::string>&);
 
     void markDirty(int);
     void freeGlobal(std::vector<std::string>&);

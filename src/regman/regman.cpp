@@ -19,9 +19,9 @@ regManager::~regManager() {
     delete[] isDirty;
 }
 
-int regManager::regEnsure(string op, vector<string>& opcode, set<string>& liveOut) {
+int regManager::regEnsure(string op, int doNotFree, vector<string>& opcode, set<string>& liveOut) {
     if(inUseRO.find(op) != inUseRO.end()) return inUseRO[op];
-    int reg = regAllocate(op, opcode, liveOut);
+    int reg = regAllocate(op, doNotFree, opcode, liveOut);
     // generate load from op to reg
     if(tempLoc.find(op) != tempLoc.end()) op = "$-" + to_string(tempLoc[op]);
     opcode.push_back("move " + op + " r" + to_string(reg));
@@ -49,7 +49,8 @@ void regManager::regFree(int r, vector<string>& opcode, set<string>& liveOut) {
     inUseOR.erase(inUseOR.find(r));
 }
 
-int regManager::regAllocate(string op, vector<string>& opcode, set<string>& liveOut) {
+int regManager::regAllocate(string op, int doNotFree, 
+        vector<string>& opcode, set<string>& liveOut) {
     
     int reg = -1;
 
@@ -65,6 +66,7 @@ int regManager::regAllocate(string op, vector<string>& opcode, set<string>& live
     if(reg == -1) {
         for(auto kv: inUseOR) {
             if(isDirty[kv.first]) continue;
+            if(kv.first == doNotFree) continue;
             regFree(kv.first, opcode, liveOut);      
             reg = kv.first;
             break;
@@ -73,8 +75,14 @@ int regManager::regAllocate(string op, vector<string>& opcode, set<string>& live
 
     // otherwise choose r0
     if(reg == -1) {
-        reg = 0;
-        regFree(0, opcode, liveOut); 
+        if(doNotFree != 0) {
+            reg = 0;
+            regFree(0, opcode, liveOut); 
+        }
+        else {
+            reg = 1;
+            regFree(1, opcode, liveOut); 
+        }
     }
 
     // mark r associated with op
