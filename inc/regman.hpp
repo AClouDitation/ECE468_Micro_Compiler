@@ -24,7 +24,11 @@ public:
     int regEnsure(std::string, std::vector<std::string>&, std::set<std::string>&);
     void regFree(int, std::vector<std::string>&, std::set<std::string>&);
     int regAllocate(std::string, std::vector<std::string>&, std::set<std::string>&);
+
     void markDirty(int);
+    void freeGlobal(std::vector<std::string>&);
+    void freeReturn(std::vector<std::string>&, int);
+
     std::stringstream print();
 };
 

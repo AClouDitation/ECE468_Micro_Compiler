@@ -83,7 +83,22 @@ void IrNode::updateWorklist() {
 
 vector<string> IrNode::translate() {
     vector<string> opCodeBlock;
-    opCodeBlock.push_back(toLower(cmd));
+
+    if(cmd == "PUSHREGS") {
+        opCodeBlock.push_back("push r0");
+        opCodeBlock.push_back("push r1");
+        opCodeBlock.push_back("push r2");
+        opCodeBlock.push_back("push r3");
+    }
+    else if(cmd == "POPREGS") {
+        opCodeBlock.push_back("pop r3");
+        opCodeBlock.push_back("pop r2");
+        opCodeBlock.push_back("pop r1");
+        opCodeBlock.push_back("pop r0");
+    }
+    else {
+        opCodeBlock.push_back(toLower(cmd));
+    }
     return opCodeBlock;
 }
 
@@ -127,11 +142,15 @@ vector<string> ArithmeticIrNode::translate() {
     if(regX != regZ) opCodeBlock.push_back("move r" + to_string(regX) + " r" + to_string(regZ));
     //cout << regMan.print().str() << endl;
 
-    int regY = regMan.regEnsure(op2, opCodeBlock, outSet);
-    if(outSet.find(op2) == outSet.end()) regMan.regFree(regY, opCodeBlock, outSet);
-    //cout << regMan.print().str() << endl;
-    opCodeBlock.push_back(toLower(cmd+type) + " r" +  to_string(regY) + " r" + to_string(regZ));
-
+    if(op2 == op1) {    // since op1 has been freed, it might cause some trouble
+        opCodeBlock.push_back(toLower(cmd+type) + " r" +  to_string(regZ) + " r" + to_string(regZ));
+    }
+    else {
+        int regY = regMan.regEnsure(op2, opCodeBlock, outSet);
+        if(outSet.find(op2) == outSet.end()) regMan.regFree(regY, opCodeBlock, outSet);
+        //cout << regMan.print().str() << endl;
+        opCodeBlock.push_back(toLower(cmd+type) + " r" +  to_string(regY) + " r" + to_string(regZ));
+    }
     regMan.markDirty(regZ);
     
     return opCodeBlock;
@@ -185,14 +204,14 @@ vector<string> ReadIrNode::translate() {
     int regZ = regMan.regAllocate(res, opCodeBlock, outSet);
     regMan.markDirty(regZ);
 
-    opCodeBlock.push_back("sys " + toLower(cmd) + " r" + to_string(regZ));
+    opCodeBlock.push_back("sys " + toLower(cmd+type) + " r" + to_string(regZ));
     return opCodeBlock;
 }
 
 /* ----- Write IR nodes ----- */
 WriteIrNode::WriteIrNode(string type, string op1, regManager& regMan):
     IrNode("WRITE", regMan), type(type), op1(op1) {
-    if(!isLiteral(op1)) genSet.insert(op1);
+    if(!isLiteral(op1) && type != "S") genSet.insert(op1);
 }
 
 WriteIrNode::~WriteIrNode() {}
@@ -312,3 +331,18 @@ vector<string> JumpIrNode::translate() {
     return opCodeBlock;
 }
 
+/* ----- Retuen IR nodes ----- */
+ReturnIrNode::ReturnIrNode(int retLoc, regManager& regMan):
+    IrNode("RET", regMan), retLoc(retLoc) {}
+
+ReturnIrNode::~ReturnIrNode() {}
+
+vector<string> ReturnIrNode::translate() {
+    vector<string> opCodeBlock;
+    // free all global var
+    regMan.freeGlobal(opCodeBlock);
+    // free return value
+    regMan.freeReturn(opCodeBlock, retLoc);
+
+    return opCodeBlock;
+}

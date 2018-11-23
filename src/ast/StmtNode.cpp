@@ -41,7 +41,7 @@ vector<IrNode*>& FunctionDeclNode::translate(){
 
     // return if reach the end of function
     irBlockInsert(*ir, new IrNode("UNLNK", *regMan));
-    irBlockInsert(*ir, new IrNode("RET", *regMan));
+    irBlockInsert(*ir, new ReturnIrNode(argc+6, *regMan));
 
     // TODO: make a class for return node
     // and puth the following part into it
@@ -49,6 +49,7 @@ vector<IrNode*>& FunctionDeclNode::translate(){
     extern Symtable* globalSymtable;
     for(auto kv: globalSymtable->id_map) {
         if(kv.second->isFunc) continue;
+        if(kv.second->type == "S") continue;
         ir->back()->insertOutSet(kv.first);
     }
     return *ir;

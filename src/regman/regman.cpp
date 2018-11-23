@@ -1,6 +1,7 @@
 #include "../../inc/regman.hpp"
 #include "../../inc/irNode.hpp"
 #include "../../inc/StmtNode.hpp"
+#include "../../inc/symtable.hpp"
 #include <iostream>
 #include <iomanip>
 
@@ -84,9 +85,28 @@ int regManager::regAllocate(string op, vector<string>& opcode, set<string>& live
     return reg;
 }
 
-void regManager::markDirty(int r){
+void regManager::markDirty(int r) {
     if(r >= totalAmount || r < 0) return;
     isDirty[r] = true;
+}
+
+void regManager::freeGlobal(vector<string>& opCodeBlock) {
+
+    // if there is global variable still in use, spill it
+    extern Symtable* globalSymtable;
+    for(auto kv: globalSymtable->id_map) {
+        if(kv.second->isFunc) continue;
+        
+        if(inUseRO.find(kv.first) != inUseRO.end())
+            opCodeBlock.push_back("move r" + to_string(inUseRO[kv.first]) + " " + kv.first);
+    }
+}
+
+void regManager::freeReturn(vector<string>& opCodeBlock, int retLoc) {
+    string op = "$" + to_string(retLoc);
+    // if return value still in use, spill it
+    if(inUseRO.find(op) != inUseRO.end())
+        opCodeBlock.push_back("move r" + to_string(inUseRO[op]) + " " + op);
 }
 
 stringstream regManager::print() {

@@ -163,4 +163,13 @@ public:
 
     virtual std::vector<std::string> translate();       // translate into opcode
 };
+
+class ReturnIrNode: public IrNode {
+    int retLoc;
+public:
+    ReturnIrNode(int, regManager&);
+    virtual ~ReturnIrNode();
+    
+    virtual std::vector<std::string> translate();       // translate into opcode
+};
 #endif //IRNODE_HPP_

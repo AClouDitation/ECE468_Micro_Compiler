@@ -6,6 +6,7 @@
 #include <string>
 #include <iostream>
 #include "BaseStmtNode.hpp"
+#include "regman.hpp"
 
 class IrNode;
 
@@ -69,6 +70,7 @@ public:
     friend std::vector<IrNode*>& ReturnStmtNode::translate();
     friend std::vector<IrNode*>& FunctionDeclNode::translate();
     friend bool isLiteral(std::string op);
+    friend void regManager::freeGlobal(std::vector<std::string>&);
 };
 
 #endif
