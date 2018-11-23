@@ -35,11 +35,11 @@ int main(int argc, char** argv){
     ops.push_back("sys halt");      // end
 
     for(auto block_node: func_list){
-        //vector<vector<string>>& ir = split_irs(block_node->translate());
         vector<IrNode*> irs = block_node->translate();
         IrNode::livenessAna();
-
         //printing debugging infos
+        int lastIndex = ops.size();
+
         for(auto ir: irs){
             cout << ";" ;
             ir->reformatPrint();
@@ -56,6 +56,7 @@ int main(int argc, char** argv){
             }
             ops.insert(ops.end(), codeBlock.begin(), codeBlock.end());
         }
+        ops[lastIndex+1] = "link " + to_string(block_node->getStackSize());
     }
 
     for(auto op:ops){

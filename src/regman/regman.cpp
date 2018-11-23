@@ -1,12 +1,13 @@
 #include "../../inc/regman.hpp"
 #include "../../inc/irNode.hpp"
+#include "../../inc/StmtNode.hpp"
 #include <iostream>
 #include <iomanip>
 
 using namespace std;
 
-regManager::regManager(int totalAmount):
-    totalAmount(totalAmount) {
+regManager::regManager(int totalAmount, FunctionDeclNode* farther):
+    totalAmount(totalAmount), farther(farther) {
 
     isDirty = new bool[totalAmount];
     // mark all register clean
@@ -21,7 +22,9 @@ int regManager::regEnsure(string op, vector<string>& opcode, set<string>& liveOu
     if(inUseRO.find(op) != inUseRO.end()) return inUseRO[op];
     int reg = regAllocate(op, opcode, liveOut);
     // generate load from op to reg
+    if(tempLoc.find(op) != tempLoc.end()) op = "$-" + to_string(tempLoc[op]);
     opcode.push_back("move " + op + " r" + to_string(reg));
+    isDirty[reg] = false;
     return reg;
 }
 
@@ -30,8 +33,15 @@ void regManager::regFree(int r, vector<string>& opcode, set<string>& liveOut) {
     if(inUseOR.find(r) == inUseOR.end()) return;
 
     //if r dirty and var in r still live, generate store to spill the register
-    if(isDirty[r] && liveOut.find(inUseOR[r]) != liveOut.end())
-        opcode.push_back("move r" + to_string(r) + " " + inUseOR[r]);
+    if(isDirty[r] && liveOut.find(inUseOR[r]) != liveOut.end()) {
+        // map extra temporary onto stack
+        if(inUseOR[r][0] == '!' && tempLoc.find(inUseOR[r]) == tempLoc.end())
+            tempLoc[inUseOR[r]] = ++(farther->stackSize);
+        
+        string loc = inUseOR[r];
+        if(tempLoc.find(loc) != tempLoc.end()) loc = "$-" + to_string(tempLoc[loc]);
+        opcode.push_back("move r" + to_string(r) + " " + loc);
+    }
 
     // mark r as free
     inUseRO.erase(inUseRO.find(inUseOR[r]));

@@ -109,7 +109,7 @@ string CondExprNode::translate(vector<IrNode*>& code_block) {
     if(!(op2[0] == '!' && op2[1] == 'T')){ // op2 is not a temporary
         // Move it to one
         string res = farther->getNextAvaTemp();
-        string type = rnode->type;                    //TODO: standardlize all type to 1 letter string
+        string type = rnode->type;                    
         irBlockInsert(code_block, new StoreIrNode(type, op2, res, *(farther->regMan)));
         op2 = res;
     }

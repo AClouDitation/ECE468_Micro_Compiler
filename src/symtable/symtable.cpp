@@ -15,7 +15,7 @@ void SymEntry::print(){
 
 // different entry types
 StrEntry::StrEntry(string name, string lit)
-    :SymEntry(name,"STRING")
+    :SymEntry(name,"S")
 {
     literal = lit;
 }

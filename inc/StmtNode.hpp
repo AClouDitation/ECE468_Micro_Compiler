@@ -7,6 +7,7 @@
 class Symtable;
 class CondExprNode;
 class IrNode;
+class LinkIrNode;
 class regManager;
 class FunctionDeclNode;
 
@@ -33,10 +34,14 @@ public:
 
 class FunctionDeclNode: public BlockNode{
     int nextAvaTemp;
+    LinkIrNode* linkIr;
 public:
     std::string name;
     std::string type;
+    
     int argc;
+    int stackSize;
+
     regManager* regMan;
     FunctionDeclNode(std::string, std::string, int, Symtable* symtable);
     virtual ~FunctionDeclNode();
@@ -44,6 +49,7 @@ public:
     virtual std::vector<IrNode*>& translate();
 
     std::string getNextAvaTemp();
+    int getStackSize();
 };
 
 

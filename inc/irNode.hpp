@@ -136,10 +136,12 @@ public:
 class LinkIrNode: public IrNode {
     int size;
 public:
-    LinkIrNode(int, regManager&);
+    LinkIrNode(regManager&);
     virtual ~LinkIrNode();
     virtual std::stringstream print();
     virtual std::vector<std::string> translate();       // translate into opcode
+
+    void setSize(int size);
 };
 
 class CondIrNode: public IrNode {

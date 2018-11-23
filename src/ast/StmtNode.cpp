@@ -19,7 +19,7 @@ BlockNode::~BlockNode(){}
 FunctionDeclNode::FunctionDeclNode
     (string name, string type, int argc, Symtable* symtable):
     BlockNode(symtable, NULL),name(name),type(type),argc(argc), 
-    regMan(new regManager(4)){}
+    regMan(new regManager(4, this)){}
 
 FunctionDeclNode::~FunctionDeclNode(){
     delete regMan;
@@ -30,14 +30,17 @@ vector<IrNode*>& FunctionDeclNode::translate(){
     vector<IrNode*>* ir = new vector<IrNode*>;
 
     irBlockInsert(*ir, new LabelIrNode("FUNC_"+name, *regMan));
-    // FIXME: change link to acutal size
-    irBlockInsert(*ir,new LinkIrNode(symtable->size() - argc, *regMan));         // temporary, size of link should be adjust after 
-                                                                        // register allocation
+
+    stackSize = symtable->size() - argc;
+    linkIr = new LinkIrNode(*regMan);
+    irBlockInsert(*ir, linkIr);        
 
     for(auto stmt: stmt_list){
-        vector<IrNode*> code_block = stmt->translate();                 // translate one statment
+        vector<IrNode*> code_block = stmt->translate();                         // translate one statment
         irBlockCascade(*ir, code_block);
     }
+
+    linkIr->setSize(stackSize); //set the size of link
 
     // return if reach the end of function
     irBlockInsert(*ir, new IrNode("UNLNK", *regMan));
@@ -58,6 +61,7 @@ string FunctionDeclNode::getNextAvaTemp() {
     return "!T" + to_string(nextAvaTemp++);                             // get a new temporary
 }
 
+int FunctionDeclNode::getStackSize() { return stackSize;}
 
 IfStmtNode::IfStmtNode(CondExprNode* cond, Symtable* symtable, string index,
         FunctionDeclNode* farther):
@@ -99,8 +103,7 @@ vector<IrNode*>& IfStmtNode::translate(){
 }
 
 ElseStmtNode::ElseStmtNode(Symtable* symtable, FunctionDeclNode* farther):
-    BlockNode(symtable, farther)
-{}
+    BlockNode(symtable, farther){}
 
 ElseStmtNode::~ElseStmtNode(){}
 

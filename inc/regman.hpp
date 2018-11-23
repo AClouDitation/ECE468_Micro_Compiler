@@ -7,14 +7,18 @@
 #include <string>
 
 class IrNode;
+class FunctionDeclNode;
+
 class regManager {
     int totalAmount;
     bool* isDirty;
+    FunctionDeclNode* farther;
 
     std::unordered_map<int, std::string> inUseOR;     
     std::unordered_map<std::string, int> inUseRO;     
+    std::unordered_map<std::string, int> tempLoc;     
 public:
-    regManager(int);
+    regManager(int, FunctionDeclNode*);
     virtual ~regManager();
 
     int regEnsure(std::string, std::vector<std::string>&, std::set<std::string>&);

@@ -205,10 +205,15 @@ stringstream WriteIrNode::print() {
 
 vector<string> WriteIrNode::translate() {
     vector<string> opCodeBlock;
-    int regX = regMan.regEnsure(op1, opCodeBlock, outSet);
-    if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
+    if(type == "S") {
+        opCodeBlock.push_back("sys " + toLower(cmd+type)+ " " + op1);
+    }
+    else {
+        int regX = regMan.regEnsure(op1, opCodeBlock, outSet);
+        if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
 
-    opCodeBlock.push_back("sys " + toLower(cmd+type) + " r" + to_string(regX));
+        opCodeBlock.push_back("sys " + toLower(cmd+type) + " r" + to_string(regX));
+    }
     return opCodeBlock;
 }
 
@@ -308,8 +313,8 @@ vector<string> JumpIrNode::translate() {
 }
 
 /* ----- Link IR nodes ----- */
-LinkIrNode::LinkIrNode(int size, regManager& regMan):
-    IrNode("LINK", regMan), size(size) {}
+LinkIrNode::LinkIrNode(regManager& regMan):
+    IrNode("LINK", regMan), size(-1) {}
 
 LinkIrNode::~LinkIrNode() {}
 
@@ -321,8 +326,11 @@ stringstream LinkIrNode::print() {
 
 vector<string> LinkIrNode::translate() {
     vector<string> opCodeBlock;
-    opCodeBlock.push_back("link " + to_string(size));
+    if(size != -1) opCodeBlock.push_back("link " + to_string(size));
+    else opCodeBlock.push_back("link");
     return opCodeBlock;
 }
+
+void LinkIrNode::setSize(int size) {this->size = size;}
 
 
