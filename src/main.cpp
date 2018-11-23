@@ -48,10 +48,13 @@ int main(int argc, char** argv){
             cout << ";" ;
             ir->reformatPrint();
             vector<string> codeBlock = ir->translate();
-            if(!codeBlock.empty()) cout << codeBlock[0] << endl;
-            else cout << endl;
+            cout << setfill(' ') << setw(20);
+            if(!codeBlock.empty())  cout << codeBlock[0];
+            else cout << " ";
+            cout << ir->regMan.print().str() << endl;
+
             for(int i = 1; i < codeBlock.size(); i++) {
-                cout << left << setfill(' ') << setw(121) << ' ';
+                cout << setfill(' ') << setw(91) << ' ';
                 cout << codeBlock[i] << endl;
             }
             ops.insert(ops.end(), codeBlock.begin(), codeBlock.end());

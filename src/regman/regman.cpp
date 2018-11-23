@@ -1,6 +1,7 @@
 #include "../../inc/regman.hpp"
 #include "../../inc/irNode.hpp"
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -24,7 +25,7 @@ int regManager::regEnsure(string op, vector<string>& opcode, set<string>& liveOu
     if(inUseRO.find(op) != inUseRO.end()) return inUseRO[op];
     int reg = regAllocate(op, opcode, liveOut);
     // generate load from op to reg
-    opcode.push_back("move " + op + " r" + to_string(reg) + " debug: ldr from reg to op");
+    opcode.push_back("move " + op + " r" + to_string(reg) + " debug:ldr");
     return reg;
 }
 
@@ -34,7 +35,7 @@ void regManager::regFree(int r, vector<string>& opcode, set<string>& liveOut) {
 
     //if r dirty and var in r still live, generate store to spill the register
     if(isDirty[r] && liveOut.find(inUseOR[r]) != liveOut.end())
-        opcode.push_back("move r" + to_string(r) + " " + inUseOR[r] + " debug: spill");
+        opcode.push_back("move r" + to_string(r) + " " + inUseOR[r] + " debug:spill");
 
     // mark r as free
     inUseRO.erase(inUseRO.find(inUseOR[r]));
@@ -78,4 +79,17 @@ int regManager::regAllocate(string op, vector<string>& opcode, set<string>& live
 void regManager::markDirty(int r){
     if(r >= totalAmount || r < 0) return;
     isDirty[r] = true;
+}
+
+stringstream regManager::print() {
+   stringstream ss;
+
+   for(int i = 0;i < 4; i++){
+       ss << "r" + to_string(i) + ": ";
+       ss << left << setfill(' ') << setw(10);
+       if(inUseOR.find(i) != inUseOR.end()) ss << inUseOR[i];
+       else ss << ' ';
+   }
+
+   return ss;
 }

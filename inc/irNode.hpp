@@ -17,11 +17,11 @@ protected:
     std::set<std::string> killSet;
     std::set<std::string> inSet;
     std::set<std::string> outSet;
-    regManager& regMan;
 
     static std::list<IrNode*> worklist;
 
 public:
+    regManager& regMan;     // FIXME: put this into protected
     IrNode(std::string, regManager&);
     virtual ~IrNode();
     virtual std::stringstream print();

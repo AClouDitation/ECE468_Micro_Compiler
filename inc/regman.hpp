@@ -22,6 +22,7 @@ public:
     void regFree(int, std::vector<std::string>&, std::set<std::string>&);
     int regAllocate(std::string, std::vector<std::string>&, std::set<std::string>&);
     void markDirty(int);
+    std::stringstream print();
 };
 
 #endif

@@ -23,9 +23,9 @@ stringstream IrNode::print() {
 
 void IrNode::reformatPrint() {
     stringstream ss;
-    cout << left << setfill(' ') << setw(40) << print().str();
-    cout << left << setfill(' ') << setw(40) << printIn().str();
-    cout << left << setfill(' ') << setw(40) << printOut().str();
+    cout << left << setfill(' ') << setw(30) << print().str();
+    cout << left << setfill(' ') << setw(30) << printIn().str();
+    cout << left << setfill(' ') << setw(30) << printOut().str();
 }
 
 void IrNode::setPre(IrNode* predecessor) {
