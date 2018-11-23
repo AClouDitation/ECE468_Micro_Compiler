@@ -30,17 +30,14 @@ vector<IrNode*>& FunctionDeclNode::translate(){
     vector<IrNode*>* ir = new vector<IrNode*>;
 
     irBlockInsert(*ir, new LabelIrNode("FUNC_"+name, *regMan));
+    irBlockInsert(*ir, new IrNode("LINK", *regMan));        
 
     stackSize = symtable->size() - argc;
-    linkIr = new LinkIrNode(*regMan);
-    irBlockInsert(*ir, linkIr);        
 
     for(auto stmt: stmt_list){
         vector<IrNode*> code_block = stmt->translate();                         // translate one statment
         irBlockCascade(*ir, code_block);
     }
-
-    linkIr->setSize(stackSize); //set the size of link
 
     // return if reach the end of function
     irBlockInsert(*ir, new IrNode("UNLNK", *regMan));

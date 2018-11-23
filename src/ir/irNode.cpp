@@ -312,25 +312,3 @@ vector<string> JumpIrNode::translate() {
     return opCodeBlock;
 }
 
-/* ----- Link IR nodes ----- */
-LinkIrNode::LinkIrNode(regManager& regMan):
-    IrNode("LINK", regMan), size(-1) {}
-
-LinkIrNode::~LinkIrNode() {}
-
-stringstream LinkIrNode::print() {
-    stringstream ss = IrNode::print();
-    ss << " " << size;
-    return ss;
-}
-
-vector<string> LinkIrNode::translate() {
-    vector<string> opCodeBlock;
-    if(size != -1) opCodeBlock.push_back("link " + to_string(size));
-    else opCodeBlock.push_back("link");
-    return opCodeBlock;
-}
-
-void LinkIrNode::setSize(int size) {this->size = size;}
-
-

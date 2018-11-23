@@ -133,17 +133,6 @@ public:
     virtual std::vector<std::string> translate();       // translate into opcode
 };
 
-class LinkIrNode: public IrNode {
-    int size;
-public:
-    LinkIrNode(regManager&);
-    virtual ~LinkIrNode();
-    virtual std::stringstream print();
-    virtual std::vector<std::string> translate();       // translate into opcode
-
-    void setSize(int size);
-};
-
 class CondIrNode: public IrNode {
     IrNode* successor2; 
     std::string cond;

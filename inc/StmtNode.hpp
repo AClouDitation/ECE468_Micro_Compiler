@@ -7,7 +7,6 @@
 class Symtable;
 class CondExprNode;
 class IrNode;
-class LinkIrNode;
 class regManager;
 class FunctionDeclNode;
 
@@ -34,7 +33,6 @@ public:
 
 class FunctionDeclNode: public BlockNode{
     int nextAvaTemp;
-    LinkIrNode* linkIr;
 public:
     std::string name;
     std::string type;
