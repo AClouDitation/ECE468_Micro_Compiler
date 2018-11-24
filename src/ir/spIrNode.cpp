@@ -45,6 +45,11 @@ vector<string> CondIrNode::translate() {
     if(outSet.find(op2) == outSet.end()) regMan.regFree(regY, opCodeBlock, outSet);
 
     opCodeBlock.push_back("cmp" + toLower(type) + " r" + to_string(regX)  + " r" + to_string(regY));
+    // spill everything before jump
+    regMan.regFree(0, opCodeBlock, outSet);
+    regMan.regFree(1, opCodeBlock, outSet);
+    regMan.regFree(2, opCodeBlock, outSet);
+    regMan.regFree(3, opCodeBlock, outSet);
     opCodeBlock.push_back("j" + toLower(cmd) + " " + jumpTo);
 
 
