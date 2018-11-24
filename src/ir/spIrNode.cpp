@@ -44,8 +44,7 @@ vector<string> CondIrNode::translate() {
     if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
     if(outSet.find(op2) == outSet.end()) regMan.regFree(regY, opCodeBlock, outSet);
 
-    // FIXME; 
-    opCodeBlock.push_back("cmp" + type + " r" + to_string(regX)  + " r" + to_string(regY));
+    opCodeBlock.push_back("cmp" + toLower(type) + " r" + to_string(regX)  + " r" + to_string(regY));
     opCodeBlock.push_back("j" + toLower(cmd) + " " + jumpTo);
 
 
@@ -77,6 +76,11 @@ void LabelIrNode::updateWorklist() {
 
 vector<string> LabelIrNode::translate() {
     vector<string> opCodeBlock;
+    // spill everything after label
+    regMan.regFree(0, opCodeBlock, outSet);
+    regMan.regFree(1, opCodeBlock, outSet);
+    regMan.regFree(2, opCodeBlock, outSet);
+    regMan.regFree(3, opCodeBlock, outSet);
     opCodeBlock.push_back("label " + label); 
     return opCodeBlock;
 }

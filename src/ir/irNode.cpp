@@ -1,5 +1,6 @@
 #include "../../inc/irNode.hpp"
 #include "../../inc/utility.hpp"
+#include <assert.h>
 #include <algorithm>
 #include <iomanip>
 
@@ -23,7 +24,7 @@ stringstream IrNode::print() {
 
 void IrNode::reformatPrint() {
     stringstream ss;
-    cout << left << setfill(' ') << setw(20) << print().str();
+    cout << left << setfill(' ') << setw(40) << print().str();
     cout << left << setfill(' ') << setw(30) << printIn().str();
     cout << left << setfill(' ') << setw(30) << printOut().str();
 }
@@ -134,6 +135,7 @@ vector<string> ArithmeticIrNode::translate() {
     vector<string> opCodeBlock;
     /* register allocation */
 
+    /* ugly but working 
     int regX = regMan.regEnsure(op1, -1, opCodeBlock, outSet);
     if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
     int regZ = regMan.regAllocate(res, -1, opCodeBlock, outSet);
@@ -148,7 +150,20 @@ vector<string> ArithmeticIrNode::translate() {
         //cout << regMan.print().str() << endl;
         opCodeBlock.push_back(toLower(cmd+type) + " r" +  to_string(regY) + " r" + to_string(regZ));
     }
+    */
 
+    int regX = regMan.regEnsure(op1, -1, opCodeBlock, outSet);
+    int regY = regMan.regEnsure(op2, regX, opCodeBlock, outSet);
+    assert(regX != regY);
+    if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
+    int regZ = regMan.regAllocate(res, regY, opCodeBlock, outSet);
+
+    if(outSet.find(op2) == outSet.end()) regMan.regFree(regY, opCodeBlock, outSet);
+    assert(regZ != regY);
+    if(regZ != regX) {
+        opCodeBlock.push_back("move r" +  to_string(regX) + " r" + to_string(regZ));
+    }
+    opCodeBlock.push_back(toLower(cmd+type) + " r" +  to_string(regY) + " r" + to_string(regZ));
     regMan.markDirty(regZ);
     
     return opCodeBlock;
@@ -325,6 +340,11 @@ stringstream JumpIrNode::print() {
 
 vector<string> JumpIrNode::translate() {
     vector<string> opCodeBlock;
+    // spill everything before jump
+    regMan.regFree(0, opCodeBlock, outSet);
+    regMan.regFree(1, opCodeBlock, outSet);
+    regMan.regFree(2, opCodeBlock, outSet);
+    regMan.regFree(3, opCodeBlock, outSet);
     opCodeBlock.push_back("jmp " + label);
     return opCodeBlock;
 }
