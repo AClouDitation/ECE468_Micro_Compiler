@@ -84,13 +84,7 @@ bool IrNode::livenessCalc() {
     if(successor) outSet = successor->inSet;    // initialize outSet
     set<string> inSetbk = inSet;                // backup inSet
     inSet = outSet;                             // initialize inSet                    
-    if(cmd == "JUMP") {
-        cerr << "jmp successor ";
-        cerr << left << setfill(' ') << setw(40) << successor->print().str();
-        cerr << left << setfill(' ') << setw(30) << successor->printIn().str();
-        cerr << left << setfill(' ') << setw(30) << successor->printOut().str();
-        cerr << endl;
-    }
+    
     /* calculate new inSet */
     for(auto id: killSet) inSet.erase(id);      
     for(auto id: genSet)  inSet.insert(id);
@@ -102,7 +96,6 @@ void IrNode::updateWorklist() {
     if(!predecessor) return;
     for(auto irNode: worklist) if(irNode == predecessor) return;
     
-    cerr << "inserting " << predecessor -> print().str() << endl;
     worklist.push_back(predecessor);
     predecessor->updateWorklist();
 }
@@ -137,13 +130,6 @@ void IrNode::livenessAna() {
         worklist.pop_front();                    
         // push all predecessor of this node into worklist
         if(lastNode->livenessCalc()) lastNode->updateWorklist();            
-        /*
-        cerr << "poping ";
-        cerr << left << setfill(' ') << setw(40) << lastNode->print().str();
-        cerr << left << setfill(' ') << setw(30) << lastNode->printIn().str();
-        cerr << left << setfill(' ') << setw(30) << lastNode->printOut().str();
-        cerr << endl;
-        */
     }
 }
 
