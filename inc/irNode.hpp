@@ -33,6 +33,8 @@ public:
 
     virtual std::stringstream printIn();
     virtual std::stringstream printOut();
+    virtual std::stringstream printGen();
+    virtual std::stringstream printKill();
     virtual bool livenessCalc();    // return true if inSet got updated
     virtual void updateWorklist();  // put predecessor into worklist
 

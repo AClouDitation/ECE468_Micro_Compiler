@@ -7,6 +7,21 @@
 
 using namespace std;
 
+regManager::regManager(const regManager& orig) {
+    totalAmount = orig.totalAmount;
+    isDirty = new bool[totalAmount];
+    for(int i = 0;i < totalAmount;i++) {
+        isDirty[i] = orig.isDirty[i];
+    }
+
+    farther = orig.farther;
+    inUseOR = orig.inUseOR;
+    inUseRO = orig.inUseRO;
+    tempLoc = orig.tempLoc;
+
+    bk = NULL;
+}
+
 regManager::regManager(int totalAmount, FunctionDeclNode* farther):
     totalAmount(totalAmount), farther(farther) {
 
@@ -129,4 +144,22 @@ stringstream regManager::print() {
    }
 
    return ss;
+}
+
+void regManager::pushAll() {
+    bk = new regManager(*this);
+}
+
+void regManager::popAll() {
+    totalAmount = bk->totalAmount;
+    for(int i = 0; i < totalAmount;i++) {
+        isDirty[i] = bk->isDirty[i];
+    }
+    farther = bk->farther;
+    inUseOR = bk->inUseOR;
+    inUseRO = bk->inUseRO;
+    tempLoc = bk->tempLoc;
+
+    delete bk;
+    bk = NULL;
 }

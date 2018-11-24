@@ -17,7 +17,10 @@ class regManager {
     std::unordered_map<int, std::string> inUseOR;     
     std::unordered_map<std::string, int> inUseRO;     
     std::unordered_map<std::string, int> tempLoc;     
+
+    regManager* bk;
 public:
+    regManager(const regManager&);
     regManager(int, FunctionDeclNode*);
     virtual ~regManager();
 
@@ -28,6 +31,9 @@ public:
     void markDirty(int);
     void freeGlobal(std::vector<std::string>&);
     void freeReturn(std::vector<std::string>&, int);
+
+    void pushAll();
+    void popAll();
 
     std::stringstream print();
 };

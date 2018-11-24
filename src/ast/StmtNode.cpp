@@ -143,7 +143,8 @@ vector<IrNode*>& WhileStmtNode::translate(){
 
     LabelIrNode* endLabelNode = new LabelIrNode("END_WHILE_"+index, *(farther->regMan));
     irBlockInsert(*ir, endLabelNode);
-    endLabelNode->setPre2(condNode);
+    jmp->setSuc(begin);
+    endLabelNode->setPre(condNode);
     condNode->setSuc2(endLabelNode);
     return *ir;
 }

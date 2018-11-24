@@ -23,7 +23,6 @@ stringstream IrNode::print() {
 }
 
 void IrNode::reformatPrint() {
-    stringstream ss;
     cout << left << setfill(' ') << setw(40) << print().str();
     cout << left << setfill(' ') << setw(30) << printIn().str();
     cout << left << setfill(' ') << setw(30) << printOut().str();
@@ -63,11 +62,35 @@ stringstream IrNode::printOut() {
     return ss;
 }
 
+stringstream IrNode::printGen() {
+    stringstream ss;
+    ss << "Gen SET: ";
+    for(auto id: inSet){
+        ss << id << " ";
+    }
+    return ss;
+}
+
+stringstream IrNode::printKill() {
+    stringstream ss;
+    ss << "Kill SET: ";
+    for(auto id: outSet){
+        ss << id << " ";
+    }
+    return ss;
+}
+
 bool IrNode::livenessCalc() {
     if(successor) outSet = successor->inSet;    // initialize outSet
     set<string> inSetbk = inSet;                // backup inSet
     inSet = outSet;                             // initialize inSet                    
-
+    if(cmd == "JUMP") {
+        cerr << "jmp successor ";
+        cerr << left << setfill(' ') << setw(40) << successor->print().str();
+        cerr << left << setfill(' ') << setw(30) << successor->printIn().str();
+        cerr << left << setfill(' ') << setw(30) << successor->printOut().str();
+        cerr << endl;
+    }
     /* calculate new inSet */
     for(auto id: killSet) inSet.erase(id);      
     for(auto id: genSet)  inSet.insert(id);
@@ -78,6 +101,8 @@ bool IrNode::livenessCalc() {
 void IrNode::updateWorklist() {
     if(!predecessor) return;
     for(auto irNode: worklist) if(irNode == predecessor) return;
+    
+    cerr << "inserting " << predecessor -> print().str() << endl;
     worklist.push_back(predecessor);
     predecessor->updateWorklist();
 }
@@ -86,12 +111,14 @@ vector<string> IrNode::translate() {
     vector<string> opCodeBlock;
 
     if(cmd == "PUSHREGS") {
+        regMan.pushAll();
         opCodeBlock.push_back("push r0");
         opCodeBlock.push_back("push r1");
         opCodeBlock.push_back("push r2");
         opCodeBlock.push_back("push r3");
     }
     else if(cmd == "POPREGS") {
+        regMan.popAll();
         opCodeBlock.push_back("pop r3");
         opCodeBlock.push_back("pop r2");
         opCodeBlock.push_back("pop r1");
@@ -110,6 +137,13 @@ void IrNode::livenessAna() {
         worklist.pop_front();                    
         // push all predecessor of this node into worklist
         if(lastNode->livenessCalc()) lastNode->updateWorklist();            
+        /*
+        cerr << "poping ";
+        cerr << left << setfill(' ') << setw(40) << lastNode->print().str();
+        cerr << left << setfill(' ') << setw(30) << lastNode->printIn().str();
+        cerr << left << setfill(' ') << setw(30) << lastNode->printOut().str();
+        cerr << endl;
+        */
     }
 }
 

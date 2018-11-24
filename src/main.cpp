@@ -31,6 +31,10 @@ int main(int argc, char** argv){
     vector<string>& ops = symtable_stack.top()->decl();
 
     ops.push_back("push");          // push a space for return value of main
+    ops.push_back("push r0");          // push a space for return value of main
+    ops.push_back("push r1");          // push a space for return value of main
+    ops.push_back("push r2");          // push a space for return value of main
+    ops.push_back("push r3");          // push a space for return value of main
     ops.push_back("jsr FUNC_main"); // call main
     ops.push_back("sys halt");      // end
 
