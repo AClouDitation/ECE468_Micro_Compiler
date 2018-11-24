@@ -45,6 +45,7 @@ void regManager::regFree(int r, vector<string>& opcode, set<string>& liveOut) {
     }
 
     // mark r as free
+    isDirty[r] = false;
     inUseRO.erase(inUseRO.find(inUseOR[r]));
     inUseOR.erase(inUseOR.find(r));
 }
@@ -123,8 +124,8 @@ stringstream regManager::print() {
    for(int i = 0;i < 4; i++){
        ss << "r" + to_string(i) + ": ";
        ss << left << setfill(' ') << setw(10);
-       if(inUseOR.find(i) != inUseOR.end()) ss << inUseOR[i];
-       else ss << ' ';
+       if(inUseOR.find(i) != inUseOR.end()) ss << inUseOR[i] + (isDirty[i]?"*":"");
+       else ss << (isDirty[i]?"*":"");
    }
 
    return ss;

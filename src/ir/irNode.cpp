@@ -135,23 +135,6 @@ vector<string> ArithmeticIrNode::translate() {
     vector<string> opCodeBlock;
     /* register allocation */
 
-    /* ugly but working 
-    int regX = regMan.regEnsure(op1, -1, opCodeBlock, outSet);
-    if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
-    int regZ = regMan.regAllocate(res, -1, opCodeBlock, outSet);
-    if(regX != regZ) opCodeBlock.push_back("move r" + to_string(regX) + " r" + to_string(regZ));
-
-    if(op2 == op1) {    // since op1 has been freed, it might cause some trouble
-        opCodeBlock.push_back(toLower(cmd+type) + " r" +  to_string(regZ) + " r" + to_string(regZ));
-    }
-    else {
-        int regY = regMan.regEnsure(op2, regZ, opCodeBlock, outSet);
-        if(outSet.find(op2) == outSet.end()) regMan.regFree(regY, opCodeBlock, outSet);
-        //cout << regMan.print().str() << endl;
-        opCodeBlock.push_back(toLower(cmd+type) + " r" +  to_string(regY) + " r" + to_string(regZ));
-    }
-    */
-
     int regX = regMan.regEnsure(op1, -1, opCodeBlock, outSet);
     int regY = regMan.regEnsure(op2, regX, opCodeBlock, outSet);
     assert(regX != regY);
@@ -317,7 +300,7 @@ stringstream PopIrNode::print() {
 vector<string> PopIrNode::translate() {
     vector<string> opCodeBlock;
     if(op1 == "") {
-        opCodeBlock.push_back("push");
+        opCodeBlock.push_back("pop");
         return opCodeBlock;
     }
     int regZ = regMan.regAllocate(op1, -1, opCodeBlock, outSet);
@@ -362,5 +345,7 @@ vector<string> ReturnIrNode::translate() {
     // free return value
     regMan.freeReturn(opCodeBlock, retLoc);
 
+    opCodeBlock.push_back("unlnk");
+    opCodeBlock.push_back("ret");
     return opCodeBlock;
 }

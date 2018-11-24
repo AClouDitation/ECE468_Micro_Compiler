@@ -25,6 +25,7 @@ void CondIrNode::setSuc2(IrNode* successor2) {this->successor2 = successor2;}
 
 bool CondIrNode::livenessCalc() {
     if(successor) outSet = successor->inSet;    // initialize outSet
+    if(successor2) for(auto id: successor2->inSet) outSet.insert(id);
     set<string> inSetbk = inSet;                // backup inSet
 
     inSet = outSet;                             // initialize inSet
@@ -39,17 +40,19 @@ bool CondIrNode::livenessCalc() {
 
 vector<string> CondIrNode::translate() {
     vector<string> opCodeBlock;
+
     int regX = regMan.regEnsure(op1, -1, opCodeBlock, outSet);
     int regY = regMan.regEnsure(op2, regX, opCodeBlock, outSet);
     if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
     if(outSet.find(op2) == outSet.end()) regMan.regFree(regY, opCodeBlock, outSet);
 
-    opCodeBlock.push_back("cmp" + toLower(type) + " r" + to_string(regX)  + " r" + to_string(regY));
     // spill everything before jump
     regMan.regFree(0, opCodeBlock, outSet);
     regMan.regFree(1, opCodeBlock, outSet);
     regMan.regFree(2, opCodeBlock, outSet);
     regMan.regFree(3, opCodeBlock, outSet);
+
+    opCodeBlock.push_back("cmp" + toLower(type) + " r" + to_string(regX)  + " r" + to_string(regY));
     opCodeBlock.push_back("j" + toLower(cmd) + " " + jumpTo);
 
 

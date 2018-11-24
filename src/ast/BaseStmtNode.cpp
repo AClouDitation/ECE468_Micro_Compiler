@@ -87,13 +87,13 @@ vector<IrNode*>& ReturnStmtNode::translate(){
 
     irBlockInsert(*ir, new StoreIrNode(type, ret, newReg, *(farther->regMan)));
     irBlockInsert(*ir, new StoreIrNode(type, newReg,"$"+to_string(retLoc), *(farther->regMan)));
-    irBlockInsert(*ir, new IrNode("UNLNK", *(farther->regMan)));
-    irBlockInsert(*ir, new IrNode("RET", *(farther->regMan)));
+    irBlockInsert(*ir, new ReturnIrNode(retLoc, *(farther->regMan)));
     
     // mark all global var as live here
     extern Symtable* globalSymtable;
     for(auto kv: globalSymtable->id_map) {
         if(kv.second->isFunc) continue;
+        if(kv.second->type == "S") continue;
         ir->back()->insertOutSet(kv.first);
     }
 
