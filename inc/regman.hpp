@@ -25,6 +25,8 @@ public:
     virtual ~regManager();
 
     int regEnsure(std::string, int, std::vector<std::string>&, std::set<std::string>&);
+    void regEnsure2(std::string, std::string, int&, int&, 
+            std::vector<std::string>&, std::set<std::string>&);
     void regFree(int, std::vector<std::string>&, std::set<std::string>&);
     int regAllocate(std::string, int, std::vector<std::string>&, std::set<std::string>&);
 

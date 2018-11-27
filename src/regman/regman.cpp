@@ -44,6 +44,20 @@ int regManager::regEnsure(string op, int doNotFree, vector<string>& opcode, set<
     return reg;
 }
 
+
+void regManager::regEnsure2(string op1, string op2, int& reg1, int& reg2, 
+        vector<string>& opcode, set<string>& liveOut) {
+    
+    reg1 = -1;
+    reg2 = -1;
+
+    if(inUseRO.find(op1) != inUseRO.end()) reg1 = inUseRO[op1];
+    if(inUseRO.find(op2) != inUseRO.end()) reg2 = inUseRO[op2];
+
+    if(reg1 == -1) reg1 = regEnsure(op1, reg2, opcode, liveOut);
+    if(reg2 == -1) reg2 = regEnsure(op2, reg1, opcode, liveOut);
+}
+
 void regManager::regFree(int r, vector<string>& opcode, set<string>& liveOut) {
     // if not used, return directly
     if(inUseOR.find(r) == inUseOR.end()) return;
@@ -72,7 +86,7 @@ int regManager::regAllocate(string op, int doNotFree,
 
     // if there is a free register, choose it
     for(int i = 0;i < totalAmount;i++) {
-        if(inUseOR.find(i) == inUseOR.end()) {
+        if(inUseOR.find(i) == inUseOR.end() && i != doNotFree) {
             reg = i;
             break;
         }

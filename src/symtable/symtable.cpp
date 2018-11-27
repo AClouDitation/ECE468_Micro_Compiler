@@ -89,7 +89,8 @@ int Symtable::size() {return id_map.size();}
 
 void Symtable::offsetFuncParam(){
    for(auto entry: id_map) {
-        entry.second->index *= -1;
+        // entry.second->index *= -1;
+        entry.second->index -= (nextIndex-1);
    }
    nextIndex = -1;
 }

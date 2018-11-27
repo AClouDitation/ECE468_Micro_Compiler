@@ -155,9 +155,13 @@ vector<string> ArithmeticIrNode::translate() {
     vector<string> opCodeBlock;
     /* register allocation */
 
-    int regX = regMan.regEnsure(op1, -1, opCodeBlock, outSet);
-    int regY = regMan.regEnsure(op2, regX, opCodeBlock, outSet);
-    assert(regX != regY);
+    // int regX = regMan.regEnsure(op1, -1, opCodeBlock, outSet);
+    // int regY = regMan.regEnsure(op2, regX, opCodeBlock, outSet);
+    
+    int regX, regY;
+    regMan.regEnsure2(op1, op2, regX, regY, opCodeBlock, outSet);
+
+    assert(regX != regY || op1 == op2);
     if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
     int regZ = regMan.regAllocate(res, regY, opCodeBlock, outSet);
 

@@ -41,8 +41,12 @@ bool CondIrNode::livenessCalc() {
 vector<string> CondIrNode::translate() {
     vector<string> opCodeBlock;
 
-    int regX = regMan.regEnsure(op1, -1, opCodeBlock, outSet);
-    int regY = regMan.regEnsure(op2, regX, opCodeBlock, outSet);
+    //int regX = regMan.regEnsure(op1, -1, opCodeBlock, outSet);
+    //int regY = regMan.regEnsure(op2, regX, opCodeBlock, outSet);
+
+    int regX, regY;
+    regMan.regEnsure2(op1, op2, regX, regY, opCodeBlock, outSet);
+
     if(outSet.find(op1) == outSet.end()) regMan.regFree(regX, opCodeBlock, outSet);
     if(outSet.find(op2) == outSet.end()) regMan.regFree(regY, opCodeBlock, outSet);
 
