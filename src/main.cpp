@@ -31,7 +31,6 @@ int main(int argc, char** argv){
     vector<string>& ops = symtable_stack.top()->decl();
 
     Symtable* globalSymtable = symtable_stack.top();
-    globalSymtable->print();
     FuncEntry* mainEntry = static_cast<FuncEntry*>(globalSymtable->have("main"));
 
     ops.push_back("push");          // push a space for return value of main
