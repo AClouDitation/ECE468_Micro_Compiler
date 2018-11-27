@@ -301,6 +301,7 @@ return_stmt         :RETURN expr SEMICOLON{
                         FunctionDeclNode* lastFuncDecl = func_list.back();
                         assert(lastFuncDecl);
                         int retLoc = lastFuncDecl->argc + 2 + 4;    // only have 4 registers
+                        lastFuncDecl->symtable->print();
                         
                         block_list.back()->stmt_list.push_back(new ReturnStmtNode(lastFuncDecl, $2, retLoc)); 
                     };

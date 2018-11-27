@@ -42,9 +42,6 @@ vector<IrNode*>& FunctionDeclNode::translate(){
     // return if reach the end of function
     irBlockInsert(*ir, new ReturnIrNode(argc+6, *regMan));
 
-    // TODO: make a class for return node
-    // and puth the following part into it
-    // mark all global var as live here
     extern Symtable* globalSymtable;
     for(auto kv: globalSymtable->id_map) {
         if(kv.second->isFunc) continue;
