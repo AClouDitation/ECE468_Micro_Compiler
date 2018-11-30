@@ -22,6 +22,10 @@ extern vector<FunctionDeclNode*> func_list;
 
 int main(int argc, char** argv){
 
+    if (argc != 2) {
+        cerr << "Usage: ./compiler <source file>" << endl;
+    }
+
     FILE* fp = fopen(argv[1],"r");
     yyin = fp;
     yyparse();
@@ -45,14 +49,19 @@ int main(int argc, char** argv){
 
     for(auto block_node: func_list){
         vector<IrNode*> irs = block_node->translate();
+        // TODO: constant folding here
         IrNode::livenessAna();
-        //printing debugging infos
-        int lastIndex = ops.size();
+        int linkIr = ops.size() + 1; // to find where is the link stmt
 
         for(auto ir: irs){
+            /* printing debugging infos */
             cout << ";" ;
             ir->reformatPrint();
+            /*--------------------------*/
+
             vector<string> codeBlock = ir->translate();
+
+            /* printing debugging infos */
             cout << setfill(' ') << setw(20);
             if(!codeBlock.empty())  cout << codeBlock[0];
             else cout << " ";
@@ -63,9 +72,10 @@ int main(int argc, char** argv){
                 cout << setfill(' ') << setw(100) << ' ';
                 cout << codeBlock[i] << endl;
             }
+            /*--------------------------*/
             ops.insert(ops.end(), codeBlock.begin(), codeBlock.end());
         }
-        ops[lastIndex+1] = "link " + to_string(block_node->getStackSize());
+        ops[linkIr] = "link " + to_string(block_node->getStackSize());
     }
 
     for(auto op:ops){

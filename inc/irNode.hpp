@@ -40,7 +40,9 @@ public:
 
     virtual std::vector<std::string> translate();       // translate into opcode
     
+    static void constant_swap(std::vector<IrNode*>);
     static void livenessAna();
+
     friend class CondIrNode;       // don't know why...
     friend void irBlockCascade(std::vector<IrNode*>& block, std::vector<IrNode*>& newBlock);    // TODO: make this a member function
     friend void irBlockInsert(std::vector<IrNode*>& block, IrNode* newIr);                           // and this
@@ -58,6 +60,7 @@ public:
     virtual std::stringstream print();
     
     virtual std::vector<std::string> translate();       // translate into opcode
+    friend void IrNode::constant_swap(std::vector<IrNode*>);
 };
 
 class StoreIrNode: public IrNode {
@@ -70,6 +73,7 @@ public:
     virtual std::stringstream print();
     
     virtual std::vector<std::string> translate();       // translate into opcode
+    friend void IrNode::constant_swap(std::vector<IrNode*>);
 };
 
 class ReadIrNode: public IrNode {
@@ -81,6 +85,7 @@ public:
     virtual std::stringstream print();
     
     virtual std::vector<std::string> translate();       // translate into opcode
+    friend void IrNode::constant_swap(std::vector<IrNode*>);
 };
 
 class WriteIrNode: public IrNode {
@@ -92,6 +97,7 @@ public:
     virtual std::stringstream print();
     
     virtual std::vector<std::string> translate();       // translate into opcode
+    friend void IrNode::constant_swap(std::vector<IrNode*>);
 };
 
 

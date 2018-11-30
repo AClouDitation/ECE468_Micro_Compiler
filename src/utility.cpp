@@ -286,3 +286,12 @@ string toLower(string s){
     transform(s.begin(), s.end(), s.begin(), ::tolower);
     return s;
 }
+
+bool is_constant(string lit){
+    char have_dot = false;
+    for(auto ch:lit){
+        if(!isdigit(ch) && (ch != '.' || have_dot))return false;
+        if(ch == '.') have_dot = true;
+    }
+    return true;
+}

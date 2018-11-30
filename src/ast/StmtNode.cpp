@@ -55,7 +55,7 @@ string FunctionDeclNode::getNextAvaTemp() {
     return "!T" + to_string(nextAvaTemp++);                             // get a new temporary
 }
 
-int FunctionDeclNode::getStackSize() { return stackSize;}
+int FunctionDeclNode::getStackSize() { return stackSize; }
 
 IfStmtNode::IfStmtNode(CondExprNode* cond, Symtable* symtable, string index,
         FunctionDeclNode* farther):

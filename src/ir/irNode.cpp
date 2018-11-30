@@ -123,6 +123,95 @@ vector<string> IrNode::translate() {
     return opCodeBlock;
 }
 
+
+void IrNode::constant_swap(vector<IrNode*> irs) {
+
+    unordered_map<string, string> const_refs;
+
+    for(auto ir = irs.begin(); ir != irs.end();)
+    {
+        string cmd = (*ir)->cmd;
+        if(cmd == "STORE") {
+            StoreIrNode* storeIr = static_cast<StoreIrNode*>(*ir);
+            if(is_constant(storeIr->op1)) {            // op1 is a literal
+                const_refs[storeIr->res] = storeIr->op1;
+                ir = irs.erase(ir);
+            }
+            else if(const_refs.find(storeIr->op1) != const_refs.end()) {// or const ref
+                const_refs[storeIr->res] = const_refs[storeIr->op1];
+                ir = irs.erase(ir);
+            }
+            else {
+                const_refs.erase(storeIr->res);    
+                ir++;
+            }
+        }
+        else if(cmd == "READ"){
+            ReadIrNode* readIr = static_cast<ReadIrNode*>(*ir);
+            const_refs.erase(readIr->res);    // not a constant anymore
+            ir++;
+        }
+        else if(cmd == "MUL" || cmd == "ADD" || 
+                cmd == "DIV" || cmd == "SUB")
+        {
+            ArithmeticIrNode* arithIr = static_cast<ArithmeticIrNode*>(*ir);
+            
+            if((is_constant(arithIr->op1) || const_refs.find(arithIr->op1) != const_refs.end()) && // op1 is a literal or const ref
+                (is_constant(arithIr->op2) || const_refs.find(arithIr->op2) != const_refs.end())) // and op2 is a literal or const ref
+            {
+                // op1 and op2 are constant
+                if(arithIr->type == "I"){
+                    int op1 = is_constant(arithIr->op1)?stoi(arithIr->op1):stoi(const_refs[arithIr->op1]);
+                    int op2 = is_constant(arithIr->op2)?stoi(arithIr->op2):stoi(const_refs[arithIr->op2]);
+                    int res;
+                    if(arithIr->cmd == "MUL") res = op1*op2;
+                    if(arithIr->cmd == "ADD") res = op1+op2;
+                    if(arithIr->cmd == "DIV") res = op1/op2;
+                    if(arithIr->cmd == "SUB") res = op1-op2;
+                    const_refs[arithIr->res] = to_string(res);
+                }
+                else{
+                    double op1 = is_constant(arithIr->op1)?stof(arithIr->op1):stof(const_refs[arithIr->op1]);
+                    double op2 = is_constant(arithIr->op2)?stof(arithIr->op2):stof(const_refs[arithIr->op2]);
+                    double res;
+                    if(arithIr->cmd == "MUL") res = op1*op2;
+                    if(arithIr->cmd == "ADD") res = op1+op2;
+                    if(arithIr->cmd == "DIV") res = op1/op2;
+                    if(arithIr->cmd == "SUB") res = op1-op2;
+                    const_refs[arithIr->res] = to_string(res);
+                }
+                ir = irs.erase(ir);
+            }
+            else{
+                if(const_refs.find(arithIr->op1) != const_refs.end())
+                    arithIr->op1 = const_refs[arithIr->op1];
+                if(const_refs.find(arithIr->op2) != const_refs.end())
+                    arithIr->op2 = const_refs[arithIr->op2];
+                const_refs.erase(arithIr->res);
+                ir++;
+            }
+        }
+        else if(cmd == "WRITE") {
+            WriteIrNode* writeIr = static_cast<WriteIrNode*>(*ir);
+            if(const_refs.find(writeIr->op1) != const_refs.end()){
+                //store back to register for priting
+                StoreIrNode* storeIr = new StoreIrNode(writeIr->type, const_refs[writeIr->op1],
+                        "!T-1", writeIr->regMan);
+                writeIr->op1 = "!T-1";
+                irs.insert(ir,storeIr);
+                ir++;
+            }
+            ir++;
+        }
+        else{
+            // should be WRITES only
+            ir++;
+        }
+
+    }
+}
+
+
 void IrNode::livenessAna() {
     reverse(worklist.begin(),worklist.end());   // reverse the worklist
     while(!worklist.empty()){ 
