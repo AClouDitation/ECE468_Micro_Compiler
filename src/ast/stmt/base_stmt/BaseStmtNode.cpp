@@ -1,10 +1,4 @@
-#include "../../inc/ExprNode.hpp"
-#include "../../inc/BaseStmtNode.hpp"
-#include "../../inc/symtable.hpp"
-#include "../../inc/irNode.hpp"
-#include "../../inc/utility.hpp"
-
-using namespace::std;
+#include "../../../../inc/ast/stmt/base_stmt/BaseStmtNode.hpp"
 
 BaseStmtNode::BaseStmtNode(FunctionDeclNode* farther):
     StmtNode(farther)

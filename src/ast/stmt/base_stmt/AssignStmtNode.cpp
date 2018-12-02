@@ -1,8 +1,8 @@
-#include "../../../inc/ExprNode.hpp"
-#include "../../../inc/BaseStmtNode.hpp"
-#include "../../../inc/symtable.hpp"
-#include "../../../inc/irNode.hpp"
-#include "../../../inc/utility.hpp"
+#include "../../../../inc/ast/stmt/base_stmt/AssignStmtNode.hpp"
+#include "../../../../inc/ast/expr/VarRef.hpp"
+#include "../../../../inc/ir/StoreIrNode.hpp"
+#include "../../../../inc/symtable/symtable.hpp"
+#include "../../../../inc/utility.hpp"
 
 using namespace::std;
 
@@ -33,3 +33,4 @@ vector<IrNode*>& AssignStmtNode::translate(){
     
     return *code_block;
 }
+

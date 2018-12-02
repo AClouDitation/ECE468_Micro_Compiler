@@ -1,8 +1,10 @@
 #include "../../../../inc/ast/stmt/blk_stmt/FunctionDeclNode.hpp"
 #include "../../../../inc/ast/stmt/blk_stmt/WhileStmtNode.hpp"
-#include "../../../../inc/ExprNode.hpp"
-#include "../../../../inc/irNode.hpp"
-#include "../../../../inc/regman.hpp"
+#include "../../../../inc/ast/expr/CondExprNode.hpp"
+#include "../../../../inc/ir/LabelIrNode.hpp"
+#include "../../../../inc/ir/JumpIrNode.hpp"
+#include "../../../../inc/ir/CondIrNode.hpp"
+#include "../../../../inc/regman/regman.hpp"
 #include "../../../../inc/utility.hpp"
 
 using namespace std;

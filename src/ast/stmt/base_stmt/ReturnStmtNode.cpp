@@ -1,8 +1,9 @@
-#include "../../inc/ExprNode.hpp"
-#include "../../inc/BaseStmtNode.hpp"
-#include "../../inc/symtable.hpp"
-#include "../../inc/irNode.hpp"
-#include "../../inc/utility.hpp"
+#include "../../../../inc/ast/expr/ExprNode.hpp"
+#include "../../../../inc/ast/stmt/base_stmt/ReturnStmtNode.hpp"
+#include "../../../../inc/symtable/symtable.hpp"
+#include "../../../../inc/ir/StoreIrNode.hpp"
+#include "../../../../inc/ir/ReturnIrNode.hpp"
+#include "../../../../inc/utility.hpp"
 
 using namespace::std;
 

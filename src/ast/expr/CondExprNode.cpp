@@ -1,8 +1,10 @@
+#include "../../../inc/ast/expr/CondExprNode.hpp"
+#include "../../../inc/ast/stmt/blk_stmt/FunctionDeclNode.hpp"
+#include "../../../inc/ir/StoreIrNode.hpp"
+#include "../../../inc/ir/CondIrNode.hpp"
+#include "../../../inc/utility.hpp"
+#include <iostream>
 #include <assert.h>
-#include "../../inc/ExprNode.hpp"
-#include "../../inc/StmtNode.hpp"
-#include "../../inc/irNode.hpp"
-#include "../../inc/utility.hpp"
 
 using namespace std;
 

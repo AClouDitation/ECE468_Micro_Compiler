@@ -14,3 +14,5 @@ public:
     virtual ~BaseStmtNode();
     std::vector<IrNode*>& translate()=0;
 };
+
+#endif

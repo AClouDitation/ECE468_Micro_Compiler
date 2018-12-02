@@ -5,6 +5,7 @@
 #include <vector>
 #include <set>
 #include <string>
+#include <sstream>
 
 class IrNode;
 class FunctionDeclNode;

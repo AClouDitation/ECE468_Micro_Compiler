@@ -1,7 +1,7 @@
 %{
-    #include "../inc/symtable.hpp"
-    #include "../inc/ExprNode.hpp"
-    #include "../inc/StmtNode.hpp"
+    #include "../inc/symtable/symtable.hpp"
+    #include "../inc/ast/expr/ExprNode.hpp"
+    #include "../inc/ast/stmt/StmtNode.hpp"
     #include "../generated/parser.hpp"
     #include <stdio.h>
     #include <stdlib.h>

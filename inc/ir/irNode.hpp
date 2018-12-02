@@ -6,7 +6,7 @@
 #include <set>
 #include <vector>
 #include <sstream>
-#include "../regman.hpp"
+#include "../regman/regman.hpp"
 
 class IrNode {
 protected:

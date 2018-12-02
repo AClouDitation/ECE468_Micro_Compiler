@@ -1,8 +1,8 @@
-#include "../../inc/ExprNode.hpp"
-#include "../../inc/BaseStmtNode.hpp"
-#include "../../inc/symtable.hpp"
-#include "../../inc/irNode.hpp"
-#include "../../inc/utility.hpp"
+#include "../../../../inc/ast/stmt/blk_stmt/FunctionDeclNode.hpp"
+#include "../../../../inc/ast/stmt/base_stmt/ReadStmtNode.hpp"
+#include "../../../../inc/ast/expr/VarRef.hpp"
+#include "../../../../inc/ir/ReadIrNode.hpp"
+#include "../../../../inc/utility.hpp"
 
 using namespace::std;
 

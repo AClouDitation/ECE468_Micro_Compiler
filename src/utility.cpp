@@ -1,6 +1,6 @@
 #include "../inc/utility.hpp"
-#include "../inc/irNode.hpp"
-#include "../inc/symtable.hpp"
+#include "../inc/ir/irNode.hpp"
+#include "../inc/symtable/symtable.hpp"
 #include<bits/stdc++.h>
 
 using namespace std;

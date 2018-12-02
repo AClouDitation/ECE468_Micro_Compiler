@@ -1,7 +1,5 @@
-#include "../../inc/regman.hpp"
-#include "../../inc/irNode.hpp"
-#include "../../inc/StmtNode.hpp"
-#include "../../inc/symtable.hpp"
+#include "../../inc/regman/regman.hpp"
+#include "../../inc/symtable/symtable.hpp"
 #include <iostream>
 #include <iomanip>
 

@@ -1,8 +1,8 @@
+#include "../../../inc/ast/expr/AddExprNode.hpp"
+#include "../../../inc/ast/stmt/blk_stmt/FunctionDeclNode.hpp"
+#include "../../../inc/ir/ArithmeticIrNode.hpp"
+#include "../../../inc/utility.hpp"
 #include <assert.h>
-#include "../../inc/ExprNode.hpp"
-#include "../../inc/StmtNode.hpp"
-#include "../../inc/irNode.hpp"
-#include "../../inc/utility.hpp"
 
 using namespace std;
 

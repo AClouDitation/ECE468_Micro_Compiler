@@ -5,11 +5,11 @@
 #include <unordered_map>
 #include <string>
 #include <iostream>
-#include "BaseStmtNode.hpp"
-#include "regman.hpp"
+#include "../ast/stmt/blk_stmt/FunctionDeclNode.hpp"
+#include "../ast/stmt/base_stmt/ReturnStmtNode.hpp"
+#include "../regman/regman.hpp"
 
 class IrNode;
-
 
 class SymEntry{
 public:

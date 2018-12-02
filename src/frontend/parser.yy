@@ -5,10 +5,25 @@
     #include <vector>
     #include <iostream>
     #include <bits/stdc++.h> //cstr
-    #include "../../inc/symtable/symtable.hpp"
-    #include "../../inc/ast/expr/ExprNode.hpp"
-    #include "../../inc/ast/expr/StmtNode.hpp"
-    #include "../../inc/ast/stmt/BaseStmtNode.hpp"
+    #include "../inc/symtable/symtable.hpp"
+    #include "../inc/ast/expr/ExprNode.hpp"
+    #include "../inc/ast/expr/AddExprNode.hpp"
+    #include "../inc/ast/expr/MulExprNode.hpp"
+    #include "../inc/ast/expr/CondExprNode.hpp"
+    #include "../inc/ast/expr/CallExprNode.hpp"
+    #include "../inc/ast/expr/VarRef.hpp"
+    #include "../inc/ast/expr/LitRef.hpp"
+    #include "../inc/ast/stmt/StmtNode.hpp"
+    #include "../inc/ast/stmt/base_stmt/BaseStmtNode.hpp"
+    #include "../inc/ast/stmt/base_stmt/AssignStmtNode.hpp"
+    #include "../inc/ast/stmt/base_stmt/ReturnStmtNode.hpp"
+    #include "../inc/ast/stmt/base_stmt/WriteStmtNode.hpp"
+    #include "../inc/ast/stmt/base_stmt/ReadStmtNode.hpp"
+    #include "../inc/ast/stmt/blk_stmt/BlockNode.hpp"
+    #include "../inc/ast/stmt/blk_stmt/FunctionDeclNode.hpp"
+    #include "../inc/ast/stmt/blk_stmt/IfStmtNode.hpp"
+    #include "../inc/ast/stmt/blk_stmt/ElseStmtNode.hpp"
+    #include "../inc/ast/stmt/blk_stmt/WhileStmtNode.hpp"
 
     extern int yylex();
     extern int yylineno;

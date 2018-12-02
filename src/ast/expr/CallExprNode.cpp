@@ -1,8 +1,11 @@
+#include "../../../inc/ast/expr/CallExprNode.hpp"
+#include "../../../inc/ast/stmt/blk_stmt/FunctionDeclNode.hpp"
+#include "../../../inc/ir/irNode.hpp"
+#include "../../../inc/ir/PushIrNode.hpp"
+#include "../../../inc/ir/PopIrNode.hpp"
+#include "../../../inc/ir/CallIrNode.hpp"
+#include "../../../inc/utility.hpp"
 #include <assert.h>
-#include "../../inc/ExprNode.hpp"
-#include "../../inc/StmtNode.hpp"
-#include "../../inc/irNode.hpp"
-#include "../../inc/utility.hpp"
 
 using namespace std;
 

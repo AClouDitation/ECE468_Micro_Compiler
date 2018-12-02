@@ -1,7 +1,8 @@
 #include "../../../../inc/ast/stmt/blk_stmt/FunctionDeclNode.hpp"
-#include "../../../../inc/irNode.hpp"
-#include "../../../../inc/symtable.hpp"
-#include "../../../../inc/regman.hpp"
+#include "../../../../inc/ir/LabelIrNode.hpp"
+#include "../../../../inc/ir/ReturnIrNode.hpp"
+#include "../../../../inc/symtable/symtable.hpp"
+#include "../../../../inc/regman/regman.hpp"
 #include "../../../../inc/utility.hpp"
 #include <assert.h>
 

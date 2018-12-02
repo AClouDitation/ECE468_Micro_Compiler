@@ -5,10 +5,10 @@
 #include <iostream>
 #include <stack>
 #include <iomanip>
-#include "../inc/symtable.hpp"
-#include "../inc/ExprNode.hpp"
-#include "../inc/StmtNode.hpp"
-#include "../inc/irNode.hpp"
+#include "../inc/symtable/symtable.hpp"
+#include "../inc/ast/expr/ExprNode.hpp"
+#include "../inc/ast/stmt/StmtNode.hpp"
+#include "../inc/ir/irNode.hpp"
 #include "../inc/opt.hpp"
 #include "../inc/utility.hpp"///////new add utility.cpp
 #include "../generated/parser.hpp"

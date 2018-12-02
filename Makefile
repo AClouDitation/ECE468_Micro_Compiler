@@ -6,6 +6,7 @@ CXX :=
 
 SRC := $(shell find src -type f -name '*.cpp')
 OBJ := $(patsubst src/%.cpp, build/%.o, $(SRC))
+
 BUILD_PATH = $(PWD)/build
 
 team:
@@ -20,26 +21,29 @@ compiler: CXX := $(CXX_ECN)
 compiler: main
 
 compiler_local: CXX := $(CXX_LOCAL)
-compiler_local: frontend link
+compiler_local: build/scanner.o link
 
-frontend: scanner parser
+build/parser.o: src/frontend/parser.yy
+	@mkdir -p generated
 	@mkdir -p build
-	$(CXX) $(CXXFLAGS) -c generated/scanner.cpp -o build/scanner.o -ll
+	bison -d -o generated/parser.cpp src/frontend/parser.yy
 	$(CXX) $(CXXFLAGS) -c generated/parser.cpp -o build/parser.o 
 
-scanner: src/frontend/scanner.ll
-	@mkdir -p generated
+build/scanner.o: build/parser.o src/frontend/scanner.ll
 	flex -o generated/scanner.cpp src/frontend/scanner.ll
+	$(CXX) $(CXXFLAGS) -c generated/scanner.cpp -o build/scanner.o -ll
 
-parser:	src/frontend/parser.yy
-	@mkdir -p generated
-	bison -d -o generated/parser.cpp src/frontend/parser.yy
+build/main.o: ./src/main.cpp
+	$(CXX) $(CXXFLAGS) $< -c -o build/main.o 
 
 build/%.o: ./src/%.cpp ./inc/%.hpp
-	$(CXX) $< $(CXXFLAGS) -o $@
+	@mkdir -p $(@D)
+	$(CXX) $< $(CXXFLAGS) -c -o $@
 
-link: $(OBJ)
-	$(CXX) $(CXXFLAGS) -o compiler $(OBJ)
+link: build/scanner.o build/parser.o $(OBJ)
+	@echo "linking object files ......"
+	@$(CXX) $(CXXFLAGS) -o compiler $^
+	@echo "Done!"
 
 clean:
 	rm -rf generated
