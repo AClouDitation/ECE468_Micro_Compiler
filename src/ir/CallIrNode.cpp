@@ -1,5 +1,4 @@
-#include "../../inc/irNode.hpp"
-#include "../../inc/utility.hpp"
+#include "../../inc/ir/CallIrNode.hpp"
 #include <assert.h>
 
 using namespace std;

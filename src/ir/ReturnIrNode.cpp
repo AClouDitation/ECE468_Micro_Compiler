@@ -1,4 +1,4 @@
-#include "../../inc/irNode.hpp"
+#include "../../inc/ir/ReturnIrNode.hpp"
 #include "../../inc/utility.hpp"
 #include <assert.h>
 
