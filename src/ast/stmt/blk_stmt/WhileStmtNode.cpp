@@ -1,8 +1,9 @@
-#include "../../../inc/StmtNode.hpp"
-#include "../../../inc/ExprNode.hpp"
-#include "../../../inc/irNode.hpp"
-#include "../../../inc/regman.hpp"
-#include "../../../inc/utility.hpp"
+#include "../../../../inc/ast/stmt/blk_stmt/FunctionDeclNode.hpp"
+#include "../../../../inc/ast/stmt/blk_stmt/WhileStmtNode.hpp"
+#include "../../../../inc/ExprNode.hpp"
+#include "../../../../inc/irNode.hpp"
+#include "../../../../inc/regman.hpp"
+#include "../../../../inc/utility.hpp"
 
 using namespace std;
 

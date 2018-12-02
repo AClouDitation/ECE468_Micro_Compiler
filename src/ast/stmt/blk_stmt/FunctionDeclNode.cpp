@@ -1,9 +1,8 @@
-#include "../../../inc/StmtNode.hpp"
-#include "../../../inc/ExprNode.hpp"
-#include "../../../inc/symtable.hpp"
-#include "../../../inc/irNode.hpp"
-#include "../../../inc/regman.hpp"
-#include "../../../inc/utility.hpp"
+#include "../../../../inc/ast/stmt/blk_stmt/FunctionDeclNode.hpp"
+#include "../../../../inc/irNode.hpp"
+#include "../../../../inc/symtable.hpp"
+#include "../../../../inc/regman.hpp"
+#include "../../../../inc/utility.hpp"
 #include <assert.h>
 
 using namespace std;
