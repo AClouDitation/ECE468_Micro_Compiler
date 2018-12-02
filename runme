@@ -2,7 +2,7 @@
 
 if [[ $# != 2 ]]
 then
-	echo "Usage: ./runme.bash <input filename> <output filename>"
+	echo "Usage: ./runme <input filename> <output filename>"
 	exit 1
 fi
 
