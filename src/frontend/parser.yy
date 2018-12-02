@@ -5,10 +5,10 @@
     #include <vector>
     #include <iostream>
     #include <bits/stdc++.h> //cstr
-    #include "../inc/symtable.hpp"
-    #include "../inc/ExprNode.hpp"
-    #include "../inc/StmtNode.hpp"
-    #include "../inc/BaseStmtNode.hpp"
+    #include "../../inc/symtable/symtable.hpp"
+    #include "../../inc/ast/expr/ExprNode.hpp"
+    #include "../../inc/ast/expr/StmtNode.hpp"
+    #include "../../inc/ast/stmt/BaseStmtNode.hpp"
 
     extern int yylex();
     extern int yylineno;

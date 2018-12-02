@@ -1,4 +1,8 @@
 #include "../../inc/ir/irNode.hpp"
+#include "../../inc/ir/WriteIrNode.hpp"
+#include "../../inc/ir/ReadIrNode.hpp"
+#include "../../inc/ir/StoreIrNode.hpp"
+#include "../../inc/ir/ArithmeticIrNode.hpp"
 #include "../../inc/utility.hpp"
 #include <assert.h>
 #include <algorithm>
@@ -143,8 +147,7 @@ void IrNode::constant_swap(vector<IrNode*> irs) {
             const_refs.erase(readIr->res);    // not a constant anymore
             ir++;
         }
-        else if(cmd == "MUL" || cmd == "ADD" || 
-                cmd == "DIV" || cmd == "SUB")
+        else if(cmd == "MUL" || cmd == "ADD" || cmd == "DIV" || cmd == "SUB")
         {
             ArithmeticIrNode* arithIr = static_cast<ArithmeticIrNode*>(*ir);
             
@@ -195,11 +198,21 @@ void IrNode::constant_swap(vector<IrNode*> irs) {
             }
             ir++;
         }
+        else if(cmd == "LABEL" || cmd == "END") {
+            // this is another block,
+            // spill everything in the buffer
+            
+            for(auto kv: const_refs) {
+                string type = "I";      // for now
+                                        // TODO: change to actual type
+                ir = irs.insert(ir, new StoreIrNode(type, kv.first, kv.second, (*ir)->regMan));
+            }
+
+            const_refs.clear();
+        }
         else{
-            // should be WRITES only
             ir++;
         }
-
     }
 }
 
