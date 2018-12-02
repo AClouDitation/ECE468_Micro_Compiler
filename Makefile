@@ -2,7 +2,11 @@ CXXFLAGS := -std=c++11 -g -static-libstdc++
 CXX_ECN := /opt/gcc/7.1.0/bin/g++
 CXX_LOCAL := g++
 CC := gcc
-CXX :=
+CXX := g++
+
+SRC := $(shell find src -type f -name '*.cpp')
+OBJ := $(patsubst src/%.cpp, build/%.o, $(SRC))
+BUILD_PATH = $(PWD)/build
 
 team:
 	@echo "Team: Compliation_Error\n"
@@ -16,28 +20,22 @@ compiler: CXX := $(CXX_ECN)
 compiler: main
 
 compiler_local: CXX := $(CXX_LOCAL)
-compiler_local: main
+compiler_local: main test_build
 
 main: ./src/* ./inc/*
 	mkdir -p generated
 	mkdir -p build
 	flex -o generated/scanner.cpp src/frontend/scanner.ll
 	bison -d -o generated/parser.cpp src/frontend/parser.yy
-	$(CXX) $(CXXFLAGS) -c generated/scanner.cpp -o build/scanner.o -ll
-	$(CXX) $(CXXFLAGS) -c generated/parser.cpp -o build/parser.o 
-	$(CXX) $(CXXFLAGS) -c src/utility.cpp -o build/utility.o
-	$(CXX) $(CXXFLAGS) -c src/ast/ExprNode.cpp -o build/ExprNode.o 
-	$(CXX) $(CXXFLAGS) -c src/ast/StmtNode.cpp -o build/StmtNode.o 
-	$(CXX) $(CXXFLAGS) -c src/ast/BaseStmtNode.cpp -o build/BaseStmtNode.o 
-	$(CXX) $(CXXFLAGS) -c src/ir/irNode.cpp -o build/irNode.o 
-	$(CXX) $(CXXFLAGS) -c src/ir/spIrNode.cpp -o build/spIrNode.o 
-	$(CXX) $(CXXFLAGS) -c src/regman/regman.cpp -o build/regman.o 
-#	$(CXX) $(CXXFLAGS) -c src/opt.cpp -o build/opt.o 
-	$(CXX) $(CXXFLAGS) -c src/symtable/symtable.cpp -o build/symtable.o 
-	$(CXX) $(CXXFLAGS) -c src/main.cpp -o build/comp.o
-	$(CXX) $(CXXFLAGS) -o compiler build/*.o
+	#$(CXX) $(CXXFLAGS) -c generated/scanner.cpp -o build/scanner.o -ll
+	#$(CXX) $(CXXFLAGS) -c generated/parser.cpp -o build/parser.o 
+
+build/%.o: ./src/%.cpp ./inc/%.hpp
+	$(CXX) $< $(CXXFLAGS) -o $@
+
+test_build: $(OBJ)
+	$(CXX) $(CXXFLAGS) -o compiler $(OBJ)
 
 clean:
 	rm -rf generated
 	rm -rf build
-
