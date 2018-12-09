@@ -73,8 +73,8 @@ void regManager::regFree(int r, vector<string>& opcode, set<string>& liveOut) {
 
     // mark r as free
     isDirty[r] = false;
-    inUseRO.erase(inUseRO.find(inUseOR[r]));
-    inUseOR.erase(inUseOR.find(r));
+    if(inUseRO.find(inUseOR[r])!=inUseRO.end()) inUseRO.erase(inUseRO.find(inUseOR[r]));
+    if(inUseOR.find(r)!=inUseOR.end())          inUseOR.erase(inUseOR.find(r));
 }
 
 int regManager::regAllocate(string op, int doNotFree, 

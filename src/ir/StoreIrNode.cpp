@@ -28,8 +28,11 @@ vector<string> StoreIrNode::translate() {
     regMan.markDirty(regZ);
 
     if(regX != regZ)
-        opCodeBlock.push_back("move r" + to_string(regX) + " r" + to_string(regZ));   // TODO: this seems redundant...
-                                                // optimize it
+        opCodeBlock.push_back("move r" + to_string(regX) + " r" + to_string(regZ));     // TODO: this seems redundant...
+                                                                                        // optimize it
+                                                                                    
+    if(outSet.find(res) == outSet.end()) regMan.regFree(regZ, opCodeBlock, outSet);
+
     return opCodeBlock;
 }
 

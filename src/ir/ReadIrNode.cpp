@@ -22,7 +22,8 @@ vector<string> ReadIrNode::translate() {
     vector<string> opCodeBlock;
     int regZ = regMan.regAllocate(res, -1, opCodeBlock, outSet);
     regMan.markDirty(regZ);
-
     opCodeBlock.push_back("sys " + toLower(cmd+type) + " r" + to_string(regZ));
+
+    if(outSet.find(res) == outSet.end()) regMan.regFree(regZ, opCodeBlock, outSet);
     return opCodeBlock;
 }
