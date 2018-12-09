@@ -155,9 +155,9 @@ decl                :string_decl decl|var_decl decl|/* empty */;
 
 /* Global String Declaration */
 string_decl         :STRING id ASSIGN str SEMICOLON {
-                        Symtable* current = symtable_stack.top();
+                        //Symtable* current = symtable_stack.top();
                         StrEntry* new_entry = new StrEntry(*$2,*$4);
-                        current->add(new_entry);
+                        globalSymtable->add(new_entry);
                         delete $2;
                         delete $4;
                     };
