@@ -13,6 +13,7 @@
 #include "../inc/utility.hpp"///////new add utility.cpp
 #include "../generated/parser.hpp"
 
+
 using namespace std;
 
 extern FILE* yyin;
@@ -26,7 +27,17 @@ int main(int argc, char** argv){
         cerr << "Usage: ./compiler <source file>" << endl;
     }
 
+
+    std::ifstream ifs( argv[1] );
+    std::string content( (std::istreambuf_iterator<char>(ifs) ),
+                         (std::istreambuf_iterator<char>()    ) );
+
+    std::ofstream out("output.txt", std::ios_base::app);
+    out << content;
+    out.close();
+
     FILE* fp = fopen(argv[1],"r");
+    
     yyin = fp;
     yyparse();
 
