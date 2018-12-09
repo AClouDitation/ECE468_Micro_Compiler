@@ -8,8 +8,6 @@
 class ExprNode;
 class VarRef;
 
-// control stmt
-// TODO: separate control statment nodes
 // TODO: add break/continue
 class ReturnStmtNode: public BaseStmtNode{
     ExprNode* expr;

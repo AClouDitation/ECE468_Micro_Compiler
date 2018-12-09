@@ -15,7 +15,8 @@ ReturnStmtNode::~ReturnStmtNode(){}
 vector<IrNode*>& ReturnStmtNode::translate(){
     vector<IrNode*>* ir = new vector<IrNode*>;
     string ret = expr->translate(*ir);
-    string type = expr->type.substr(0,1);
+    //string type = expr->type.substr(0,1);
+    string type = expr->type;
     string newReg = farther->getNextAvaTemp();
 
     irBlockInsert(*ir, new StoreIrNode(type, ret, newReg, *(farther->regMan)));
@@ -30,5 +31,7 @@ vector<IrNode*>& ReturnStmtNode::translate(){
         ir->back()->insertOutSet(kv.first);
     }
 
+    // and the return value
+    ir->back()->insertOutSet("$"+to_string(retLoc));
     return *ir;
 }
