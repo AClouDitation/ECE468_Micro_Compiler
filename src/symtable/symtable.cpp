@@ -39,7 +39,7 @@ int FuncEntry::getArgCnt(){return argc;}
 
 // the symtable table
 // start from 2 since $1 is the frame pointer 
-Symtable::Symtable(string name):name(name),nextIndex(-2){}
+Symtable::Symtable(string name, int nextIndex):name(name),nextIndex(nextIndex){}
 
 Symtable::~Symtable(){
     for(auto id:id_map) delete id.second;

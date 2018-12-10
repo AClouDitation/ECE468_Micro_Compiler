@@ -141,7 +141,7 @@
 /* Grammar rules */
 /* Program */
 program             :PROGRAM {
-                        Symtable* current = new Symtable("GLOBAL");
+                        Symtable* current = new Symtable("GLOBAL", -1);
                         globalSymtable = current;
                         symtable_stack.push(current);
                     }
@@ -238,7 +238,7 @@ func_decl           :FUNCTION any_type id {
                         FuncEntry* new_entry = new FuncEntry(*$3, *$2); 
                         current->add(new_entry); 
                         // allocate symboltable for the new function
-                        symtable_stack.push(new Symtable(*$3));
+                        symtable_stack.push(new Symtable(*$3, -2));
                     }OPAREN param_decl_list CPAREN {
                         
                         // set argc for the new function
@@ -407,7 +407,7 @@ mulop               :MUL{$$='*';} | DIV{$$='/';};
 if_stmt             :IF OPAREN cond CPAREN decl{
                         // allocate a new block
                         block_index++;
-                        Symtable* current = new Symtable("BLOCK "+std::to_string(block_index));
+                        Symtable* current = new Symtable("BLOCK "+std::to_string(block_index), symtable_stack.top()->nextIndex);
                         symtable_stack.push(current);
 
                         // allocate a new if node
@@ -417,7 +417,9 @@ if_stmt             :IF OPAREN cond CPAREN decl{
                         block_list.push_back(new_if);
                     }
                     stmt_list{
+                        int nextIndex = symtable_stack.top()->nextIndex;
                         symtable_stack.pop();                    
+                        symtable_stack.top()->nextIndex = nextIndex;
                     }
                     else_part ENDIF{
                         block_list.pop_back();
@@ -426,7 +428,8 @@ else_part           :ELSE{
                         block_index++;
                         Symtable* current = new Symtable(
                             "BLOCK "+
-                            std::to_string(block_index));
+                            std::to_string(block_index),
+                            symtable_stack.top()->nextIndex);
                         symtable_stack.push(current);
                         //symtable_list.push_back(current);
 
@@ -457,7 +460,8 @@ while_stmt          :WHILE OPAREN cond CPAREN {
                         block_index++;
                         Symtable* current = new Symtable(
                             "BLOCK "+
-                            std::to_string(block_index));
+                            std::to_string(block_index),
+                            symtable_stack.top()->nextIndex);
                         symtable_stack.push(current);
 
                         // allocate a new while node

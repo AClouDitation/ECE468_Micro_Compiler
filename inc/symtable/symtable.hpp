@@ -56,10 +56,10 @@ public:
 class Symtable{
     std::unordered_map<std::string, SymEntry*> id_map; // this is better
     std::string name;
-    int nextIndex;
 
 public:
-    Symtable(std::string name);
+    int nextIndex;
+    Symtable(std::string name, int nextIndex);
     virtual ~Symtable();
     virtual void add(SymEntry*); 
     virtual void print();
