@@ -2,6 +2,7 @@
 #include "../../../inc/ast/stmt/blk_stmt/FunctionDeclNode.hpp"
 #include "../../../inc/ir/StoreIrNode.hpp"
 #include "../../../inc/ir/CondIrNode.hpp"
+#include "../../../inc/ir/JumpIrNode.hpp"
 #include "../../../inc/utility.hpp"
 #include <iostream>
 #include <assert.h>
@@ -31,12 +32,19 @@ void CondExprNode::setOutLabel(string out_label) {this -> out_label = out_label;
 
 string CondExprNode::translate(vector<IrNode*>& code_block) {
 
+    if(cmp == "TRUE" || cmp == "FALSE") {
+        // out_label should be set by the caller of this function
+        irBlockInsert(code_block, new CondIrNode(cmp, type, "", "",
+                    out_label, *(farther->regMan)));
+        return out_label;
+    }
+
     assert(out_label != "NULL");
     string op1 = lnode->translate(code_block);
     string op2 = rnode->translate(code_block);
 
     //cmp op1 op2 label
-    if(!(op2[0] == '!' && op2[1] == 'T')){ // op2 is not a temporary
+    if(!(op2[0] == '!' && op2[1] == 'T')) { // op2 is not a temporary
         // Move it to one
         string res = farther->getNextAvaTemp();
         string type = rnode->type;                    

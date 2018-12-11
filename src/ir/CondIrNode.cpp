@@ -41,8 +41,11 @@ bool CondIrNode::livenessCalc() {
 vector<string> CondIrNode::translate() {
     vector<string> opCodeBlock;
 
-    //int regX = regMan.regEnsure(op1, -1, opCodeBlock, outSet);
-    //int regY = regMan.regEnsure(op2, regX, opCodeBlock, outSet);
+    if(cmd == "FALSE") {
+        opCodeBlock.push_back("jmp " + jumpTo);
+        return opCodeBlock;
+    }
+    if(cmd == "TRUE") return opCodeBlock;
 
     int regX, regY;
     regMan.regEnsure2(op1, op2, regX, regY, opCodeBlock, outSet);

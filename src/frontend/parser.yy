@@ -451,9 +451,11 @@ cond                :expr compop expr{
                     }
                     | TRUE {
                         CondExprNode* new_lit = new CondExprNode(func_list.back(), "TRUE");
+                        $$ = new_lit;
                     }
                     | FALSE{
                         CondExprNode* new_lit = new CondExprNode(func_list.back(), "FALSE");
+                        $$ = new_lit;
                     };
 compop              :LT| GT| EQ| NEQ| LEQ| GEQ; /* reutrn $1 by default */
 while_stmt          :WHILE OPAREN cond CPAREN {
