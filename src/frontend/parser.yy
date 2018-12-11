@@ -404,7 +404,7 @@ addop               :PLUS{$$='+';} | MINUS{$$='-';};
 mulop               :MUL{$$='*';} | DIV{$$='/';};
 
 /* Complex Statements and Condition */ 
-if_stmt             :IF OPAREN cond CPAREN decl{
+if_stmt             :IF OPAREN cond CPAREN{
                         // allocate a new block
                         block_index++;
                         Symtable* current = new Symtable("BLOCK "+std::to_string(block_index), symtable_stack.top()->nextIndex);
@@ -416,7 +416,7 @@ if_stmt             :IF OPAREN cond CPAREN decl{
                         block_list.back()->stmt_list.push_back(new_if); 
                         block_list.push_back(new_if);
                     }
-                    stmt_list{
+                    decl stmt_list{
                         int nextIndex = symtable_stack.top()->nextIndex;
                         symtable_stack.pop();                    
                         symtable_stack.top()->nextIndex = nextIndex;

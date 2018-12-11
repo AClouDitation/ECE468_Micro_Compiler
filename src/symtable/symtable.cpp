@@ -52,7 +52,7 @@ void Symtable::add(SymEntry* entry){
         id_map[entry->name] = entry;
     }
     else{
-        cout<<"DECLARATION ERROR "<<entry->name<<endl;
+        cerr << "SYMBOLTABLE NAME: " << name  << " DECLARATION ERROR " << entry->name << endl;
         exit(1);
     }
 }
