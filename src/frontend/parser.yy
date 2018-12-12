@@ -358,10 +358,12 @@ postfix_expr        :primary {
                     };
 call_expr           :id{
                         // TODO:check if the amount of argument match 
+                        /*  seems like this is causing a problem if there is no foward declaration
                         if(!globalSymtable->have(*$1)){
                             std::cout << "undeclared function " << *$1 << std::endl;
                             yyerror("undeclared function"); 
                         }
+                        */
                         // push last expr list onto stack
                         if(expr_stack_ptr) expr_stack_ptr_stack.push(expr_stack_ptr);
                         // allocate new expr list
@@ -438,12 +440,12 @@ else_part           :ELSE{
                         dynamic_cast<IfStmtNode*>(block_list.back())->elseNode = new_else;
                         block_list.push_back(new_else);
                     }
-                    decl stmt_list{
+                    decl stmt_list {
                         symtable_stack.pop(); 
                         block_list.pop_back();
                     } 
                     | /* empty */;
-cond                :expr compop expr{
+cond                :expr compop expr {
                         CondExprNode* new_cond = new CondExprNode(func_list.back(), (std::string)$2);
                         new_cond->lnode = $1;
                         new_cond->rnode = $3;
@@ -453,7 +455,7 @@ cond                :expr compop expr{
                         CondExprNode* new_lit = new CondExprNode(func_list.back(), "TRUE");
                         $$ = new_lit;
                     }
-                    | FALSE{
+                    | FALSE {
                         CondExprNode* new_lit = new CondExprNode(func_list.back(), "FALSE");
                         $$ = new_lit;
                     };
@@ -472,7 +474,7 @@ while_stmt          :WHILE OPAREN cond CPAREN {
                         block_list.back()->stmt_list.push_back(new_while); 
                         block_list.push_back(new_while);
                     } 
-                    decl stmt_list ENDWHILE{
+                    decl stmt_list ENDWHILE {
                         symtable_stack.pop(); 
                         block_list.pop_back();
                     };
