@@ -248,7 +248,20 @@ func_decl           :FUNCTION any_type id {
 
                         // get the symbol table of this function
                         Symtable* current = symtable_stack.top();
+
+                        // std::cerr << *$3 << " " << $6 << std::endl;
+                        // TODO: add param type in to symbol table
+                        thisFunc->argTypes = new std::string[$6]; 
+                        for(auto kv: current->id_map){
+                            SymEntry* entry = kv.second;
+                            //std::cerr << entry->index << std::endl;
+                            int index = entry->index * (-1) - 2;
+                            thisFunc->argTypes[index] = entry->type;
+                            //std::cerr << index << " " << entry->type << std::endl;
+                        } 
+                        
                         current->offsetFuncParam();
+
                         FunctionDeclNode* new_func = new FunctionDeclNode(*$3,*$2,$6,current);
 
                         block_list.push_back(new_func);

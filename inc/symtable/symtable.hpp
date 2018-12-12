@@ -45,6 +45,7 @@ public:
 class FuncEntry: public SymEntry{
     int argc;
 public:
+    std::string* argTypes;
     FuncEntry(std::string, std::string);
     virtual ~FuncEntry(){};
     void print();
@@ -54,10 +55,11 @@ public:
 };
 
 class Symtable{
+
+public:
     std::unordered_map<std::string, SymEntry*> id_map; // this is better
     std::string name;
 
-public:
     int nextIndex;
     Symtable(std::string name, int nextIndex);
     virtual ~Symtable();

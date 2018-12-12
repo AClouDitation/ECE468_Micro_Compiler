@@ -1,3 +1,4 @@
+#include "../../../inc/symtable/symtable.hpp"
 #include "../../../inc/ast/expr/CallExprNode.hpp"
 #include "../../../inc/ast/stmt/blk_stmt/FunctionDeclNode.hpp"
 #include "../../../inc/ir/irNode.hpp"
@@ -5,6 +6,7 @@
 #include "../../../inc/ir/PopIrNode.hpp"
 #include "../../../inc/ir/CallIrNode.hpp"
 #include "../../../inc/utility.hpp"
+
 #include <assert.h>
 
 using namespace std;
@@ -19,8 +21,12 @@ string CallExprNode::translate(vector<IrNode*>& code_block){
 
     vector<string> args;
     int argc = 0;
+
+    extern Symtable* globalSymtable;
+    FuncEntry* funcDecl = static_cast<FuncEntry*>(globalSymtable->have(name));
     // prepare arguments
     while(!exprStack.empty()){
+        exprStack.top()->type = funcDecl->argTypes[argc];
         argc++;
         string ret = exprStack.top()->translate(code_block);
         args.push_back(ret);
