@@ -7,7 +7,7 @@
 class CallExprNode: public ExprNode{
     std::string name;
 public:
-    CallExprNode(FunctionDeclNode*, std::string);
+    CallExprNode(FunctionDeclNode*, std::string, std::string);
     virtual ~CallExprNode();
     virtual std::string translate(std::vector<IrNode*>&);
 

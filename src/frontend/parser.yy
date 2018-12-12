@@ -383,7 +383,8 @@ call_expr           :id{
                         expr_stack_ptr = new std::stack<ExprNode*>();
                     }OPAREN expr_list CPAREN {
                         
-                        CallExprNode* new_call = new CallExprNode(func_list.back(), *$1);
+                        SymEntry* entry = globalSymtable->have(*$1);
+                        CallExprNode* new_call = new CallExprNode(func_list.back(), *$1, entry->type);
                         new_call->exprStack = *expr_stack_ptr;  // copy expr list in to call expr node
 
                         // free and pop

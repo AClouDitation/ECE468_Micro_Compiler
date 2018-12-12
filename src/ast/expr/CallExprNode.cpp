@@ -12,8 +12,10 @@
 using namespace std;
 
 // for now
-CallExprNode::CallExprNode(FunctionDeclNode* farther, string fname):
-    ExprNode(farther),name(fname){}
+CallExprNode::CallExprNode(FunctionDeclNode* farther, string fname, string type):
+    ExprNode(farther),name(fname){
+    this->type = type;
+}
 
 CallExprNode::~CallExprNode(){}
 
@@ -28,6 +30,8 @@ string CallExprNode::translate(vector<IrNode*>& code_block){
     while(!exprStack.empty()){
         exprStack.top()->type = funcDecl->argTypes[argc];
         argc++;
+        
+        ExprNode::updateExpr(exprStack.top());
         string ret = exprStack.top()->translate(code_block);
         args.push_back(ret);
         exprStack.pop();
