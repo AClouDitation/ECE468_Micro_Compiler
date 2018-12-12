@@ -44,6 +44,7 @@
     std::stack<std::stack<ExprNode*>*> expr_stack_ptr_stack; // this is soooo f**king dumb
                                                              // however has to be here for the f**king sake
                                                              // of nested function call
+    std::vector<CallExprNode*> callNeedUpdate;
 
 
     // search through the symbol table,
@@ -145,7 +146,16 @@ program             :PROGRAM {
                         globalSymtable = current;
                         symtable_stack.push(current);
                     }
-                    id{delete $3;} BEGIN pgm_body END;
+                    id{
+                        delete $3;
+                    } 
+                    BEGIN pgm_body END {
+                        for(auto call: callNeedUpdate) {
+                            SymEntry* entry = globalSymtable->have(call->name);
+                            assert(entry);
+                            call->type = entry->type; 
+                        }
+                    };
 
 id                  :IDENTIFIER {
                         $$ = new std::string($1);
@@ -384,7 +394,14 @@ call_expr           :id{
                     }OPAREN expr_list CPAREN {
                         
                         SymEntry* entry = globalSymtable->have(*$1);
-                        CallExprNode* new_call = new CallExprNode(func_list.back(), *$1, entry->type);
+                        CallExprNode* new_call;
+                        if(entry) {
+                            new_call = new CallExprNode(func_list.back(), *$1, entry->type);
+                        }
+                        else {
+                            new_call = new CallExprNode(func_list.back(), *$1, "I");
+                            callNeedUpdate.push_back(new_call);
+                        }
                         new_call->exprStack = *expr_stack_ptr;  // copy expr list in to call expr node
 
                         // free and pop

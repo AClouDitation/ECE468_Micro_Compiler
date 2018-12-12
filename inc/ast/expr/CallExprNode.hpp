@@ -5,8 +5,8 @@
 #include "ExprNode.hpp"
 
 class CallExprNode: public ExprNode{
-    std::string name;
 public:
+    std::string name;
     CallExprNode(FunctionDeclNode*, std::string, std::string);
     virtual ~CallExprNode();
     virtual std::string translate(std::vector<IrNode*>&);
