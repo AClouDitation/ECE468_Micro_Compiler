@@ -7,3 +7,6 @@ Topics include:
 3. Code generation: emitting assembly code that is equivalent to the program
 4. Program optimizations: improving the performance of a program
 5. Program analysis: determining interesting information about a program’s behavior
+
+
+# TODO: update this
