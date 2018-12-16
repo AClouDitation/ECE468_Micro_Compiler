@@ -1,0 +1,28 @@
+PROGRAM complexfuncreturn
+BEGIN
+
+    STRING newline := "\n";
+    STRING space := " ";
+
+    FUNCTION FLOAT max2(FLOAT a,FLOAT b)
+    BEGIN
+        IF(a>b)
+            RETURN a;
+        ENDIF
+        RETURN b;
+    END
+
+    FUNCTION VOID main()
+    BEGIN
+        FLOAT a,b;
+        FLOAT res;
+        
+        a := 4.0;
+        b := 4.1;
+        
+        res := max2(a, b);
+        
+        WRITE(res, newline);
+
+    END
+END

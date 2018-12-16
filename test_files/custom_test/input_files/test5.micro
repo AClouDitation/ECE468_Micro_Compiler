@@ -1,0 +1,41 @@
+PROGRAM complexfuncreturn
+BEGIN
+
+    STRING newline := "\n";
+    STRING space := " ";
+
+    FUNCTION INT max2(INT a,INT b)
+    BEGIN
+        IF(a>b)
+            RETURN a;
+        ENDIF
+        RETURN b;
+    END
+
+    FUNCTION INT max3(INT a, INT b, INT c)
+    BEGIN
+        RETURN max2(c,max2(a,b));
+    END
+
+    FUNCTION VOID main()
+    BEGIN
+        INT a,b,c,d,e,f,g,h,i,j;
+        INT res;
+        
+        a := 0;
+        b := 1;
+        c := 2;
+        d := 3;
+        e := 4;
+        f := 5;
+        g := 6;
+        h := 7;
+        i := 8;
+
+        
+        res := max2(a, max3(max3(b,c,d), max3(e,f,g), max3(h,i,j)));
+        
+        WRITE(res, newline);
+
+    END
+END

@@ -1,0 +1,52 @@
+PROGRAM scopetest
+BEGIN
+    
+    STRING newline := "\n";
+    STRING space := " ";
+    INT a;
+
+    FUNCTION VOID func1() 
+    BEGIN
+        INT a;
+        a := 1;
+        WRITE(a, newline);
+    END
+
+    FUNCTION VOID func2()
+    BEGIN
+        INT a;
+        a := 2;
+        WRITE(a, newline);
+        IF (TRUE)
+            INT a;
+            a := 3;
+            WRITE(a, newline);
+        ENDIF
+        WRITE(a, newline);
+    END
+
+    FUNCTION VOID func3()
+    BEGIN
+        STRING msg := "i: ";
+        INT i;
+
+        WRITE(a, newline);
+        i := 0;
+        WHILE(i < 10)
+            INT a;
+            a := 1000;
+            WRITE(msg, i, space, a, newline);
+            i := i + 1;
+        ENDWHILE
+        WRITE(a, newline);
+    END
+
+    FUNCTION VOID main()
+    BEGIN
+        a := func1();
+        a := func2();
+        a := func3();
+        a := 100;
+        WRITE(a, newline);
+    END
+END

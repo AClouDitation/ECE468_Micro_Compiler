@@ -1,0 +1,25 @@
+PROGRAM test
+BEGIN
+
+	INT i, j;
+	FLOAT n,a,num;
+	STRING eol := "\n";
+
+	FUNCTION VOID main()
+	BEGIN
+	
+--		num := 7.0;			
+        READ(num);
+		j := 1;
+		a := num;	
+		i := 100;
+
+		WHILE(i != 0)
+			n := 0.5*(a + num/a);
+			a := n;
+			i := i-1;
+		ENDWHILE
+		        
+		WRITE(a, eol);
+	END
+END

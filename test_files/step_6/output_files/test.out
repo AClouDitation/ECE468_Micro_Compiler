@@ -1,0 +1,165 @@
+;LABEL FUNC_factorial 
+;LINK 2 
+;STOREI 1 $T0 
+;EQ INT $2 $T0 SUCCESS_1 
+;SUBI $2 1 $T1 
+;PUSH $T0 
+;PUSH $T1 
+;PUSH 
+;PUSH $T1 
+;JSR FUNC_factorial 
+;POP 
+;POP $T2 
+;POP $T1 
+;POP $T0 
+;STOREI $T2 $-2 
+;MULI $-2 $2 $T3 
+;STOREI $T3 $-1 
+;WRITEI $2 
+;WRITES space 
+;WRITEI $-2 
+;WRITES space 
+;WRITEI $-1 
+;WRITES eol 
+;JUMP OUT_1 
+;LABEL SUCCESS_1 
+;WRITEI $2 
+;WRITES eol 
+;MOVE 1 $T4 
+;MOVE $T4 $3 
+;UNLINK 
+;RET 
+;LABEL OUT_1 
+;MOVE $-1 $T5 
+;MOVE $T5 $3 
+;UNLINK 
+;RET 
+;UNLINK 
+;RET 
+
+;LABEL FUNC_main 
+;LINK 2 
+;WRITES input 
+;READI $-1 
+;STOREI 1 $T0 
+;EQ INT $-1 $T0 SUCCESS_3 
+;STOREI 1 $T1 
+;GT INT $-1 $T1 SUCCESS_5 
+;STOREI 0 $-2 
+;JUMP OUT_5 
+;LABEL SUCCESS_5 
+;PUSH $T0 
+;PUSH $T1 
+;PUSH 
+;PUSH $-1 
+;JSR FUNC_factorial 
+;POP 
+;POP $T2 
+;POP $T1 
+;POP $T0 
+;STOREI $T2 $-2 
+;WRITEI $-2 
+;WRITES eol 
+;LABEL OUT_5 
+;JUMP OUT_3 
+;LABEL SUCCESS_3 
+;STOREI 1 $-2 
+;LABEL OUT_3 
+;WRITES eol 
+;WRITEI $-2 
+;WRITES eol 
+;MOVE 0 $T3 
+;MOVE $T3 $2 
+;UNLINK 
+;RET 
+;UNLINK 
+;RET 
+
+var main
+str space " "
+str input "Please enter an integer number: "
+var factorial
+str eol "\n"
+push
+jsr FUNC_main
+sys halt
+label FUNC_factorial
+link 2
+move 1 r0
+cmpi $2 r0
+jeq SUCCESS_1
+move $2 r1
+subi 1 r1
+push r0
+push r1
+push
+push r1
+jsr FUNC_factorial
+pop
+pop r2
+pop r1
+pop r0
+move r2 $-2
+move $-2 r3
+muli $2 r3
+move r3 $-1
+sys writei $2
+sys writes space
+sys writei $-2
+sys writes space
+sys writei $-1
+sys writes eol
+jmp OUT_1
+label SUCCESS_1
+sys writei $2
+sys writes eol
+move 1 r4
+move r4 $3
+unlnk
+ret
+label OUT_1
+move $-1 r5
+move r5 $3
+unlnk
+ret
+unlnk
+ret
+label FUNC_main
+link 2
+sys writes input
+sys readi $-1
+move 1 r0
+cmpi $-1 r0
+jeq SUCCESS_3
+move 1 r1
+cmpi $-1 r1
+jgt SUCCESS_5
+move 0 $-2
+jmp OUT_5
+label SUCCESS_5
+push r0
+push r1
+push
+push $-1
+jsr FUNC_factorial
+pop
+pop r2
+pop r1
+pop r0
+move r2 $-2
+sys writei $-2
+sys writes eol
+label OUT_5
+jmp OUT_3
+label SUCCESS_3
+move 1 $-2
+label OUT_3
+sys writes eol
+sys writei $-2
+sys writes eol
+move 0 r3
+move r3 $2
+unlnk
+ret
+unlnk
+ret

@@ -1,0 +1,26 @@
+PROGRAM truefalsecond
+BEGIN
+    
+    STRING newline := "\n";
+    STRING space := " ";
+    STRING errmsg := "err!!!";
+    STRING truemsg := "TRUE!!!";
+    STRING falsemsg := "FALSE!!!";
+
+    FUNCTION VOID main()
+    BEGIN
+
+        INT a, b, c;
+        IF(TRUE)
+            READ(a,b,c);
+            WRITE(a,b,c, newline);
+            IF(TRUE)
+                READ(a,b,c);
+                WRITE(a,b,c, newline);
+            ENDIF
+            WRITE(a,b,c, newline);
+        ENDIF
+        WRITE(a,b,c, newline);
+        RETURN 0;
+    END
+END

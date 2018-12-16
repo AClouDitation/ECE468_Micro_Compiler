@@ -1,0 +1,37 @@
+PROGRAM integration2
+BEGIN
+    
+    STRING newline := "\n";
+    STRING space := " ";
+
+    FUNCTION INT FUNC(INT x)
+    BEGIN
+        RETURN x * x;
+    END
+
+    FUNCTION VOID main()
+    BEGIN
+        FLOAT lbound, rbound, delta, now, sum;
+        INT cnt;
+        lbound := 0.0;
+        rbound := 1.0;
+        delta := 0.0001;
+        
+        now := lbound;
+        sum := 0.0;
+        cnt := 0;
+
+        WRITE(sum, space, now, space, lbound, space, rbound, space, delta, newline);
+        WHILE (now < rbound)
+            FLOAT mid, val;
+            mid := now + delta / 2;
+            val := FUNC(FUNC(mid));
+            sum := sum + val * delta;
+            now := now + delta;
+            WRITE(now, space, val, newline);
+        ENDWHILE
+
+        WRITE(sum, newline);
+        
+    END
+END

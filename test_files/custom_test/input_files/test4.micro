@@ -1,0 +1,19 @@
+PROGRAM truecondloop
+BEGIN
+    
+    STRING newline := "\n";
+    STRING space := " ";
+
+    FUNCTION VOID main()
+    BEGIN
+        INT a;
+        a := 0;
+        WHILE (FALSE)
+            WRITE(a, newline);
+            a := a + 1;            
+            IF(a > 10) 
+                RETURN a;
+            ENDIF
+        ENDWHILE
+    END
+END
